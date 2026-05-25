@@ -297,7 +297,7 @@
       inset: 0;
       z-index: 3;
       background:
-        linear-gradient(180deg, rgba(0,0,0,.18) 0%, rgba(0,0,0,.58) 100%);
+        linear-gradient(180deg, rgba(0,0,0,.08) 0%, rgba(0,0,0,.38) 100%);
       color: #eee;
       align-items: center;
       justify-content: center;
@@ -316,9 +316,15 @@
       font-size: .82rem;
     }
 
+    .offline-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      text-shadow: 0 2px 12px rgba(0,0,0,.55);
+    }
+
     .cam-card .fallback-media {
       display: none;
-      filter: brightness(.72) saturate(.92);
+      filter: brightness(.92);
     }
 
     .cam-card.has-fallback-active video,
@@ -829,8 +835,13 @@
       </div>
 
       <div class="offline-overlay">
-        ⚫ Câmara temporariamente indisponível
-        <small>A ligação será retomada automaticamente.</small>
+        <div class="offline-title">
+          Ligação temporariamente indisponível
+        </div>
+
+        <small>
+          A tentar restabelecer transmissão…
+        </small>
       </div>
     `;
 
