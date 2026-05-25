@@ -194,7 +194,7 @@ window.LSM_CAMERAS = [
     url: null,
     refresh: null,
 
-    preview: "./assets/img/anjos-blues.jpg",
+    preview: "./assets/previews/anjos-blues.jpg",
     message: "Apoio Assoc. Escravos da Cadainha",
     status: "Em preparação",
 
@@ -223,7 +223,7 @@ window.LSM_CAMERAS = [
     url: null,
     refresh: null,
 
-    preview: "./assets/img/farol-malmerendo.jpg",
+    preview: "./assets/previews/farol-malmerendo.jpg",
     message: "Vista prevista sobre a costa sul",
     status: "Brevemente",
 
@@ -252,7 +252,7 @@ window.LSM_CAMERAS = [
     url: null,
     refresh: null,
 
-    preview: "./assets/img/ilheu-lagoinhas.jpg",
+    preview: "./assets/previews/ilheu-lagoinhas.jpg",
     message: "Futura vista sobre o ilhéu e costa norte",
     status: "Aguarda patrocínio",
 
@@ -281,7 +281,7 @@ window.LSM_CAMERAS = [
     url: null,
     refresh: null,
 
-    preview: "./assets/img/farol-maia.jpeg",
+    preview: "./assets/previews/farol-maia.jpeg",
     message: "Vista sobre a Maia",
     status: "Brevemente",
 
