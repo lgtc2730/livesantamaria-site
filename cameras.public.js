@@ -11,7 +11,7 @@ window.LSM_CAMERAS = [
     type: "hls",
     url: "https://cnsm.olho.mariense.pt/cam/camera.m3u8",
     refresh: null,
-    fallbackImage: "./assets/fallback/cnsm.jpeg",
+    fallbackImage: "./assets/fallback/cnsm.jpg",
 
     preview: null,
     message: null,
@@ -41,7 +41,7 @@ window.LSM_CAMERAS = [
     type: "hls",
     url: "https://anjos-cam.livesantamaria.org/cam1/index.m3u8",
     refresh: null,
-    fallbackImage: "./assets/fallback/anjos-porto.jpeg",
+    fallbackImage: "./assets/fallback/anjos-porto.jpg",
 
     preview: null,
     message: null,
@@ -71,7 +71,7 @@ window.LSM_CAMERAS = [
     type: "snapshot",
     url: "https://www.spotazores.com/camaras/SMALOU01/QXGAcurrent.jpg",
     refresh: 15000,
-    fallbackImage: "./assets/fallback/slourenco-norte.jpeg",
+    fallbackImage: "./assets/fallback/slourenco-norte.jpg",
 
     preview: null,
     message: null,
@@ -101,7 +101,7 @@ window.LSM_CAMERAS = [
     type: "hls",
     url: "https://slourenco-sul-cam.livesantamaria.org/cam1/index.m3u8",
     refresh: null,
-    fallbackImage: "./assets/fallback/slourenco-sul.jpeg",
+    fallbackImage: "./assets/fallback/slourenco-sul.jpg",
 
     preview: null,
     message: null,
@@ -131,7 +131,7 @@ window.LSM_CAMERAS = [
     type: "snapshot",
     url: "https://www.spotazores.com/camaras/SMAFOR01/VGAcurrent.jpg",
     refresh: 15000,
-    fallbackImage: "./assets/fallback/praia-nascente.jpeg",
+    fallbackImage: "./assets/fallback/praia-nascente.jpg",
 
     preview: null,
     message: null,
@@ -161,7 +161,7 @@ window.LSM_CAMERAS = [
     type: "hls",
     url: "https://praia-poente-cam.livesantamaria.org/cam1/index.m3u8",
     refresh: null,
-    fallbackImage: "./assets/fallback/praia-poente.jpeg",
+    fallbackImage: "./assets/fallback/praia-poente.jpg",
 
     preview: null,
     message: null,
@@ -197,7 +197,7 @@ window.LSM_CAMERAS = [
     refresh: null,
     fallbackImage: null,
 
-    preview: "./assets/img/anjos-blues.jpg",
+    preview: "./assets/previews/anjos-blues.jpg",
     message: "Apoio Assoc. Escravos da Cadainha",
     status: "Em preparação",
 
@@ -227,7 +227,7 @@ window.LSM_CAMERAS = [
     refresh: null,
     fallbackImage: null,
 
-    preview: "./assets/img/farol-malmerendo.jpg",
+    preview: "./assets/previews/farol-malmerendo.jpg",
     message: "Vista prevista sobre a costa sul",
     status: "Brevemente",
 
@@ -257,7 +257,7 @@ window.LSM_CAMERAS = [
     refresh: null,
     fallbackImage: null,
 
-    preview: "./assets/img/ilheu-lagoinhas.jpg",
+    preview: "./assets/previews/ilheu-lagoinhas.jpg",
     message: "Futura vista sobre o ilhéu e costa norte",
     status: "Aguarda patrocínio",
 
@@ -287,7 +287,7 @@ window.LSM_CAMERAS = [
     refresh: null,
     fallbackImage: null,
 
-    preview: "./assets/img/farol-maia.jpeg",
+    preview: "./assets/previews/farol-maia.jpeg",
     message: "Vista sobre a Maia",
     status: "Brevemente",
 
