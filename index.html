@@ -296,22 +296,38 @@
       position: absolute;
       inset: 0;
       z-index: 3;
-      background: rgba(0,0,0,.78);
-      color: #ddd;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.18) 0%, rgba(0,0,0,.58) 100%);
+      color: #eee;
       align-items: center;
       justify-content: center;
       flex-direction: column;
       text-align: center;
       padding: 22px;
       font-size: 1rem;
+      pointer-events: none;
     }
 
     .offline-overlay.show { display: flex; }
 
     .offline-overlay small {
-      color: #aaa;
+      color: rgba(255,255,255,.72);
       margin-top: 8px;
       font-size: .82rem;
+    }
+
+    .cam-card .fallback-media {
+      display: none;
+      filter: brightness(.72) saturate(.92);
+    }
+
+    .cam-card.has-fallback-active video,
+    .cam-card.has-fallback-active .live-media {
+      display: none;
+    }
+
+    .cam-card.has-fallback-active .fallback-media {
+      display: block;
     }
 
     .weather-strip {
@@ -730,6 +746,7 @@
 
   function createCameraBlock(cam) {
     const block = document.createElement("article");
+    block._cam = cam;
     block.className = `cam-card ${cam.type === "future" ? "future" : ""}`;
     block.id = `camera-${cam.id}`;
     block.dataset.type = cam.type;
@@ -738,11 +755,17 @@
     let mediaHtml = "";
 
     if (cam.type === "snapshot") {
-      mediaHtml = `<img alt="${cam.name}">`;
+      mediaHtml = `
+        <img class="live-media" alt="${cam.name}">
+        <img class="fallback-media" src="${cam.fallbackImage || ""}" alt="${cam.name}">
+      `;
     } else if (cam.type === "future") {
-      mediaHtml = `<img src="${cam.preview || ""}" alt="${cam.name}">`;
+      mediaHtml = `<img class="live-media" src="${cam.preview || ""}" alt="${cam.name}">`;
     } else {
-      mediaHtml = `<video autoplay muted playsinline></video>`;
+      mediaHtml = `
+        <video autoplay muted playsinline></video>
+        <img class="fallback-media" src="${cam.fallbackImage || ""}" alt="${cam.name}">
+      `;
     }
 
     const statusLabel =
@@ -827,15 +850,25 @@
     status.className = "status live";
     statusText.textContent = "LIVE";
     overlay.classList.remove("show");
+
+    block.classList.remove("has-fallback-active");
   }
 
   function setOffline(block) {
     const status = block.querySelector(".status");
     const statusText = status.querySelector("span:last-child");
     const overlay = block.querySelector(".offline-overlay");
+    const fallback = block.querySelector(".fallback-media");
+    const cam = block._cam;
 
     status.className = "status";
     statusText.textContent = "OFFLINE";
+
+    if (fallback && cam?.fallbackImage) {
+      fallback.src = cam.fallbackImage;
+      block.classList.add("has-fallback-active");
+    }
+
     overlay.classList.add("show");
   }
 
@@ -877,7 +910,7 @@
   }
 
   function loadSnapshot(block, cam) {
-    const img = block.querySelector("img");
+    const img = block.querySelector(".live-media");
     let hasLoadedOnce = false;
     let initialTimer = null;
 
