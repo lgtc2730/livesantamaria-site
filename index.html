@@ -590,7 +590,82 @@
         background .2s ease,
         color .2s ease;
     }
-    
+
+    .tv-button {
+      margin-top: 14px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      font-weight: 800;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+
+    .tv-button:hover {
+      background: rgba(255,255,255,.14);
+    }
+
+    .tv-mode {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #000;
+    }
+
+    .tv-mode.show {
+      display: block;
+    }
+
+    .tv-stage {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .tv-stage video,
+    .tv-stage img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: #000;
+    }
+
+    .tv-info {
+      position: absolute;
+      left: 32px;
+      right: 32px;
+      bottom: 28px;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 18px;
+      color: white;
+      text-shadow: 0 3px 18px rgba(0,0,0,.75);
+    }
+
+    .tv-name {
+      font-size: clamp(1.8rem, 4vw, 3.8rem);
+      font-weight: 900;
+    }
+
+    .tv-close {
+      position: absolute;
+      top: 22px;
+      right: 22px;
+      z-index: 3;
+      padding: 9px 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.24);
+      background: rgba(0,0,0,.45);
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+    }    
+
     @media (max-width: 700px), (max-height: 500px) {
 
       .map-weather-card {
@@ -663,6 +738,9 @@
     <div class="fullscreen-hint">
       Clica numa imagem para abrir em ecrã inteiro.
     </div>
+    <button class="tv-button" id="tvModeButton">
+      📺 Modo TV
+    </button>
   </div>
 </header>
 
@@ -724,6 +802,11 @@
 
 <div class="footer">
   © Live Santa Maria · Imagens em directo para apoio à observação meteorológica e marítima informal.
+</div>
+
+<div class="tv-mode" id="tvMode">
+  <div class="tv-stage" id="tvStage"></div>
+  <button class="tv-close" id="tvCloseButton">Fechar</button>
 </div>
 
 <script>
@@ -1287,6 +1370,129 @@
       wxPressEl.textContent = "—";
     }
   }
+
+  let tvIndex = 0;
+  let tvTimer = null;
+  let tvHls = null;
+
+  function stopTvMode() {
+    const tvMode = document.getElementById("tvMode");
+    const tvStage = document.getElementById("tvStage");
+
+    clearInterval(tvTimer);
+    tvTimer = null;
+
+    if (tvHls) {
+      tvHls.destroy();
+      tvHls = null;
+    }
+
+    tvStage.innerHTML = "";
+    tvMode.classList.remove("show");
+  }
+
+  function renderTvCamera(cam) {
+    const tvStage = document.getElementById("tvStage");
+
+    if (tvHls) {
+      tvHls.destroy();
+      tvHls = null;
+    }
+
+    tvStage.innerHTML = "";
+
+    const media =
+      cam.type === "snapshot"
+        ? document.createElement("img")
+        : document.createElement("video");
+
+    if (cam.type === "snapshot") {
+      media.src = addCacheBuster(cam.url);
+    } else {
+      media.autoplay = true;
+      media.muted = true;
+      media.playsInline = true;
+
+      if (media.canPlayType("application/vnd.apple.mpegurl")) {
+        media.src = cam.url;
+        media.play().catch(() => {});
+      } else if (window.Hls && Hls.isSupported()) {
+        tvHls = new Hls({
+          enableWorker: true,
+          lowLatencyMode: false,
+          liveSyncDuration: 4,
+          liveMaxLatencyDuration: 12
+        });
+
+        tvHls.loadSource(cam.url);
+        tvHls.attachMedia(media);
+
+        tvHls.on(Hls.Events.MANIFEST_PARSED, () => {
+          media.play().catch(() => {});
+        });
+      }
+    }
+
+    media.addEventListener("error", () => {
+      if (cam.fallbackImage) {
+        media.replaceWith(Object.assign(document.createElement("img"), {
+          src: cam.fallbackImage,
+          alt: cam.name
+        }));
+      }
+    });
+
+    const info = document.createElement("div");
+    info.className = "tv-info";
+    info.innerHTML = `
+      <div>
+        <div class="tv-name">${cam.name}</div>
+        <div>Live Santa Maria · Santa Maria, Açores</div>
+      </div>
+      <div class="status live">
+        <span class="dot"></span>
+        <span>Modo TV</span>
+      </div>
+    `;
+
+    tvStage.appendChild(media);
+    tvStage.appendChild(info);
+  }
+
+  function startTvMode() {
+    const tvMode = document.getElementById("tvMode");
+
+    const tvCameras = PUBLIC_CAMERAS.filter(cam =>
+      cam.enabled !== false &&
+      cam.type !== "future" &&
+      cam.url
+    );
+
+    if (!tvCameras.length) return;
+
+    tvMode.classList.add("show");
+
+    tvIndex = 0;
+    renderTvCamera(tvCameras[tvIndex]);
+
+    clearInterval(tvTimer);
+    tvTimer = setInterval(() => {
+      tvIndex = (tvIndex + 1) % tvCameras.length;
+      renderTvCamera(tvCameras[tvIndex]);
+    }, 20000);
+  }
+
+  document.getElementById("tvModeButton")
+    ?.addEventListener("click", startTvMode);
+
+  document.getElementById("tvCloseButton")
+    ?.addEventListener("click", stopTvMode);
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+      stopTvMode();
+    }
+  });
 
   startMonitoring();
   updateWeatherStrip();
