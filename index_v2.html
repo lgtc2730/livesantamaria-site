@@ -1270,80 +1270,6 @@
     });
   }
 
-
-
-  function retryOfflineCamera(block, cam) {
-    if (!block || !cam || cam.type === "future") return;
-
-    if (block._retrying) return;
-    block._retrying = true;
-
-    setTimeout(() => {
-      block._retrying = false;
-    }, 5000);
-
-    block.classList.remove("has-fallback-active");
-    setChecking(block);
-
-    if (cam.type === "snapshot") {
-      const img = block.querySelector(".live-media");
-      if (img) {
-        img.src = addCacheBuster(cam.url);
-      }
-      return;
-    }
-
-    if (block.hlsInstance) {
-      try { block.hlsInstance.destroy(); } catch (_) {}
-      block.hlsInstance = null;
-    }
-
-    const oldVideo = block.querySelector("video");
-    if (!oldVideo) return;
-
-    try {
-      oldVideo.pause();
-      oldVideo.removeAttribute("src");
-      oldVideo.load();
-    } catch (_) {}
-
-    const newVideo = document.createElement("video");
-    newVideo.autoplay = true;
-    newVideo.muted = true;
-    newVideo.playsInline = true;
-
-    oldVideo.replaceWith(newVideo);
-    loadHls(block, cam);
-  }
-
-  function retryOfflineCameras() {
-    PUBLIC_CAMERAS.forEach(cam => {
-      if (cam.type === "future") return;
-
-      const block = document.getElementById(`camera-${cam.id}`);
-      if (!block) return;
-
-      const statusText = block.querySelector(".status span:last-child");
-      const isOffline =
-        statusText && statusText.textContent.trim().toUpperCase() === "OFFLINE";
-
-      if (isOffline || block.classList.contains("has-fallback-active")) {
-        retryOfflineCamera(block, cam);
-      }
-    });
-  }
-
-  function rearmVisibleCameras() {
-    PUBLIC_CAMERAS.forEach(cam => {
-      if (cam.type === "future") return;
-
-      const block = document.getElementById(`camera-${cam.id}`);
-      if (!block) return;
-
-      retryOfflineCamera(block, cam);
-    });
-  }
-
   function startMonitoring() {
     PUBLIC_CAMERAS.forEach(cam => {
       const block = createCameraBlock(cam);
@@ -1575,20 +1501,6 @@
   document.addEventListener("keydown", event => {
     if (event.key === "Escape") {
       stopTvMode();
-    }
-  });
-
-  setInterval(retryOfflineCameras, 30000);
-
-  window.addEventListener("pageshow", event => {
-    if (event.persisted) {
-      rearmVisibleCameras();
-    }
-  });
-
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) {
-      retryOfflineCameras();
     }
   });
 
