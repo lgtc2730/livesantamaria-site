@@ -26,7 +26,7 @@
       --danger: #ff6b82;
       --shadow: 0 24px 70px rgba(0,0,0,.44);
       --radius: 22px;
-      --banner-image: url("./assets/banner-sma-ocean-bg-clean.png?v=1");
+      --banner-image: url("./assets/banner-sma-ocean-bg.png?v=1");
       --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
 
@@ -196,13 +196,13 @@
 
     .hero {
       position: relative;
-      min-height: clamp(132px, 11.8vw, 188px);
+      min-height: clamp(104px, 10.4vw, 158px);
       border-radius: 22px;
       overflow: hidden;
       border: 1px solid rgba(255,255,255,.18);
       box-shadow: var(--shadow);
       background-image: var(--banner-image);
-      background-size: 100% 100%;
+      background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       isolation: isolate;
@@ -257,11 +257,11 @@
       inset: 0;
       z-index: 2;
       display: grid;
-      grid-template-columns: minmax(185px, .58fr) minmax(330px, .94fr) minmax(145px, .36fr) minmax(108px, .28fr);
+      grid-template-columns: minmax(210px, .7fr) minmax(360px, 1fr) minmax(170px, .48fr) minmax(118px, .34fr);
       align-items: center;
-      gap: clamp(8px, 1.05vw, 18px);
+      gap: clamp(10px, 1.35vw, 22px);
       padding: clamp(12px, 1.45vw, 22px) clamp(18px, 2.4vw, 34px);
-      padding-left: clamp(390px, 27vw, 520px);
+      padding-left: clamp(300px, 24vw, 420px);
       pointer-events: none;
     }
 
@@ -272,7 +272,7 @@
     }
 
     .hero-live-title {
-      font-size: clamp(1.55rem, 2.55vw, 2.7rem);
+      font-size: clamp(1.72rem, 3.0vw, 3.05rem);
       line-height: .92;
       letter-spacing: -.055em;
       font-weight: 950;
@@ -281,7 +281,7 @@
 
     .hero-live-subtitle {
       margin-top: 8px;
-      font-size: clamp(.98rem, 1.36vw, 1.48rem);
+      font-size: clamp(1.05rem, 1.55vw, 1.65rem);
       letter-spacing: .02em;
       font-weight: 850;
     }
@@ -299,7 +299,7 @@
       gap: clamp(14px, 1.6vw, 26px);
       color: rgba(255,255,255,.9);
       font-weight: 780;
-      font-size: clamp(.64rem, .76vw, .82rem);
+      font-size: clamp(.68rem, .82vw, .9rem);
       white-space: nowrap;
       min-width: 0;
     }
@@ -312,7 +312,7 @@
 
     .hero-live-divider {
       width: 1px;
-      height: clamp(28px, 3.5vw, 48px);
+      height: clamp(30px, 4.1vw, 56px);
       background: rgba(255,255,255,.16);
       flex: 0 0 auto;
     }
@@ -329,13 +329,13 @@
     }
 
     .hero-weather-icon {
-      font-size: clamp(1.45rem, 1.9vw, 2.15rem);
+      font-size: clamp(1.6rem, 2.25vw, 2.45rem);
       line-height: 1;
       filter: drop-shadow(0 8px 16px rgba(0,0,0,.25));
     }
 
     .hero-weather strong {
-      font-size: clamp(1.35rem, 1.9vw, 2.05rem);
+      font-size: clamp(1.45rem, 2.2vw, 2.35rem);
       line-height: 1;
       letter-spacing: -.04em;
     }
@@ -344,8 +344,8 @@
       display: block;
       margin-top: 5px;
       color: rgba(255,255,255,.78);
-      font-size: clamp(.64rem, .76vw, .86rem);
-      max-width: 120px;
+      font-size: clamp(.75rem, .9vw, 1rem);
+      max-width: 150px;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -927,8 +927,8 @@
 
     @media (max-width: 1350px) {
       .hero-live-overlay {
-        grid-template-columns: minmax(170px, .55fr) minmax(260px, .86fr) minmax(132px, .35fr) minmax(94px, .25fr);
-        padding-left: clamp(330px, 27vw, 390px);
+        grid-template-columns: minmax(190px, .65fr) minmax(300px, 1fr) minmax(150px, .45fr) minmax(104px, .3fr);
+        padding-left: clamp(260px, 23vw, 340px);
         gap: 10px;
       }
 
@@ -947,8 +947,8 @@
 
     @media (max-width: 1080px) {
       .hero-live-overlay {
-        grid-template-columns: minmax(160px, .6fr) minmax(240px, .95fr) minmax(118px, .34fr);
-        padding-left: clamp(250px, 26vw, 315px);
+        grid-template-columns: minmax(170px, .65fr) minmax(260px, 1fr) minmax(126px, .38fr);
+        padding-left: clamp(220px, 22vw, 285px);
       }
 
       .hero-map-dynamic {
@@ -996,7 +996,6 @@
         border: 1px solid rgba(255,255,255,.14);
         box-shadow: 0 18px 44px rgba(0,0,0,.38);
         background-position: center;
-        background-size: cover;
       }
 
       .hero-map-button {
@@ -1321,7 +1320,7 @@ function updateCounts() {
   const watching = liveCameras.reduce((sum, cam, index) => sum + viewerCount(cam, index), 0);
 
   document.getElementById("onlineCount").textContent =
-    `${online} online`;
+    `${online} ${online === 1 ? "câmara online" : "câmaras online"}`;
 
   document.getElementById("watchingNow").textContent =
     `${watching} a ver agora`;
