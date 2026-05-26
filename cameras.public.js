@@ -198,7 +198,7 @@ window.LSM_CAMERAS = [
     fallbackImage: null,
 
     preview: "./assets/previews/anjos-blues.jpg",
-    message: "Apoio Assoc. Escravos da Cadainha",
+    message: null,
     status: "Em preparação",
 
     position: {
@@ -209,10 +209,10 @@ window.LSM_CAMERAS = [
     },
 
     sponsor: {
-      name: null,
+      name: "Assoc. Escravos da Cadainha",
       logo: null,
       url: null,
-      label: null
+      label: "Apoio de"
     },
 
     enabled: true
@@ -257,7 +257,7 @@ window.LSM_CAMERAS = [
     refresh: null,
     fallbackImage: null,
 
-    preview: "./assets/previews/pico_alto_nascente.jpg",
+    preview: "./assets/previews/pico-alto-nascente.jpg",
     message: null,
     status: "Brevemente",
 
@@ -287,7 +287,7 @@ window.LSM_CAMERAS = [
     refresh: null,
     fallbackImage: null,
 
-    preview: "./assets/previews/pico_alto_poente.jpg",
+    preview: "./assets/previews/pico-alto-poente.jpg",
     message: null,
     status: "Brevemente",
 
@@ -378,7 +378,7 @@ window.LSM_CAMERAS = [
     refresh: null,
     fallbackImage: null,
 
-    preview: "./assets/previews/porto_do_castelo.jpg",
+    preview: "./assets/previews/porto-do-castelo.jpg",
     message: "Vista sobre o Porto do Castelo",
     status: "Brevemente",
 
