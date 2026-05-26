@@ -39,14 +39,6 @@
       text-align: center;
     }
 
-    .footer {
-      width: 100%;
-      text-align: center;
-      margin-top: 24px;
-      opacity: 0.75;
-      font-size: 0.9rem;
-    }
-
     .brand {
       max-width: 1100px;
       margin: 0 auto;
@@ -155,20 +147,20 @@
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(180deg, rgba(0,0,0,.04) 45%, rgba(0,0,0,.28) 100%),
-        linear-gradient(90deg, rgba(0,0,0,.14), transparent 55%);
+        linear-gradient(180deg, rgba(0,0,0,.10) 35%, rgba(0,0,0,.68) 100%),
+        linear-gradient(90deg, rgba(0,0,0,.34), transparent 50%);
       pointer-events: none;
       z-index: 1;
     }
 
     .cam-card.future::after {
       background:
-        linear-gradient(180deg, rgba(0,0,0,.04) 20%, rgba(0,0,0,.30) 100%),
-        linear-gradient(90deg, rgba(4, 22, 34, .18), transparent 60%);
+        linear-gradient(180deg, rgba(0,0,0,.08) 10%, rgba(0,0,0,.76) 100%),
+        linear-gradient(90deg, rgba(4, 22, 34, .58), transparent 58%);
     }
 
     .cam-card.future img {
-      filter: brightness(1.12) contrast(1.03) saturate(1.04);
+      filter: saturate(.92) contrast(1.03) brightness(.86);
     }
 
     .future-ribbon {
@@ -192,7 +184,7 @@
       margin-top: 6px;
       color: rgba(255,255,255,.78);
       font-size: .92rem;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      text-shadow: 0 2px 12px rgba(0,0,0,.7);
     }
 
     .sponsor-box {
@@ -202,8 +194,7 @@
       gap: 8px;
       padding: 6px 10px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.10);
-      backdrop-filter: blur(6px);
+      background: rgba(0,0,0,.34);
       border: 1px solid rgba(255,255,255,.12);
       backdrop-filter: blur(8px);
       max-width: 100%;
@@ -258,7 +249,7 @@
       font-size: clamp(1.15rem, 2vw, 1.5rem);
       font-weight: 800;
       letter-spacing: -.02em;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      text-shadow: 0 2px 12px rgba(0,0,0,.7);
     }
 
     .status {
@@ -269,8 +260,7 @@
       border-radius: 999px;
       font-size: .78rem;
       font-weight: 800;
-      background: rgba(255,255,255,0.10);
-      backdrop-filter: blur(6px);
+      background: rgba(0,0,0,.48);
       border: 1px solid rgba(255,255,255,.16);
       backdrop-filter: blur(10px);
       white-space: nowrap;
@@ -298,44 +288,22 @@
       position: absolute;
       inset: 0;
       z-index: 3;
-      background:
-        linear-gradient(180deg, rgba(0,0,0,.08) 0%, rgba(0,0,0,.38) 100%);
-      color: #eee;
+      background: rgba(0,0,0,.78);
+      color: #ddd;
       align-items: center;
       justify-content: center;
       flex-direction: column;
       text-align: center;
       padding: 22px;
       font-size: 1rem;
-      pointer-events: none;
     }
 
     .offline-overlay.show { display: flex; }
 
     .offline-overlay small {
-      color: rgba(255,255,255,.72);
+      color: #aaa;
       margin-top: 8px;
       font-size: .82rem;
-    }
-
-    .offline-title {
-      font-size: 1.05rem;
-      font-weight: 800;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    }
-
-    .cam-card .fallback-media {
-      display: none;
-      filter: brightness(.92);
-    }
-
-    .cam-card.has-fallback-active video,
-    .cam-card.has-fallback-active .live-media {
-      display: none;
-    }
-
-    .cam-card.has-fallback-active .fallback-media {
-      display: block;
     }
 
     .weather-strip {
@@ -357,51 +325,6 @@
     .weather-strip strong {
       color: var(--text);
       font-size: 1.05rem;
-    }
-
-    .map-weather-card {
-      position: absolute;
-
-      top: 16px;
-      right: 16px;
-
-      z-index: 500;
-
-      width: 240px;
-      padding: 14px;
-
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.14);
-
-      background: rgba(7, 19, 29, .72);
-      backdrop-filter: blur(10px);
-
-      color: #f4f8fb;
-
-      box-shadow:
-        0 18px 45px rgba(0,0,0,.35);
-    }
-
-    .weather-title {
-      font-weight: 700;
-      font-size: .95rem;
-      margin-bottom: 10px;
-    }
-
-    .weather-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px 14px;
-
-      font-size: .88rem;
-      color: rgba(255,255,255,.92);
-    }
-
-    .weather-updated {
-      margin-top: 10px;
-
-      font-size: .75rem;
-      color: rgba(255,255,255,.58);
     }
 
     .map-section {
@@ -478,9 +401,8 @@
       left: var(--x);
       top: var(--y);
     
-      width: 1px;
-      height: 1px;
-      overflow: visible;
+      width: 0;
+      height: 0;
     
       padding: 0;
       margin: 0;
@@ -503,41 +425,25 @@
     
     .map-fov {
       position: absolute;
-      left: 50%;
-      top: 50%;
-
-      width: 100px;
-      height: 100px;
-
-      transform-origin: 0 50%;
-      transform:
-        translate(0, -50%)
-        rotate(var(--angle));
-
-
-      background:
-        linear-gradient(
-          90deg,
-          rgba(120,255,210,.88) 0%,
-          rgba(90,240,190,.58) 30%,
-          rgba(70,220,170,.24) 66%,
-          rgba(70,220,170,.08) 86%,
-          rgba(70,220,170,0) 100%
-        );
-
+      left: 0;
+      top: 0;
+    
+      width: 120px;
+      height: 120px;
+    
+      transform-origin: 0 0;
+      transform: rotate(var(--angle));
+    
+      background: rgba(5, 32, 48, .42);
+    
       clip-path: polygon(
-        0 50%,
-        100% var(--fov-top, 18%),
-        100% var(--fov-bottom, 82%)
+        0 0,
+        100% 28%,
+        100% 72%
       );
-
+    
       pointer-events: none;
       z-index: 1;
-
-      filter:
-        blur(2.2px)
-        drop-shadow(0 0 10px rgba(120,255,210,.70))
-        drop-shadow(0 0 18px rgba(120,255,210,.32));
     }
     
     .map-dot {
@@ -563,158 +469,78 @@
     
     .map-label {
       position: absolute;
-
-      left: var(--label-x, 16px);
-      top: var(--label-y, 0px);
-
+    
+      left: 14px;
+      top: 0;
+    
       transform: translateY(-50%);
-
+    
       padding: 5px 9px;
+    
       border-radius: 999px;
-
-      background: rgba(7, 19, 29, .88);
-      border: 1px solid rgba(54,211,153,.45);
-
+    
+      background: rgba(7, 19, 29, .82);
+      border: 1px solid rgba(255,255,255,.16);
+    
       color: var(--text);
-
+    
       font-size: .78rem;
       font-weight: 800;
-
+    
       white-space: nowrap;
-
+    
       backdrop-filter: blur(8px);
-
+    
       z-index: 5;
-
-      box-shadow: 0 4px 14px rgba(0,0,0,.38);
-
+    
       transition:
         background .2s ease,
         color .2s ease;
     }
-
-    .tv-button {
-      margin-top: 14px;
-      padding: 9px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(255,255,255,.08);
-      color: var(--text);
-      font-weight: 800;
-      cursor: pointer;
-      backdrop-filter: blur(10px);
-    }
-
-    .tv-button:hover {
-      background: rgba(255,255,255,.14);
-    }
-
-    .tv-mode {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      background: #000;
-    }
-
-    .tv-mode.show {
-      display: block;
-    }
-
-    .tv-stage {
-      width: 100%;
-      height: 100%;
-      position: relative;
-    }
-
-    .tv-stage video,
-    .tv-stage img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      background: #000;
-    }
-
-    .tv-info {
-      position: absolute;
-      left: 32px;
-      right: 32px;
-      bottom: 28px;
-      z-index: 2;
-      display: flex;
-      justify-content: space-between;
-      align-items: end;
-      gap: 18px;
-      color: white;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    }
-
-    .tv-name {
-      font-size: clamp(1.8rem, 4vw, 3.8rem);
-      font-weight: 900;
-    }
-
-    .tv-close {
-      position: absolute;
-      top: 22px;
-      right: 22px;
-      z-index: 3;
-      padding: 9px 13px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.24);
-      background: rgba(255,255,255,0.10);
-      backdrop-filter: blur(6px);
-      color: white;
-      font-weight: 800;
-      cursor: pointer;
-    }    
-
-    .cam-card video,
-    .cam-card img,
-    .tv-stage video,
-    .tv-stage img {
-      filter: brightness(1.12) contrast(1.03) saturate(1.04);
-    }
-
-    @media (max-width: 700px), (max-height: 500px) {
-
-      .map-weather-card {
-        display: none;
+    
+    @media (max-width: 700px) {
+    
+      .map-fov {
+        width: 82px;
+        height: 82px;
       }
-
+    
+      .map-dot {
+        width: 15px;
+        height: 15px;
+        border-width: 2px;
+      }
+    
+      .map-label {
+        left: 12px;
+    
+        padding: 4px 7px;
+    
+        font-size: .64rem;
+    
+        max-width: 116px;
+    
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+    
+    @media (max-width: 430px) {
+    
       .map-label {
         display: none;
       }
-
-      .map-legend {
-        display: none;
-      }
-
-      .map-head p {
-        font-size: .82rem;
-        line-height: 1.3;
-      }
-
-      .map-note {
-        font-size: .78rem;
-        line-height: 1.3;
-      }
-    }
-
-    @media (max-width: 430px) {
-
+    
       .map-fov {
         width: 68px;
         height: 68px;
       }
-
+    
       .map-dot {
         width: 14px;
         height: 14px;
       }
-
     }
-
   </style>
 </head>
 
@@ -748,9 +574,6 @@
     <div class="fullscreen-hint">
       Clica numa imagem para abrir em ecrã inteiro.
     </div>
-    <button class="tv-button" id="tvModeButton">
-      📺 Modo TV
-    </button>
   </div>
 </header>
 
@@ -780,43 +603,18 @@
     </div>
 
     <div class="island-map-wrap">
-      <img src="./assets/santa-maria-map.png?v=2"
-          alt="Mapa da ilha de Santa Maria"
-          class="island-map-img">
-
-      <div id="cameraMapOverlay"
-          class="camera-map-overlay"></div>
-
-      <div class="map-weather-card" id="mapWeather">
-        <div class="weather-title">
-          🌤️ Meteo Santa Maria
-        </div>
-
-      <div class="weather-grid">
-        <div>🌡️ <span id="wxTemp">-</span> ºC</div>
-        <div>💧 <span id="wxHum">-</span>%</div>
-
-        <div>🌬️ <span id="wxWind">-</span> km/h</div>
-        <div>🧭 <span id="wxDir">-</span></div>
-
-        <div>🌧️ <span id="wxRain">-</span> mm/h</div>
-        <div>📈 <span id="wxPress">-</span> hPa</div>
-      </div>
+      <img src="./santa-maria-map.png?v=2" alt="Mapa da ilha de Santa Maria" class="island-map-img">
+      <div id="cameraMapOverlay" class="camera-map-overlay"></div>
     </div>
-    </div>
+
     <div class="map-note">
-      Posições e orientações meramente indicativas. Clica num ponto do mapa para ver a respectiva câmara.
+      Posições e orientações meramente indicativas. Clica num ponto do mapa para saltar para a respectiva câmara.
     </div>
   </section>
 </main>
 
 <div class="footer">
   © Live Santa Maria · Imagens em directo para apoio à observação meteorológica e marítima informal.
-</div>
-
-<div class="tv-mode" id="tvMode">
-  <div class="tv-stage" id="tvStage"></div>
-  <button class="tv-close" id="tvCloseButton">Fechar</button>
 </div>
 
 <script>
@@ -845,7 +643,6 @@
 
   function createCameraBlock(cam) {
     const block = document.createElement("article");
-    block._cam = cam;
     block.className = `cam-card ${cam.type === "future" ? "future" : ""}`;
     block.id = `camera-${cam.id}`;
     block.dataset.type = cam.type;
@@ -854,17 +651,11 @@
     let mediaHtml = "";
 
     if (cam.type === "snapshot") {
-      mediaHtml = `
-        <img class="live-media" alt="${cam.name}">
-        <img class="fallback-media" src="${cam.fallbackImage || ""}" alt="${cam.name}">
-      `;
+      mediaHtml = `<img alt="${cam.name}">`;
     } else if (cam.type === "future") {
-      mediaHtml = `<img class="live-media" src="${cam.preview || ""}" alt="${cam.name}">`;
+      mediaHtml = `<img src="${cam.preview || ""}" alt="${cam.name}">`;
     } else {
-      mediaHtml = `
-        <video autoplay muted playsinline></video>
-        <img class="fallback-media" src="${cam.fallbackImage || ""}" alt="${cam.name}">
-      `;
+      mediaHtml = `<video autoplay muted playsinline></video>`;
     }
 
     const statusLabel =
@@ -928,13 +719,8 @@
       </div>
 
       <div class="offline-overlay">
-        <div class="offline-title">
-          Ligação temporariamente indisponível
-        </div>
-
-        <small>
-          A tentar restabelecer transmissão…
-        </small>
+        ⚫ Câmara temporariamente indisponível
+        <small>A ligação será retomada automaticamente.</small>
       </div>
     `;
 
@@ -954,25 +740,15 @@
     status.className = "status live";
     statusText.textContent = "LIVE";
     overlay.classList.remove("show");
-
-    block.classList.remove("has-fallback-active");
   }
 
   function setOffline(block) {
     const status = block.querySelector(".status");
     const statusText = status.querySelector("span:last-child");
     const overlay = block.querySelector(".offline-overlay");
-    const fallback = block.querySelector(".fallback-media");
-    const cam = block._cam;
 
     status.className = "status";
     statusText.textContent = "OFFLINE";
-
-    if (fallback && cam?.fallbackImage) {
-      fallback.src = cam.fallbackImage;
-      block.classList.add("has-fallback-active");
-    }
-
     overlay.classList.add("show");
   }
 
@@ -1014,7 +790,7 @@
   }
 
   function loadSnapshot(block, cam) {
-    const img = block.querySelector(".live-media");
+    const img = block.querySelector("img");
     let hasLoadedOnce = false;
     let initialTimer = null;
 
@@ -1048,7 +824,12 @@
 
     armInitialTimeout();
     refreshSnapshot();
-    setInterval(refreshSnapshot, cam.refresh || 15000);
+
+    if (block.snapshotInterval) {
+      clearInterval(block.snapshotInterval);
+    }
+
+    block.snapshotInterval = setInterval(refreshSnapshot, cam.refresh || 15000);
   }
 
   function loadHls(block, cam) {
@@ -1156,20 +937,17 @@
     const la = Number(lat);
     const lo = normalizeLon(lon);
 
-    const xPx =
-      (6703.43685 * lo) +
-      (-33.10088 * la) +
-      170078.486;
+    const x =
+      (-4.27040552 * la) +
+      (484.952520 * lo) +
+      12381.5417;
 
-    const yPx =
-      (13.81720 * lo) +
-      (-8321.75633 * la) +
-      308456.406;
+    const y =
+      (-799.610701 * la) +
+      (-13.9438181 * lo) +
+      29261.9582;
 
-    return {
-      x: (xPx / 1229) * 100,
-      y: (yPx / 825) * 100
-    };
+    return { x, y };
   }
 
   function bearingToCssAngle(bearing) {
@@ -1217,34 +995,11 @@
         `${bearingToCssAngle(cam.position.bearing)}deg`
       );
 
-      const fov = Number(cam.position.fov || 65);
-
-      // FOV visual: 180 ≈ abertura máxima do cone
-      const halfOpen =
-        Math.max(8, Math.min(50, fov / 2));
-
-      item.style.setProperty("--fov-top", `${50 - halfOpen}%`);
-      item.style.setProperty("--fov-bottom", `${50 + halfOpen}%`);
-
-      const labelOffsets = {
-        "praia-poente": { x: -86, y: 18 },
-        "praia-nascente": { x: 18, y: -14 },
-        "farol-maia": { x: -120, y: 24 }
-      };
-
-      const offset =
-        labelOffsets[cam.id] || { x: 16, y: 0 };
-
       item.style.setProperty(
-        "--label-x",
-        `${offset.x}px`
+        "--fov",
+        `${cam.position.fov || 65}deg`
       );
 
-      item.style.setProperty(
-        "--label-y",
-        `${offset.y}px`
-      );      
-      
       item.innerHTML = `
         <span class="map-fov"></span>
         <span class="map-dot"></span>
@@ -1271,51 +1026,6 @@
   }
 
 
-
-  function retryOfflineCamera(block, cam) {
-    if (!block || !cam || cam.type === "future") return;
-
-    if (block._retrying) return;
-    block._retrying = true;
-
-    setTimeout(() => {
-      block._retrying = false;
-    }, 5000);
-
-    block.classList.remove("has-fallback-active");
-    setChecking(block);
-
-    if (cam.type === "snapshot") {
-      const img = block.querySelector(".live-media");
-      if (img) {
-        img.src = addCacheBuster(cam.url);
-      }
-      return;
-    }
-
-    if (block.hlsInstance) {
-      try { block.hlsInstance.destroy(); } catch (_) {}
-      block.hlsInstance = null;
-    }
-
-    const oldVideo = block.querySelector("video");
-    if (!oldVideo) return;
-
-    try {
-      oldVideo.pause();
-      oldVideo.removeAttribute("src");
-      oldVideo.load();
-    } catch (_) {}
-
-    const newVideo = document.createElement("video");
-    newVideo.autoplay = true;
-    newVideo.muted = true;
-    newVideo.playsInline = true;
-
-    oldVideo.replaceWith(newVideo);
-    loadHls(block, cam);
-  }
-
   function retryOfflineCameras() {
     PUBLIC_CAMERAS.forEach(cam => {
       if (cam.type === "future") return;
@@ -1324,23 +1034,53 @@
       if (!block) return;
 
       const statusText = block.querySelector(".status span:last-child");
-      const isOffline =
-        statusText && statusText.textContent.trim().toUpperCase() === "OFFLINE";
+      if (!statusText || statusText.textContent !== "OFFLINE") return;
 
-      if (isOffline || block.classList.contains("has-fallback-active")) {
-        retryOfflineCamera(block, cam);
+      const now = Date.now();
+      const lastRetry = Number(block.dataset.lastRetry || 0);
+
+      if (now - lastRetry < 25000) return;
+      block.dataset.lastRetry = String(now);
+
+      setChecking(block);
+
+      if (block.hlsInstance) {
+        try { block.hlsInstance.destroy(); } catch (_) {}
+        block.hlsInstance = null;
       }
-    });
-  }
 
-  function rearmVisibleCameras() {
-    PUBLIC_CAMERAS.forEach(cam => {
-      if (cam.type === "future") return;
+      if (block.snapshotInterval) {
+        clearInterval(block.snapshotInterval);
+        block.snapshotInterval = null;
+      }
 
-      const block = document.getElementById(`camera-${cam.id}`);
-      if (!block) return;
+      if (cam.type === "snapshot") {
+        const oldImg = block.querySelector("img");
+        const img = document.createElement("img");
+        img.alt = cam.name;
 
-      retryOfflineCamera(block, cam);
+        if (oldImg) {
+          oldImg.replaceWith(img);
+        }
+
+        loadSnapshot(block, cam);
+        return;
+      }
+
+      const oldVideo = block.querySelector("video");
+      const video = document.createElement("video");
+      video.autoplay = true;
+      video.muted = true;
+      video.playsInline = true;
+
+      if (oldVideo) {
+        try { oldVideo.pause(); } catch (_) {}
+        oldVideo.removeAttribute("src");
+        try { oldVideo.load(); } catch (_) {}
+        oldVideo.replaceWith(video);
+      }
+
+      loadHls(block, cam);
     });
   }
 
@@ -1384,58 +1124,30 @@
     const rainEl = document.getElementById("weatherRain");
     const updatedEl = document.getElementById("weatherUpdated");
 
-    const wxTempEl = document.getElementById("wxTemp");
-    const wxHumEl = document.getElementById("wxHum");
-    const wxWindEl = document.getElementById("wxWind");
-    const wxDirEl = document.getElementById("wxDir");
-    const wxRainEl = document.getElementById("wxRain");
-    const wxPressEl = document.getElementById("wxPress");
-
     try {
       const url =
         "https://api.open-meteo.com/v1/forecast" +
-        "?latitude=36.97639" +
-        "&longitude=-25.125" +
-        "&current=temperature_2m," +
-        "relative_humidity_2m," +
-        "pressure_msl," +
-        "wind_speed_10m," +
-        "wind_direction_10m," +
-        "precipitation" +
+        "?latitude=36.97" +
+        "&longitude=-25.10" +
+        "&current=temperature_2m,wind_speed_10m,wind_direction_10m,precipitation" +
         "&timezone=Atlantic%2FAzores";
 
       const response = await fetch(url, { cache: "no-store" });
       const data = await response.json();
       const current = data.current || {};
-      console.log("OPEN-METEO CURRENT:", current);
 
       const windDir = current.wind_direction_10m;
-      const temp = Math.round(current.temperature_2m);
-      const wind = Math.round(current.wind_speed_10m);
-      const rain = Number(current.precipitation ?? 0).toFixed(1);
-      const hum = current.relative_humidity_2m ?? "—";
-      const press = current.pressure_msl !== undefined
-        ? Math.round(current.pressure_msl)
-        : "—";
-      const dir = windDir !== undefined
-        ? degreesToCompass(windDir)
-        : "—";
 
-      tempEl.textContent = `${temp} °C`;
-      windEl.textContent = `Vento: ${wind} km/h`;
+      tempEl.textContent = `${Math.round(current.temperature_2m)} °C`;
+      windEl.textContent = `Vento: ${Math.round(current.wind_speed_10m)} km/h`;
+
       directionEl.textContent =
         windDir !== undefined
-          ? `Direção: ${dir} (${Math.round(windDir)}°)`
+          ? `Direção: ${degreesToCompass(windDir)} (${Math.round(windDir)}°)`
           : "Direção: —";
-      rainEl.textContent = `Chuva: ${rain} mm`;
-      updatedEl.textContent = `Actualizado: ${new Date().toLocaleTimeString("pt-PT")}`;
 
-      wxTempEl.textContent = temp;
-      wxHumEl.textContent = hum;
-      wxWindEl.textContent = wind;
-      wxDirEl.textContent = dir;
-      wxRainEl.textContent = rain;
-      wxPressEl.textContent = press;
+      rainEl.textContent = `Chuva: ${current.precipitation ?? 0} mm`;
+      updatedEl.textContent = `Actualizado: ${new Date().toLocaleTimeString("pt-PT")}`;
 
     } catch (err) {
       console.warn("Erro meteo:", err);
@@ -1445,156 +1157,13 @@
       directionEl.textContent = "Direção: —";
       rainEl.textContent = "Chuva: —";
       updatedEl.textContent = "Meteorologia indisponível";
-
-      wxTempEl.textContent = "—";
-      wxHumEl.textContent = "—";
-      wxWindEl.textContent = "—";
-      wxDirEl.textContent = "—";
-      wxRainEl.textContent = "—";
-      wxPressEl.textContent = "—";
     }
   }
-
-  let tvIndex = 0;
-  let tvTimer = null;
-  let tvHls = null;
-
-  function stopTvMode() {
-    const tvMode = document.getElementById("tvMode");
-    const tvStage = document.getElementById("tvStage");
-
-    clearInterval(tvTimer);
-    tvTimer = null;
-
-    if (tvHls) {
-      tvHls.destroy();
-      tvHls = null;
-    }
-
-    tvStage.innerHTML = "";
-    tvMode.classList.remove("show");
-  }
-
-  function renderTvCamera(cam) {
-    const tvStage = document.getElementById("tvStage");
-
-    if (tvHls) {
-      tvHls.destroy();
-      tvHls = null;
-    }
-
-    tvStage.innerHTML = "";
-
-    const media =
-      cam.type === "snapshot"
-        ? document.createElement("img")
-        : document.createElement("video");
-
-    if (cam.type === "snapshot") {
-      media.src = addCacheBuster(cam.url);
-    } else {
-      media.autoplay = true;
-      media.muted = true;
-      media.playsInline = true;
-
-      if (media.canPlayType("application/vnd.apple.mpegurl")) {
-        media.src = cam.url;
-        media.play().catch(() => {});
-      } else if (window.Hls && Hls.isSupported()) {
-        tvHls = new Hls({
-          enableWorker: true,
-          lowLatencyMode: false,
-          liveSyncDuration: 4,
-          liveMaxLatencyDuration: 12
-        });
-
-        tvHls.loadSource(cam.url);
-        tvHls.attachMedia(media);
-
-        tvHls.on(Hls.Events.MANIFEST_PARSED, () => {
-          media.play().catch(() => {});
-        });
-      }
-    }
-
-    media.addEventListener("error", () => {
-      if (cam.fallbackImage) {
-        media.replaceWith(Object.assign(document.createElement("img"), {
-          src: cam.fallbackImage,
-          alt: cam.name
-        }));
-      }
-    });
-
-    const info = document.createElement("div");
-    info.className = "tv-info";
-    info.innerHTML = `
-      <div>
-        <div class="tv-name">${cam.name}</div>
-        <div>Live Santa Maria · Santa Maria, Açores</div>
-      </div>
-      <div class="status live">
-        <span class="dot"></span>
-        <span>Modo TV</span>
-      </div>
-    `;
-
-    tvStage.appendChild(media);
-    tvStage.appendChild(info);
-  }
-
-  function startTvMode() {
-    const tvMode = document.getElementById("tvMode");
-
-    const tvCameras = PUBLIC_CAMERAS.filter(cam =>
-      cam.enabled !== false &&
-      cam.type !== "future" &&
-      cam.url
-    );
-
-    if (!tvCameras.length) return;
-
-    tvMode.classList.add("show");
-
-    tvIndex = 0;
-    renderTvCamera(tvCameras[tvIndex]);
-
-    clearInterval(tvTimer);
-    tvTimer = setInterval(() => {
-      tvIndex = (tvIndex + 1) % tvCameras.length;
-      renderTvCamera(tvCameras[tvIndex]);
-    }, 20000);
-  }
-
-  document.getElementById("tvModeButton")
-    ?.addEventListener("click", startTvMode);
-
-  document.getElementById("tvCloseButton")
-    ?.addEventListener("click", stopTvMode);
-
-  document.addEventListener("keydown", event => {
-    if (event.key === "Escape") {
-      stopTvMode();
-    }
-  });
-
-  setInterval(retryOfflineCameras, 30000);
-
-  window.addEventListener("pageshow", event => {
-    if (event.persisted) {
-      rearmVisibleCameras();
-    }
-  });
-
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden) {
-      retryOfflineCameras();
-    }
-  });
 
   startMonitoring();
   updateWeatherStrip();
-  setInterval(updateWeatherStrip, 60 * 1000);
+  setInterval(updateWeatherStrip, 10 * 60 * 1000);
+  setInterval(retryOfflineCameras, 30 * 1000);
 </script>
 
 </body>
