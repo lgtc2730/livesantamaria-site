@@ -227,7 +227,7 @@ window.LSM_CAMERAS = [
     refresh: null,
     fallbackImage: null,
 
-    preview: "./assets/previews/marina-club-motard.jpg",
+    preview: "./assets/previews/marina-club-motard.jpeg",
     message: null,
     status: "Brevemente",
 
@@ -257,7 +257,7 @@ window.LSM_CAMERAS = [
     refresh: null,
     fallbackImage: null,
 
-    preview: "./assets/previews/pico-alto-nascente.jpg",
+    preview: "./assets/previews/pico-alto-nascente.jpeg",
     message: null,
     status: "Brevemente",
 
@@ -287,7 +287,7 @@ window.LSM_CAMERAS = [
     refresh: null,
     fallbackImage: null,
 
-    preview: "./assets/previews/pico-alto-poente.jpg",
+    preview: "./assets/previews/pico-alto-poente.jpeg",
     message: null,
     status: "Brevemente",
 
@@ -378,7 +378,7 @@ window.LSM_CAMERAS = [
     refresh: null,
     fallbackImage: null,
 
-    preview: "./assets/previews/porto-do-castelo.jpg",
+    preview: "./assets/previews/porto-do-castelo.jpeg",
     message: "Vista sobre o Porto do Castelo",
     status: "Brevemente",
 
