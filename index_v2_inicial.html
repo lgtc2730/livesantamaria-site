@@ -26,7 +26,6 @@
       --danger: #ff6b82;
       --shadow: 0 24px 70px rgba(0,0,0,.44);
       --radius: 22px;
-      --banner-image: url("./assets/banner-sma-ocean.png?v=1");
       --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
 
@@ -196,58 +195,21 @@
 
     .hero {
       position: relative;
-      min-height: clamp(118px, 13.6vw, 205px);
+      min-height: 210px;
       border-radius: 24px;
       overflow: hidden;
-      border: 1px solid rgba(255,255,255,.18);
+      border: 1px solid var(--line);
       box-shadow: var(--shadow);
-      background-image: var(--banner-image);
+      background:
+        linear-gradient(90deg, rgba(5,12,20,.82), rgba(5,12,20,.48) 45%, rgba(5,12,20,.86)),
+        var(--hero-image, url("./assets/previews/praia-poente.jpeg"));
       background-size: cover;
       background-position: center;
-      background-repeat: no-repeat;
-      isolation: isolate;
-    }
-
-    .hero::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.035), transparent 45%),
-        radial-gradient(circle at 20% 0%, rgba(66,183,255,.12), transparent 34%);
-      mix-blend-mode: screen;
-      opacity: .55;
-    }
-
-    .hero-accessibility {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      clip: rect(0 0 0 0);
-      white-space: nowrap;
-      clip-path: inset(50%);
-    }
-
-    .hero-map-button {
-      position: absolute;
-      right: clamp(18px, 3.2vw, 46px);
-      top: 50%;
-      transform: translateY(-50%);
-      width: clamp(120px, 11.5vw, 190px);
-      height: clamp(44px, 4.4vw, 72px);
-      border: 0;
-      border-radius: 18px;
-      background: transparent;
-      color: transparent;
-      z-index: 3;
-    }
-
-    .hero-map-button:focus-visible {
-      outline: 2px solid rgba(126,215,255,.92);
-      outline-offset: -4px;
-      background: rgba(24,119,255,.10);
+      padding: 34px 40px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(310px, 410px);
+      gap: 30px;
+      align-items: center;
     }
 
     .hero h1 {
@@ -826,22 +788,24 @@
       .mobile-menu { display: grid; place-items: center; }
 
       .hero {
-        min-height: clamp(112px, 31vw, 190px);
-        border-radius: 18px;
-        border: 1px solid rgba(255,255,255,.14);
-        box-shadow: 0 18px 44px rgba(0,0,0,.38);
-        background-position: center;
+        min-height: auto;
+        padding: 0;
+        display: block;
+        border-radius: 0;
+        border: 0;
+        box-shadow: none;
+        background: transparent;
+        overflow: visible;
       }
 
-      .hero-map-button {
-        right: 4%;
-        width: 21%;
-        height: 42%;
-        border-radius: 14px;
+      .hero-copy {
+        display: none;
       }
 
       .weather-card {
-        display: none;
+        margin-top: 12px;
+        padding: 16px;
+        border-radius: 18px;
       }
 
       .weather-main .big-icon { font-size: 3rem; }
@@ -983,24 +947,34 @@
       <button class="mobile-menu icon-button" id="tvModeButton" title="Modo TV">☰</button>
     </header>
 
-    <section class="hero" id="hero" aria-label="Live Santa Maria — a ilha, em tempo real">
-      <div class="hero-accessibility" aria-live="polite">
-        <h1>Live Santa Maria</h1>
+    <section class="hero" id="hero">
+      <div class="hero-copy">
+        <h1>Santa Maria em directo</h1>
         <p>A ilha, em tempo real.</p>
-        <span id="onlineCount">— câmaras online</span>
-        <span id="watchingNow">— a ver agora</span>
-        <span id="lastUpdate">Última actualização: —</span>
-        <span id="weatherTemp">—</span>
-        <span id="weatherSummary">Meteorologia Santa Maria</span>
-        <span id="weatherWind">—</span>
-        <span id="weatherHum">—</span>
-        <span id="weatherSea">—</span>
-        <span id="weatherIcon">🌤️</span>
+        <div class="hero-pills">
+          <span class="pill"><span class="dot ok"></span><span id="onlineCount">— câmaras online</span></span>
+          <span class="pill">👥 <span id="watchingNow">— a ver agora</span></span>
+          <span class="pill">⏱️ <span id="lastUpdate">Última actualização: —</span></span>
+        </div>
       </div>
 
-      <button class="hero-map-button" type="button" data-section-jump="map" aria-label="Ver mapa das câmaras">
-        Ver mapa
-      </button>
+      <aside class="weather-card" id="weatherCard">
+        <div class="weather-main">
+          <div class="big-icon" id="weatherIcon">🌤️</div>
+          <div>
+            <strong id="weatherTemp">—</strong>
+            <span id="weatherSummary">Meteorologia Santa Maria</span>
+          </div>
+        </div>
+        <div class="weather-grid">
+          <div>Vento <b id="weatherWind">—</b></div>
+          <div>Humidade <b id="weatherHum">—</b></div>
+          <div>Mar <b id="weatherSea">—</b></div>
+        </div>
+        <button class="primary-button" style="width:100%; margin-top:16px;" data-section-jump="forecast">
+          VER PREVISÃO COMPLETA
+        </button>
+      </aside>
     </section>
 
     <main>
