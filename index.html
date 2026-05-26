@@ -155,20 +155,20 @@
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(180deg, rgba(0,0,0,.10) 35%, rgba(0,0,0,.68) 100%),
-        linear-gradient(90deg, rgba(0,0,0,.34), transparent 50%);
+        linear-gradient(180deg, rgba(0,0,0,.04) 45%, rgba(0,0,0,.28) 100%),
+        linear-gradient(90deg, rgba(0,0,0,.14), transparent 55%);
       pointer-events: none;
       z-index: 1;
     }
 
     .cam-card.future::after {
       background:
-        linear-gradient(180deg, rgba(0,0,0,.08) 10%, rgba(0,0,0,.76) 100%),
-        linear-gradient(90deg, rgba(4, 22, 34, .58), transparent 58%);
+        linear-gradient(180deg, rgba(0,0,0,.04) 20%, rgba(0,0,0,.30) 100%),
+        linear-gradient(90deg, rgba(4, 22, 34, .18), transparent 60%);
     }
 
     .cam-card.future img {
-      filter: saturate(.92) contrast(1.03) brightness(.86);
+      filter: brightness(1.12) contrast(1.03) saturate(1.04);
     }
 
     .future-ribbon {
@@ -669,9 +669,11 @@
       cursor: pointer;
     }    
 
-    video,
-    img {
-      filter: brightness(1.15) contrast(1.03) saturate(1.04);
+    .cam-card video,
+    .cam-card img,
+    .tv-stage video,
+    .tv-stage img {
+      filter: brightness(1.12) contrast(1.03) saturate(1.04);
     }
 
     @media (max-width: 700px), (max-height: 500px) {
