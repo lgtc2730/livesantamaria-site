@@ -71,15 +71,15 @@
     }
 
     .topbar {
-      min-height: 68px;
+      min-height: 72px;
       display: grid;
-      grid-template-columns: auto 1fr;
+      grid-template-columns: auto 1fr auto;
       align-items: center;
       gap: 22px;
       position: sticky;
       top: 0;
       z-index: 1000;
-      padding: 10px 0;
+      padding: 12px 0;
       background: linear-gradient(180deg, rgba(5,12,20,.94), rgba(5,12,20,.72) 72%, transparent);
       backdrop-filter: blur(18px);
     }
@@ -196,8 +196,8 @@
 
     .hero {
       position: relative;
-      min-height: clamp(104px, 10.4vw, 158px);
-      border-radius: 22px;
+      min-height: clamp(118px, 13.6vw, 205px);
+      border-radius: 24px;
       overflow: hidden;
       border: 1px solid rgba(255,255,255,.18);
       box-shadow: var(--shadow);
@@ -257,11 +257,11 @@
       inset: 0;
       z-index: 2;
       display: grid;
-      grid-template-columns: minmax(210px, .7fr) minmax(360px, 1fr) minmax(170px, .48fr) minmax(118px, .34fr);
+      grid-template-columns: minmax(360px, 1.1fr) minmax(430px, 1.25fr) minmax(260px, .72fr) minmax(150px, .45fr);
       align-items: center;
-      gap: clamp(10px, 1.35vw, 22px);
-      padding: clamp(12px, 1.45vw, 22px) clamp(18px, 2.4vw, 34px);
-      padding-left: clamp(300px, 24vw, 420px);
+      gap: clamp(18px, 2.2vw, 34px);
+      padding: clamp(18px, 2.2vw, 34px) clamp(20px, 3vw, 46px);
+      padding-left: clamp(360px, 24vw, 500px);
       pointer-events: none;
     }
 
@@ -272,7 +272,7 @@
     }
 
     .hero-live-title {
-      font-size: clamp(1.72rem, 3.0vw, 3.05rem);
+      font-size: clamp(2.1rem, 3.9vw, 4.25rem);
       line-height: .92;
       letter-spacing: -.055em;
       font-weight: 950;
@@ -281,7 +281,7 @@
 
     .hero-live-subtitle {
       margin-top: 8px;
-      font-size: clamp(1.05rem, 1.55vw, 1.65rem);
+      font-size: clamp(1.28rem, 2.2vw, 2.25rem);
       letter-spacing: .02em;
       font-weight: 850;
     }
@@ -289,7 +289,7 @@
     .hero-live-tagline {
       margin-top: 10px;
       color: rgba(220,238,255,.82);
-      font-size: clamp(.78rem, .95vw, 1rem);
+      font-size: clamp(.98rem, 1.24vw, 1.42rem);
     }
 
     .hero-live-stats {
@@ -299,7 +299,7 @@
       gap: clamp(14px, 1.6vw, 26px);
       color: rgba(255,255,255,.9);
       font-weight: 780;
-      font-size: clamp(.68rem, .82vw, .9rem);
+      font-size: clamp(.78rem, .95vw, 1.06rem);
       white-space: nowrap;
       min-width: 0;
     }
@@ -312,7 +312,7 @@
 
     .hero-live-divider {
       width: 1px;
-      height: clamp(30px, 4.1vw, 56px);
+      height: clamp(36px, 5vw, 78px);
       background: rgba(255,255,255,.16);
       flex: 0 0 auto;
     }
@@ -329,13 +329,13 @@
     }
 
     .hero-weather-icon {
-      font-size: clamp(1.6rem, 2.25vw, 2.45rem);
+      font-size: clamp(2rem, 3vw, 3.5rem);
       line-height: 1;
       filter: drop-shadow(0 8px 16px rgba(0,0,0,.25));
     }
 
     .hero-weather strong {
-      font-size: clamp(1.45rem, 2.2vw, 2.35rem);
+      font-size: clamp(1.8rem, 3.2vw, 3.55rem);
       line-height: 1;
       letter-spacing: -.04em;
     }
@@ -358,15 +358,15 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      min-width: clamp(104px, 8.8vw, 140px);
-      height: clamp(38px, 3.3vw, 50px);
+      min-width: clamp(118px, 10.6vw, 168px);
+      height: clamp(44px, 4.2vw, 66px);
       padding: 0 18px;
       border-radius: 18px;
       border: 1px solid rgba(255,255,255,.22);
       background: rgba(10, 23, 40, .54);
       color: var(--text);
       font-weight: 900;
-      font-size: clamp(.72rem, .85vw, .92rem);
+      font-size: clamp(.82rem, 1vw, 1.08rem);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
       backdrop-filter: blur(10px);
       cursor: pointer;
@@ -925,46 +925,6 @@
 
     .hidden { display: none !important; }
 
-    @media (max-width: 1350px) {
-      .hero-live-overlay {
-        grid-template-columns: minmax(190px, .65fr) minmax(300px, 1fr) minmax(150px, .45fr) minmax(104px, .3fr);
-        padding-left: clamp(260px, 23vw, 340px);
-        gap: 10px;
-      }
-
-      .hero-live-tagline {
-        display: none;
-      }
-
-      .hero-live-stats {
-        gap: 10px;
-      }
-
-      .hero-weather {
-        padding-left: 14px;
-      }
-    }
-
-    @media (max-width: 1080px) {
-      .hero-live-overlay {
-        grid-template-columns: minmax(170px, .65fr) minmax(260px, 1fr) minmax(126px, .38fr);
-        padding-left: clamp(220px, 22vw, 285px);
-      }
-
-      .hero-map-dynamic {
-        display: none;
-      }
-
-      .hero-live-divider {
-        display: none;
-      }
-
-      .hero-live-stats {
-        justify-content: flex-start;
-      }
-    }
-
-
     @media (max-width: 1180px) {
       .camera-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .hero { grid-template-columns: 1fr; }
@@ -977,9 +937,9 @@
       }
 
       .topbar {
-        grid-template-columns: 1fr;
-        min-height: 64px;
-        padding: 8px 0;
+        grid-template-columns: 1fr auto;
+        min-height: 68px;
+        padding: 10px 0;
       }
 
       .brand { min-width: 0; }
@@ -988,7 +948,9 @@
       .brand-title { font-size: 1rem; line-height: .92; }
       .brand-sub { font-size: .62rem; letter-spacing: .12em; }
 
-      .nav { display: none; }
+      .nav,
+      .weather-mini { display: none; }
+      .mobile-menu { display: grid; place-items: center; }
 
       .hero {
         min-height: clamp(112px, 31vw, 190px);
@@ -1003,10 +965,6 @@
         width: 21%;
         height: 42%;
         border-radius: 14px;
-      }
-
-      .hero-live-overlay {
-        display: none;
       }
 
       .weather-card {
@@ -1139,8 +1097,17 @@
         <button data-section="map">MAPA</button>
         <button data-section="forecast">PREVISÃO</button>
         <button data-section="about">SOBRE</button>
-        <button id="topTvButton" type="button">📺 TV</button>
       </nav>
+
+      <div class="weather-mini">
+        <span class="icon">🌤️</span>
+        <div>
+          <strong id="miniTemp">—</strong>
+          <small>Santa Maria</small>
+        </div>
+      </div>
+
+      <button class="mobile-menu icon-button" id="tvModeButton" title="Modo TV">☰</button>
     </header>
 
     <section class="hero" id="hero" aria-label="Live Santa Maria — a ilha, em tempo real">
@@ -1326,7 +1293,7 @@ function updateCounts() {
     `${watching} a ver agora`;
 
   document.getElementById("lastUpdate").textContent =
-    new Date().toLocaleTimeString("pt-PT");
+    `Última actualização: ${new Date().toLocaleTimeString("pt-PT")}`;
 }
 
 function mediaLooksAlive(video) {
@@ -1852,8 +1819,7 @@ async function updateWeather() {
     const icon = weatherCodeToIcon(code);
     const text = weatherCodeToText(code);
 
-    const miniTempEl = document.getElementById("miniTemp");
-    if (miniTempEl) miniTempEl.textContent = `${temp}°C`;
+    document.getElementById("miniTemp").textContent = `${temp}°C`;
     document.getElementById("weatherTemp").textContent = `${temp}°C`;
     document.getElementById("weatherIcon").textContent = icon;
     document.getElementById("weatherSummary").textContent = text;
@@ -1861,14 +1827,13 @@ async function updateWeather() {
     document.getElementById("weatherHum").textContent = `${hum}%`;
     document.getElementById("weatherSea").textContent = rain > 0 ? `${rain} mm` : "—";
     document.getElementById("lastUpdate").textContent =
-      new Date().toLocaleTimeString("pt-PT");
+      `Última actualização: ${new Date().toLocaleTimeString("pt-PT")}`;
 
     renderForecast(data.daily || {});
   } catch (err) {
     console.warn("Erro meteo:", err);
     document.getElementById("weatherTemp").textContent = "—";
-    const miniTempEl = document.getElementById("miniTemp");
-    if (miniTempEl) miniTempEl.textContent = "—";
+    document.getElementById("miniTemp").textContent = "—";
     document.getElementById("weatherSummary").textContent = "Meteorologia indisponível";
   }
 }
@@ -1927,7 +1892,7 @@ document.getElementById("listViewBtn")?.addEventListener("click", () => {
   renderCameras();
 });
 
-document.getElementById("topTvButton")?.addEventListener("click", startTvMode);
+document.getElementById("tvModeButton")?.addEventListener("click", startTvMode);
 document.getElementById("mobileTvButton")?.addEventListener("click", startTvMode);
 document.getElementById("tvCloseButton")?.addEventListener("click", stopTvMode);
 document.getElementById("fullscreenCloseButton")?.addEventListener("click", closeFullscreenCamera);
