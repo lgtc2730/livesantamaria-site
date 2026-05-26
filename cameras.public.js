@@ -365,6 +365,10 @@ window.LSM_CAMERAS = [
       label: "Sponsor"
     },
 
+    enabled: true
+
+  },
+
   {
     id: "porto-do-castelo",
     name: "Porto do Castelo",
