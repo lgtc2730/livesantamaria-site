@@ -402,7 +402,7 @@ window.LSM_CAMERAS = [
   {
     id: "maia-sul",
     name: "Maia Sul",
-    region: Este",
+    region: "Este",
     type: "future",
     url: null,
     refresh: null,
