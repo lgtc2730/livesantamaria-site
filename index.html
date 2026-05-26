@@ -192,7 +192,7 @@
       margin-top: 6px;
       color: rgba(255,255,255,.78);
       font-size: .92rem;
-      text-shadow: 0 2px 12px rgba(0,0,0,.7);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     }
 
     .sponsor-box {
@@ -202,7 +202,8 @@
       gap: 8px;
       padding: 6px 10px;
       border-radius: 999px;
-      background: rgba(0,0,0,.34);
+      background: rgba(255,255,255,0.10);
+      backdrop-filter: blur(6px);
       border: 1px solid rgba(255,255,255,.12);
       backdrop-filter: blur(8px);
       max-width: 100%;
@@ -257,7 +258,7 @@
       font-size: clamp(1.15rem, 2vw, 1.5rem);
       font-weight: 800;
       letter-spacing: -.02em;
-      text-shadow: 0 2px 12px rgba(0,0,0,.7);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     }
 
     .status {
@@ -268,7 +269,8 @@
       border-radius: 999px;
       font-size: .78rem;
       font-weight: 800;
-      background: rgba(0,0,0,.48);
+      background: rgba(255,255,255,0.10);
+      backdrop-filter: blur(6px);
       border: 1px solid rgba(255,255,255,.16);
       backdrop-filter: blur(10px);
       white-space: nowrap;
@@ -319,7 +321,7 @@
     .offline-title {
       font-size: 1.05rem;
       font-weight: 800;
-      text-shadow: 0 2px 12px rgba(0,0,0,.55);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     }
 
     .cam-card .fallback-media {
@@ -644,7 +646,7 @@
       align-items: end;
       gap: 18px;
       color: white;
-      text-shadow: 0 3px 18px rgba(0,0,0,.75);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     }
 
     .tv-name {
@@ -660,11 +662,17 @@
       padding: 9px 13px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.24);
-      background: rgba(0,0,0,.45);
+      background: rgba(255,255,255,0.10);
+      backdrop-filter: blur(6px);
       color: white;
       font-weight: 800;
       cursor: pointer;
     }    
+
+    video,
+    img {
+      filter: brightness(1.08) contrast(1.03) saturate(1.04);
+    }
 
     @media (max-width: 700px), (max-height: 500px) {
 
