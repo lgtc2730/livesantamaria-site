@@ -67,7 +67,7 @@ window.LSM_CAMERAS = [
   {
     id: "slourenco-norte",
     name: "São Lourenço Norte",
-    region: "Oeste",
+    region: "Este",
     type: "snapshot",
     url: "https://www.spotazores.com/camaras/SMALOU01/QXGAcurrent.jpg",
     refresh: 15000,
@@ -97,7 +97,7 @@ window.LSM_CAMERAS = [
   {
     id: "slourenco-sul",
     name: "São Lourenço Sul",
-    region: "Oeste",
+    region: "Este",
     type: "hls",
     url: "https://slourenco-sul-cam.livesantamaria.org/cam1/index.m3u8",
     refresh: null,
@@ -372,7 +372,7 @@ window.LSM_CAMERAS = [
   {
     id: "porto-do-castelo",
     name: "Porto do Castelo",
-    region: "Este",
+    region: "Sul",
     type: "future",
     url: null,
     refresh: null,
