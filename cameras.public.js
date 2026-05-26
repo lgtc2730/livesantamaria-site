@@ -7,7 +7,7 @@ window.LSM_CAMERAS = [
   {
     id: "cnsm",
     name: "Marina-Clube Naval",
-
+    region: "Oeste",
     type: "hls",
     url: "https://cnsm.olho.mariense.pt/cam/camera.m3u8",
     refresh: null,
@@ -37,7 +37,7 @@ window.LSM_CAMERAS = [
   {
     id: "anjos-porto",
     name: "Anjos Porto",
-
+    region: "Norte",
     type: "hls",
     url: "https://anjos-cam.livesantamaria.org/cam1/index.m3u8",
     refresh: null,
@@ -67,7 +67,7 @@ window.LSM_CAMERAS = [
   {
     id: "slourenco-norte",
     name: "São Lourenço Norte",
-
+    region: "Oeste",
     type: "snapshot",
     url: "https://www.spotazores.com/camaras/SMALOU01/QXGAcurrent.jpg",
     refresh: 15000,
@@ -97,7 +97,7 @@ window.LSM_CAMERAS = [
   {
     id: "slourenco-sul",
     name: "São Lourenço Sul",
-
+    region: "Oeste",
     type: "hls",
     url: "https://slourenco-sul-cam.livesantamaria.org/cam1/index.m3u8",
     refresh: null,
@@ -127,7 +127,7 @@ window.LSM_CAMERAS = [
   {
     id: "praia-nascente",
     name: "Praia Nascente",
-
+    region: "Sul",
     type: "snapshot",
     url: "https://www.spotazores.com/camaras/SMAFOR01/VGAcurrent.jpg",
     refresh: 15000,
@@ -157,7 +157,7 @@ window.LSM_CAMERAS = [
   {
     id: "praia-poente",
     name: "Praia Poente",
-
+    region: "Sul",
     type: "hls",
     url: "https://praia-poente-cam.livesantamaria.org/cam1/index.m3u8",
     refresh: null,
@@ -191,7 +191,7 @@ window.LSM_CAMERAS = [
   {
     id: "anjos-blues",
     name: "Anjos Blues",
-
+    region: "Norte",
     type: "future",
     url: null,
     refresh: null,
@@ -221,7 +221,7 @@ window.LSM_CAMERAS = [
   {
     id: "marina-club-motard",
     name: "Marina-Club Motard",
-
+    region: "Oeste",
     type: "future",
     url: null,
     refresh: null,
@@ -251,7 +251,7 @@ window.LSM_CAMERAS = [
   {
     id: "pico-alto-nascente",
     name: "Pico Alto Nascente",
-
+    region: "Centro",
     type: "future",
     url: null,
     refresh: null,
@@ -281,7 +281,7 @@ window.LSM_CAMERAS = [
   {
     id: "pico-alto-poente",
     name: "Pico Alto Poente",
-
+    region: "Centro",
     type: "future",
     url: null,
     refresh: null,
@@ -311,7 +311,7 @@ window.LSM_CAMERAS = [
   {
     id: "ilheu-lagoinhas",
     name: "Ilhéu das Lagoinhas",
-
+    region: "Norte",
     type: "future",
     url: null,
     refresh: null,
@@ -341,7 +341,7 @@ window.LSM_CAMERAS = [
   {
     id: "farol-maia",
     name: "Maia, Farol Gonçalo Velho",
-
+    region: "Este",
     type: "future",
     url: null,
     refresh: null,
@@ -372,7 +372,7 @@ window.LSM_CAMERAS = [
   {
     id: "porto-do-castelo",
     name: "Porto do Castelo",
-
+    region: "Este",
     type: "future",
     url: null,
     refresh: null,
@@ -402,7 +402,7 @@ window.LSM_CAMERAS = [
   {
     id: "maia-sul",
     name: "Maia Sul",
-
+    region: Este",
     type: "future",
     url: null,
     refresh: null,
@@ -432,7 +432,7 @@ window.LSM_CAMERAS = [
   {
     id: "maia-norte",
     name: "Maia Norte",
-
+    region: "Este",
     type: "future",
     url: null,
     refresh: null,
