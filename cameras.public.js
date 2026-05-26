@@ -18,14 +18,14 @@ window.LSM_CAMERAS = [
     status: null,
 
     position: {
-      lat: 36.9466,
-      lon: -25.1477,
+      lat: 36.946593,
+      lon: -25.147747,
       bearing: 180,
       fov: 65
     },
 
     sponsor: {
-      name: null,
+      name: "Clube Naval Santa Maria",
       logo: null,
       url: null,
       label: null
@@ -138,14 +138,14 @@ window.LSM_CAMERAS = [
     status: null,
 
     position: {
-      lat: 36.9526,
-      lon: -25.1025,
+      lat: 36.952592,
+      lon: -25.102554,
       bearing: 100,
       fov: 65
     },
 
     sponsor: {
-      name: null,
+      name: "SpotAzores",
       logo: null,
       url: null,
       label: null
@@ -168,17 +168,17 @@ window.LSM_CAMERAS = [
     status: null,
 
     position: {
-      lat: 36.9509,
-      lon: -25.0954,
+      lat: 36.950908,
+      lon: -25.095411,
       bearing: 270,
       fov: 65
     },
 
     sponsor: {
-      name: null,
+      name: "Deolinda Melo",
       logo: null,
       url: null,
-      label: null
+      label: "Apoio de"
     },
 
     enabled: true
@@ -219,30 +219,90 @@ window.LSM_CAMERAS = [
   },
 
   {
-    id: "farol-malmerendo",
-    name: "Farol Malmerendo",
+    id: "marina-club-motard",
+    name: "Marina-Club Motard",
 
     type: "future",
     url: null,
     refresh: null,
     fallbackImage: null,
 
-    preview: "./assets/previews/farol-malmerendo.jpg",
-    message: "Vista prevista sobre a costa sul",
+    preview: "./assets/previews/marina-club-motard.jpg",
+    message: null,
     status: "Brevemente",
 
     position: {
-      lat: 36.94055,
-      lon: -25.15696,
+      lat: 36.946241,
+      lon: -25.146948,
       bearing: 180,
       fov: 65
     },
 
     sponsor: {
-      name: "Restaurante O Ilhéu",
+      name: "Clube Motard Santa Maria",
       logo: "./assets/sponsors/o-ilheu.png",
       url: "https://example.com",
-      label: "Com o apoio de"
+      label: "Sponsor"
+    },
+
+    enabled: true
+  },
+
+  {
+    id: "pico-alto-nascente",
+    name: "Pico Alto Nascente",
+
+    type: "future",
+    url: null,
+    refresh: null,
+    fallbackImage: null,
+
+    preview: "./assets/previews/pico_alto_nascente.jpg",
+    message: null,
+    status: "Brevemente",
+
+    position: {
+      lat: 36.946241,
+      lon: -25.146948,
+      bearing: 180,
+      fov: 65
+    },
+
+    sponsor: {
+      name: null,
+      logo: null,
+      url: null,
+      label: "Sponsor"
+    },
+
+    enabled: false
+  },
+
+  {
+    id: "pico-alto-poente",
+    name: "Pico Alto Poente",
+
+    type: "future",
+    url: null,
+    refresh: null,
+    fallbackImage: null,
+
+    preview: "./assets/previews/pico_alto_poente.jpg",
+    message: null,
+    status: "Brevemente",
+
+    position: {
+      lat: 36.979503,
+      lon: -25.090873,
+      bearing: 270,
+      fov: 65
+    },
+
+    sponsor: {
+      name: null,
+      logo: null,
+      url: null,
+      label: "Sponsor"
     },
 
     enabled: true
@@ -302,6 +362,93 @@ window.LSM_CAMERAS = [
       name: "Disponível para apoio",
       logo: null,
       url: "mailto:livesantamaria.project@gmail.com",
+      label: "Sponsor"
+    },
+
+  {
+    id: "porto-do-castelo",
+    name: "Porto do Castelo",
+
+    type: "future",
+    url: null,
+    refresh: null,
+    fallbackImage: null,
+
+    preview: "./assets/previews/porto_do_castelo.jpg",
+    message: "Vista sobre o Porto do Castelo",
+    status: "Brevemente",
+
+    position: {
+      lat: 36.929928,
+      lon: -25.016833,
+      bearing: 180,
+      fov: 65
+    },
+
+    sponsor: {
+      name: "Ricardo Sebastião",
+      logo: null,
+      url: null,
+      label: "Sponsor"
+    },
+
+    enabled: true
+  },
+
+  {
+    id: "maia-sul",
+    name: "Maia Sul",
+
+    type: "future",
+    url: null,
+    refresh: null,
+    fallbackImage: null,
+
+    preview: "./assets/previews/maia-sul.jpeg",
+    message: "Brevemente",
+    status: "Aguarda Patrocinio",
+
+    position: {
+      lat: 36.938183,
+      lon: -25.015193,
+      bearing: 180,
+      fov: 65
+    },
+
+    sponsor: {
+      name: "null",
+      logo: null,
+      url: "mailto:livesantamaria.project@gmail.com",
+      label: "Sponsor"
+    },
+
+    enabled: true
+  },
+
+  {
+    id: "maia-norte",
+    name: "Maia Norte",
+
+    type: "future",
+    url: null,
+    refresh: null,
+    fallbackImage: null,
+
+    preview: "./assets/previews/maia-norte.jpeg",
+    message: "Brevemente",
+    status: "Brevemente",
+
+    position: {
+      lat: 36.944280,
+      lon: -25.016115,
+      bearing: 360,
+      fov: 65
+    },
+
+    sponsor: {
+      name: "Carlos Andrade e Rui Chaves",
+      logo: null,
+      url: null,
       label: "Sponsor"
     },
 
