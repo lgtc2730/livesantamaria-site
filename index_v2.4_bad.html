@@ -1413,20 +1413,14 @@ function updateCounts() {
   const online = liveCameras.length;
   const watching = liveCameras.reduce((sum, cam, index) => sum + viewerCount(cam, index), 0);
 
-  setText(
-    "onlineCount",
-    `${online} ${online === 1 ? "câmara" : "câmaras"}`
-  );
+  document.getElementById("onlineCount").textContent =
+    `${online} ${online === 1 ? "câmara" : "câmaras"}`;
 
-  setText(
-    "watchingNow",
-    `${watching} pessoas`
-  );
+  document.getElementById("watchingNow").textContent =
+    `${watching} pessoas`;
 
-  setText(
-    "lastUpdate",
-    new Date().toLocaleTimeString("pt-PT")
-  );
+  document.getElementById("lastUpdate").textContent =
+    new Date().toLocaleTimeString("pt-PT");
 }
 
 function mediaLooksAlive(video) {
@@ -1810,7 +1804,7 @@ function openCameraFullscreen(cam) {
     </div>
     <div class="status-badge ${cam.type === "future" ? "future" : ""}">
       <span class="dot ${cam.type === "future" ? "" : "ok"}"></span>
-      <span>${cam.type === "future" ? escapeHtml(cam.status ?? "") : "LIVE"}</span>
+      <span>${cam.type === "future" ? escapeHtml(cam.status || "Brevemente") : "LIVE"}</span>
     </div>
   `;
 
@@ -1961,21 +1955,22 @@ async function updateWeather() {
 
     const miniTempEl = document.getElementById("miniTemp");
     if (miniTempEl) miniTempEl.textContent = `${temp}°C`;
-    setText("weatherTemp", `${temp}°C`);
-    setText("weatherIcon", icon);
-    setText("weatherSummary", text);
-    setText("weatherWind", `${wind} km/h ${dir}`);
-    setText("weatherHum", `${hum}%`);
-    setText("weatherSea", rain > 0 ? `${rain} mm` : "—");
-    setText("lastUpdate", new Date().toLocaleTimeString("pt-PT"));
+    setText("weatherTemp").textContent = `${temp}°C`;
+    setText("weatherIcon").textContent = icon;
+    setText("weatherSummary").textContent = text;
+    setText("weatherWind").textContent = `${wind} km/h ${dir}`;
+    setText("weatherHum").textContent = `${hum}%`;
+    setText("weatherSea").textContent = rain > 0 ? `${rain} mm` : "—";
+    setText("lastUpdate").textContent =
+      new Date().toLocaleTimeString("pt-PT");
 
     renderForecast(data.daily || {});
   } catch (err) {
     console.warn("Erro meteo:", err);
-    setText("weatherTemp", "—");
+    setText("weatherTemp").textContent = "—";
     const miniTempEl = document.getElementById("miniTemp");
     if (miniTempEl) miniTempEl.textContent = "—";
-    setText("weatherSummary", "Meteorologia indisponível");
+    setText("weatherSummary").textContent = "Meteorologia indisponível";
   }
 }
 
