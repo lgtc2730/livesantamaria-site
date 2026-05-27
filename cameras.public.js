@@ -21,7 +21,7 @@ window.LSM_CAMERAS = [
       lat: 36.946593,
       lon: -25.147747,
       bearing: 200,
-      fov: 65
+      fov: 90
     },
 
     sponsor: {
@@ -265,7 +265,7 @@ window.LSM_CAMERAS = [
       lat: 36.979503,
       lon: -25.090873,
       bearing: 90,
-      fov: 65
+      fov: 90
     },
 
     sponsor: {
