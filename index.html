@@ -256,34 +256,34 @@
       position: absolute;
       inset: 0;
       z-index: 2;
-      display: grid;
-      grid-template-columns: minmax(185px, .58fr) minmax(330px, .94fr) minmax(145px, .36fr) minmax(108px, .28fr);
+
+      display: flex;
       align-items: center;
-      gap: clamp(8px, 1.05vw, 18px);
-      padding: clamp(12px, 1.45vw, 22px) clamp(18px, 2.4vw, 34px);
-      padding-left: clamp(390px, 27vw, 520px);
-      pointer-events: none;
+      justify-content: space-between;
+
+      gap: 28px;
+
+      padding:
+        clamp(14px, 1.6vw, 24px)
+        clamp(20px, 2.6vw, 42px);
+
+      padding-left: clamp(380px, 28vw, 560px);
     }
 
     .hero-title-block {
-      border-left: 1px solid rgba(255,255,255,.22);
-      padding-left: clamp(24px, 2.4vw, 42px);
-      min-width: 0;
+      border-left: 0;
+      padding-left: clamp(18px, 2vw, 34px);
     }
 
     .hero-live-title {
-      font-size: clamp(1.55rem, 2.55vw, 2.7rem);
-      line-height: .92;
-      letter-spacing: -.055em;
-      font-weight: 950;
-      text-shadow: 0 4px 22px rgba(0,0,0,.35);
+      font-size: clamp(1.6rem, 2.8vw, 3.2rem);
     }
 
     .hero-live-subtitle {
-      margin-top: 8px;
-      font-size: clamp(.98rem, 1.36vw, 1.48rem);
-      letter-spacing: .02em;
-      font-weight: 850;
+      margin-top: 2px;
+      font-size: clamp(1rem, 1.8vw, 1.7rem);
+      font-weight: 760;
+      opacity: .96;
     }
 
     .hero-live-tagline {
@@ -311,21 +311,12 @@
     }
 
     .hero-live-divider {
-      width: 1px;
-      height: clamp(28px, 3.5vw, 48px);
-      background: rgba(255,255,255,.16);
-      flex: 0 0 auto;
+      display: none;
     }
 
     .hero-weather {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      border-left: 1px solid rgba(255,255,255,.16);
-      padding-left: clamp(16px, 2vw, 34px);
-      color: var(--text);
-      min-width: 0;
+      border-left: 0;
+      padding-left: 0;
     }
 
     .hero-weather-icon {
@@ -335,9 +326,9 @@
     }
 
     .hero-weather strong {
-      font-size: clamp(1.35rem, 1.9vw, 2.05rem);
+      font-size: clamp(1.3rem, 2vw, 2.2rem);
       line-height: 1;
-      letter-spacing: -.04em;
+      letter-spacing: -.03em;
     }
 
     .hero-weather small {
@@ -937,7 +928,16 @@
       }
 
       .hero-live-stats {
-        gap: 10px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+
+        color: rgba(255,255,255,.84);
+
+        font-weight: 700;
+        font-size: .88rem;
+
+        white-space: nowrap;
       }
 
       .hero-weather {
