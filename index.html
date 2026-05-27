@@ -294,14 +294,26 @@
 
     .hero-live-stats {
       display: flex;
+      gap: 22px;
       align-items: center;
-      justify-content: center;
-      gap: clamp(14px, 1.6vw, 26px);
-      color: rgba(255,255,255,.9);
-      font-weight: 780;
-      font-size: clamp(.64rem, .76vw, .82rem);
-      white-space: nowrap;
-      min-width: 0;
+    }
+
+    .hero-stat {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.05;
+    }
+
+    .hero-stat strong {
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .hero-stat small {
+      font-size: .68rem;
+      opacity: .74;
+      text-transform: uppercase;
+      letter-spacing: .05em;
     }
 
     .hero-live-stats span {
@@ -1225,11 +1237,17 @@
         </div>
 
         <div class="hero-live-stats">
-          <span><span class="dot ok"></span><span id="onlineCount">— câmaras online</span></span>
-          <i class="hero-live-divider" aria-hidden="true"></i>
-          <span>♙ <span id="watchingNow">— a ver agora</span></span>
-          <i class="hero-live-divider" aria-hidden="true"></i>
-          <span>◷ <span id="lastUpdate">—</span></span>
+          <div class="hero-stat">
+            <span class="dot online"></span>
+            <strong id="heroOnlineCount">6</strong>
+            <small>câmaras online</small>
+          </div>
+
+          <div class="hero-stat">
+            <span>👥</span>
+            <strong id="heroViewerCount">147</strong>
+            <small>pessoas a ver agora</small>
+          </div>
         </div>
 
         <div class="hero-weather">
