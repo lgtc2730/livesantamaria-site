@@ -1171,9 +1171,7 @@
           </div>
         </div>
 
-        <button class="hero-map-dynamic" type="button" data-section-jump="map" aria-label="Ver mapa das câmaras">
-          📍 <span>VER MAPA</span>
-        </button>
+
       </div>
     </section>
 
@@ -1279,7 +1277,9 @@ function addCacheBuster(url) {
   return `${url}${sep}t=${Date.now()}`;
 }
 
-const getRegion = cam => cam.region ?? "Santa Maria";
+function getRegion(cam) {
+  return cam.region ?? "";
+}
 
 function getPreview(cam) {
   return cam.preview || cam.fallbackImage || "./assets/previews/praia-poente.jpeg";
@@ -1394,7 +1394,9 @@ function createCameraCard(cam, index) {
   }
 
   const statusClass = cam.type === "future" ? "future" : "";
-  const statusText = cam.type === "future" ? (cam.status || "BREVEMENTE") : "A VERIFICAR";
+  const statusText = cam.type === "future"
+    ? (cam.status ?? "")
+    : "A VERIFICAR";
   const message = cam.message ? `<div class="camera-message">${escapeHtml(cam.message)}</div>` : "";
 
   card.innerHTML = `

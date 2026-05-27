@@ -468,7 +468,7 @@ window.LSM_CAMERAS = [
     refresh: null,
     fallbackImage: null,
 
-    preview: "./assets/previews/neutra.jpeg",
+    preview: "./assets/previews/neutra.jpg",
     message: null,
     status: null,
 
