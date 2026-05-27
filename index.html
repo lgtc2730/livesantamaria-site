@@ -972,6 +972,7 @@
     }
 
     @media (max-width: 820px) {
+
       .app {
         padding: 10px 12px calc(92px + var(--safe-bottom));
       }
@@ -991,11 +992,12 @@
       .nav { display: none; }
 
       .hero {
-        min-height: clamp(112px, 31vw, 190px);
+        min-height: 150px;
         border-radius: 18px;
         border: 1px solid rgba(255,255,255,.14);
         box-shadow: 0 18px 44px rgba(0,0,0,.38);
-        background-position: center;
+
+        background-position: 22% center;
         background-size: cover;
       }
 
@@ -1007,7 +1009,73 @@
       }
 
       .hero-live-overlay {
+        display: grid;
+        grid-template-columns: 1fr;
+
+        align-content: center;
+        justify-items: start;
+
+        gap: 6px;
+
+        padding: 14px 14px 14px 44%;
+
+        pointer-events: none;
+      }
+
+      .hero-title-block {
+        border-left: 0;
+        padding-left: 0;
+      }
+
+      .hero-live-title {
+        font-size: 1.55rem;
+      }
+
+      .hero-live-subtitle {
+        font-size: .95rem;
+      }
+
+      .hero-live-tagline {
         display: none;
+      }
+
+      .hero-live-stats {
+        display: flex;
+        flex-wrap: wrap;
+
+        justify-content: flex-start;
+
+        gap: 8px;
+
+        font-size: .68rem;
+
+        white-space: normal;
+      }
+
+      .hero-live-stats span {
+        gap: 5px;
+      }
+
+      .hero-weather {
+        border-left: 0;
+        padding-left: 0;
+
+        justify-content: flex-start;
+
+        gap: 7px;
+      }
+
+      .hero-weather-icon {
+        font-size: 1.35rem;
+      }
+
+      .hero-weather strong {
+        font-size: 1.35rem;
+      }
+
+      .hero-weather small {
+        font-size: .68rem;
+        max-width: 120px;
       }
 
       .weather-card {
@@ -1095,11 +1163,24 @@
       .map-label { display: none; }
       .map-fov { width: 68px; height: 68px; }
       .map-dot { width: 15px; height: 15px; }
-      .map-head, .panel-pad { padding: 16px; }
-      .island-map-wrap { margin: 0 12px 14px; border-radius: 16px; }
 
-      .bottom-nav { display: grid; }
-      .footer { display: none; }
+      .map-head,
+      .panel-pad {
+        padding: 16px;
+      }
+
+      .island-map-wrap {
+        margin: 0 12px 14px;
+        border-radius: 16px;
+      }
+
+      .bottom-nav {
+        display: grid;
+      }
+
+      .footer {
+        display: none;
+      }
     }
 
     @media (max-width: 380px) {
