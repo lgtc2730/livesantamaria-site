@@ -7,7 +7,7 @@ window.LSM_CAMERAS = [
   {
     id: "cnsm",
     name: "Marina-Clube Naval",
-    region: "Oeste",
+    region: "Sul",
     type: "hls",
     url: "https://cnsm.olho.mariense.pt/cam/camera.m3u8",
     refresh: null,
@@ -221,7 +221,7 @@ window.LSM_CAMERAS = [
   {
     id: "marina-club-motard",
     name: "Marina-Club Motard",
-    region: "Oeste",
+    region: "Sul",
     type: "future",
     url: null,
     refresh: null,
