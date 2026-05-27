@@ -1279,18 +1279,7 @@ function addCacheBuster(url) {
   return `${url}${sep}t=${Date.now()}`;
 }
 
-function getRegion(cam) {
-  if (cam.region) return String(cam.region);
-  const id = `${cam.id} ${cam.name}`.toLowerCase();
-
-  if (id.includes("norte") || id.includes("lagoinhas")) return "Norte";
-  if (id.includes("sul") || id.includes("praia") || id.includes("castelo")) return "Sul";
-  if (id.includes("maia") || id.includes("farol")) return "Este";
-  if (id.includes("poente") || id.includes("pico alto")) return "Oeste";
-  if (id.includes("anjos") || id.includes("marina") || id.includes("clube") || id.includes("cnsm")) return "Centro";
-
-  return "Santa Maria";
-}
+const getRegion = cam => cam.region ?? "Santa Maria";
 
 function getPreview(cam) {
   return cam.preview || cam.fallbackImage || "./assets/previews/praia-poente.jpeg";
