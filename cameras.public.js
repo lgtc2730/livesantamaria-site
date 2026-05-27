@@ -457,6 +457,26 @@ window.LSM_CAMERAS = [
     },
 
     enabled: true
+  },
+
+  {
+    id: "neutra",
+    name: null,
+    region: null,
+    type: "future",
+    url: null,
+    refresh: null,
+    fallbackImage: null,
+
+    preview: "./assets/previews/neutra.jpeg",
+    message: null,
+    status: null,
+
+    position: null,
+
+    sponsor: null,
+
+    enabled: true
   }
 
 ];
