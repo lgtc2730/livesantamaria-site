@@ -20,7 +20,7 @@ window.LSM_CAMERAS = [
     position: {
       lat: 36.946593,
       lon: -25.147747,
-      bearing: 180,
+      bearing: 200,
       fov: 65
     },
 
@@ -234,7 +234,7 @@ window.LSM_CAMERAS = [
     position: {
       lat: 36.946241,
       lon: -25.146948,
-      bearing: 180,
+      bearing: 160,
       fov: 65
     },
 
@@ -275,7 +275,7 @@ window.LSM_CAMERAS = [
       label: "Sponsor"
     },
 
-    enabled: false
+    enabled: true
   },
 
   {
