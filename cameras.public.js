@@ -262,9 +262,9 @@ window.LSM_CAMERAS = [
     status: "Brevemente",
 
     position: {
-      lat: 36.946241,
-      lon: -25.146948,
-      bearing: 180,
+      lat: 36.979503,
+      lon: -25.090873,
+      bearing: 90,
       fov: 65
     },
 
