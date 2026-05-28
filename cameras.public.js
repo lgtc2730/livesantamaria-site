@@ -450,7 +450,7 @@ window.LSM_CAMERAS = [
     },
 
     sponsor: {
-      name: "null",
+      name: null,
       logo: null,
       url: "mailto:livesantamaria.project@gmail.com",
       label: "Sponsor"
