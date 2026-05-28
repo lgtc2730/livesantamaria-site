@@ -1255,6 +1255,17 @@
         position: static;
       }
 
+      .camera-card:hover {
+        transform: none;
+        border-color: var(--border);
+        filter: none;
+      }
+
+      .camera-card.is-open {
+        border-color: rgba(66,183,255,.35);
+        filter: saturate(1.04);
+      }
+
       .map-label { display: none; }
       .map-fov { width: 68px; height: 68px; }
       .map-dot { width: 15px; height: 15px; }
@@ -1630,7 +1641,34 @@ function createCameraCard(cam, index) {
     openCameraFullscreen(cam);
   });
 
-  card.addEventListener("click", () => {
+  let touchStartY = 0;
+  let touchStartX = 0;
+  let touchMoved = false;
+
+  card.addEventListener("touchstart", (e) => {
+    touchStartY = e.touches[0].clientY;
+    touchStartX = e.touches[0].clientX;
+    touchMoved = false;
+  }, { passive: true });
+
+  card.addEventListener("touchmove", (e) => {
+    const deltaY = Math.abs(e.touches[0].clientY - touchStartY);
+    const deltaX = Math.abs(e.touches[0].clientX - touchStartX);
+
+    if (deltaY > 12 || deltaX > 12) {
+      touchMoved = true;
+    }
+  }, { passive: true });
+
+  card.addEventListener("touchend", (e) => {
+    if (touchMoved) return;
+
+    card.classList.toggle("is-open");
+  }, { passive: true });
+
+  card.addEventListener("click", (e) => {
+    if (e.target.closest("button, a, video, select")) return;
+
     card.classList.toggle("is-open");
   });
 
