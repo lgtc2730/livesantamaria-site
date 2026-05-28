@@ -1570,6 +1570,10 @@ function setCardChecking(block) {
   }
 }
 
+function isOffline(cam) {
+  return cam.type !== "future" && !cam.isLive;
+}
+
 function createCameraCard(cam, index) {
   const card = document.createElement("article");
   card._cam = cam;
@@ -1604,7 +1608,7 @@ function createCameraCard(cam, index) {
 
   card.innerHTML = `
     ${mediaHtml}
-    <div class="status-badge ${statusClass}">
+    <div class="status-badge ${cam.type === "future" ? "future" : isOffline(cam) ? "offline" : "live"}">
       <span class="dot ${cam.type === "future" ? "" : "ok"}"></span>
       <span>${escapeHtml(statusText).toUpperCase()}</span>
     </div>
@@ -1943,36 +1947,51 @@ function closeFullscreenCamera() {
 }
 
 function renderTvCamera(cam) {
+
   const tvStage = document.getElementById("tvStage");
+
   destroyMediaInstance("tv");
+
   tvStage.innerHTML = "";
 
-  const media = cam.type === "snapshot" ? document.createElement("img") : document.createElement("video");
+  const media =
+    cam.type === "snapshot"
+      ? document.createElement("img")
+      : document.createElement("video");
+
   attachMediaToElement(media, cam, "tv");
 
   media.addEventListener("error", () => {
+
     if (cam.fallbackImage) {
-      media.replaceWith(Object.assign(document.createElement("img"), {
-        src: cam.fallbackImage,
-        alt: cam.name
-      }));
+
+      const fallback = document.createElement("img");
+
+      fallback.src = cam.fallbackImage;
+      fallback.alt = cam.name;
+
+      media.replaceWith(fallback);
     }
   });
 
   const info = document.createElement("div");
+
   info.className = "tv-info";
+
   info.innerHTML = `
     <div>
       <div class="tv-name">${escapeHtml(cam.name)}</div>
-      <div>${escapeHtml(getRegion(cam))} · Live Santa Maria</div>
+      <div>Live Santa Maria</div>
     </div>
-    <div class="status-badge ${statusClass}">
-      <span class="dot"></span>
-      ${escapeHtml(cam.status || liveLabel)}
+
+    <div class="status-badge">
+      <span class="dot ok"></span>
+      <span>SLIDE-SHOW</span>
     </div>
   `;
 
   tvStage.appendChild(media);
+
   tvStage.appendChild(info);
 }
 
