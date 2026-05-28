@@ -938,6 +938,10 @@
 
     .hidden { display: none !important; }
 
+    .view-actions {
+      display: none;
+    }
+
     @media (max-width: 1350px) {
       .hero-live-overlay {
         grid-template-columns: minmax(170px, .55fr) minmax(260px, .86fr) minmax(132px, .35fr) minmax(94px, .25fr);
@@ -1316,11 +1320,6 @@
             <button class="chip" data-filter="centro">Centro</button>
           </div>
 
-          <div class="view-actions">
-            <button class="icon-button active" id="gridViewBtn" title="Grelha">▦</button>
-            <button class="icon-button" id="listViewBtn" title="Lista">☷</button>
-            <button class="primary-button" data-section-jump="map">📍 VER MAPA</button>
-          </div>
         </div>
 
         <section class="camera-grid" id="cameraContainer"></section>
@@ -2045,20 +2044,6 @@ document.querySelectorAll("[data-section]").forEach(btn => {
 
 document.querySelectorAll("[data-section-jump]").forEach(btn => {
   btn.addEventListener("click", () => setSection(btn.dataset.sectionJump));
-});
-
-document.getElementById("gridViewBtn")?.addEventListener("click", () => {
-  listMode = false;
-  document.getElementById("gridViewBtn").classList.add("active");
-  document.getElementById("listViewBtn").classList.remove("active");
-  renderCameras();
-});
-
-document.getElementById("listViewBtn")?.addEventListener("click", () => {
-  listMode = true;
-  document.getElementById("listViewBtn").classList.add("active");
-  document.getElementById("gridViewBtn").classList.remove("active");
-  renderCameras();
 });
 
 document.getElementById("topTvButton")?.addEventListener("click", startTvMode);
