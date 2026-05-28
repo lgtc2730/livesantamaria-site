@@ -1243,12 +1243,17 @@
         height: 100%;
       }
 
+      .camera-card.compact-mobile .camera-info {
+        pointer-events: none;
+      }
+
       .camera-card.compact-mobile.expanded-mobile .camera-info {
         left: 0;
         top: auto;
         bottom: 0;
         padding: 17px;
         align-items: flex-end;
+        pointer-events: auto;
       }
 
       .camera-card.compact-mobile.expanded-mobile .viewer-count {
@@ -1261,7 +1266,7 @@
         filter: none;
       }
 
-      .camera-card.is-open {
+      .camera-card.compact-mobile.expanded-mobile {
         border-color: rgba(66,183,255,.35);
         filter: saturate(1.04);
       }
@@ -1571,6 +1576,7 @@ function createCameraCard(cam, index) {
   const card = document.createElement("article");
   card._cam = cam;
   card.className = `camera-card ${cam.type === "future" ? "future-card" : ""}`;
+
   if (window.matchMedia("(max-width: 680px)").matches) {
     card.classList.add("compact-mobile");
   }
@@ -1593,11 +1599,9 @@ function createCameraCard(cam, index) {
     `;
   }
 
-  const statusClass = cam.type === "future" ? "future" : "";
   const statusText = cam.type === "future"
     ? (cam.status ?? "")
     : "A VERIFICAR";
-  const message = cam.message ? `<div class="camera-message">${escapeHtml(cam.message)}</div>` : "";
 
   card.innerHTML = `
     ${mediaHtml}
@@ -1605,7 +1609,6 @@ function createCameraCard(cam, index) {
       <span class="dot ${cam.type === "future" ? "" : "ok"}"></span>
       <span>${escapeHtml(statusText).toUpperCase()}</span>
     </div>
-
 
     <div class="camera-info">
       <div>
@@ -1628,48 +1631,43 @@ function createCameraCard(cam, index) {
             : ""
         }
       </div>
-
     </div>
   `;
 
-  card.addEventListener("click", () => {
+  let pointerStartX = 0;
+  let pointerStartY = 0;
+  let pointerMoved = false;
+
+  card.addEventListener("pointerdown", (e) => {
+    if (e.pointerType !== "touch") return;
+
+    pointerStartX = e.clientX;
+    pointerStartY = e.clientY;
+    pointerMoved = false;
+  });
+
+  card.addEventListener("pointermove", (e) => {
+    if (e.pointerType !== "touch") return;
+
+    const deltaX = Math.abs(e.clientX - pointerStartX);
+    const deltaY = Math.abs(e.clientY - pointerStartY);
+
+    if (deltaX > 18 || deltaY > 18) {
+      pointerMoved = true;
+    }
+  });
+
+  card.addEventListener("pointerup", (e) => {
+    if (e.target.closest("button, a, video, select")) return;
+
     if (window.matchMedia("(max-width: 680px)").matches) {
+      if (e.pointerType === "touch" && pointerMoved) return;
+
       card.classList.toggle("expanded-mobile");
       return;
     }
 
     openCameraFullscreen(cam);
-  });
-
-  let touchStartY = 0;
-  let touchStartX = 0;
-  let touchMoved = false;
-
-  card.addEventListener("touchstart", (e) => {
-    touchStartY = e.touches[0].clientY;
-    touchStartX = e.touches[0].clientX;
-    touchMoved = false;
-  }, { passive: true });
-
-  card.addEventListener("touchmove", (e) => {
-    const deltaY = Math.abs(e.touches[0].clientY - touchStartY);
-    const deltaX = Math.abs(e.touches[0].clientX - touchStartX);
-
-    if (deltaY > 12 || deltaX > 12) {
-      touchMoved = true;
-    }
-  }, { passive: true });
-
-  card.addEventListener("touchend", (e) => {
-    if (touchMoved) return;
-
-    card.classList.toggle("is-open");
-  }, { passive: true });
-
-  card.addEventListener("click", (e) => {
-    if (e.target.closest("button, a, video, select")) return;
-
-    card.classList.toggle("is-open");
   });
 
   return card;
