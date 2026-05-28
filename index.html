@@ -1451,6 +1451,7 @@
 const container = document.getElementById("cameraContainer");
 const PUBLIC_CAMERAS = (window.LSM_CAMERAS || []).filter(cam => cam.enabled !== false);
 const liveCameras = PUBLIC_CAMERAS.filter(cam => cam.type !== "future" && cam.url);
+const expandedMobileCards = new Set();
 
 let activeFilter = "all";
 let listMode = false;
@@ -1584,6 +1585,10 @@ function createCameraCard(cam, index) {
   card.id = `camera-${cam.id}`;
   card.dataset.type = cam.type;
 
+  if (expandedMobileCards.has(cam.id)) {
+    card.classList.add("expanded-mobile");
+  }
+
   let mediaHtml = "";
   if (cam.type === "snapshot") {
     mediaHtml = `
@@ -1663,7 +1668,14 @@ function createCameraCard(cam, index) {
     if (window.matchMedia("(max-width: 680px)").matches) {
       if (e.pointerType === "touch" && pointerMoved) return;
 
-      card.classList.add("expanded-mobile");
+      card.classList.toggle("expanded-mobile");
+
+      if (card.classList.contains("expanded-mobile")) {
+        expandedMobileCards.add(cam.id);
+      } else {
+        expandedMobileCards.delete(cam.id);
+      }
+
       return;
     }
 
