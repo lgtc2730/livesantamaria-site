@@ -562,25 +562,26 @@
       pointer-events: none;
     }
 
-    .status-badge,
-    .fav {
-      position: absolute;
-      z-index: 3;
-      top: 14px;
-    }
-
     .status-badge {
+      position: absolute;
+      z-index: 5;
+      top: 14px;
       left: 14px;
+
       display: inline-flex;
       align-items: center;
       gap: 6px;
+
       border-radius: 8px;
       padding: 5px 8px;
+
       font-size: .7rem;
       font-weight: 950;
+
       background: rgba(3, 37, 18, .78);
       border: 1px solid rgba(39,223,117,.28);
       color: #eafff2;
+
       backdrop-filter: blur(10px);
     }
 
@@ -592,19 +593,6 @@
     .status-badge.offline {
       background: rgba(60, 12, 22, .78);
       border-color: rgba(255,107,130,.32);
-    }
-
-    .fav {
-      right: 14px;
-      width: 30px;
-      height: 30px;
-      display: grid;
-      place-items: center;
-      border: 0;
-      background: transparent;
-      color: white;
-      font-size: 1.45rem;
-      text-shadow: 0 3px 15px rgba(0,0,0,.6);
     }
 
     .camera-info {
@@ -1227,12 +1215,6 @@
         padding: 3px 6px;
       }
 
-      .camera-card:not(.featured-card).compact-mobile .fav {
-        top: 8px;
-        right: 8px;
-        font-size: 1.1rem;
-      }
-
       .camera-card:not(.featured-card).compact-mobile .camera-info {
         left: 132px;
         top: 0;
@@ -1612,7 +1594,7 @@ function createCameraCard(cam, index) {
       <span class="dot ${cam.type === "future" ? "" : "ok"}"></span>
       <span>${escapeHtml(statusText).toUpperCase()}</span>
     </div>
-    <button class="fav" type="button" aria-label="Favorito">♡</button>
+
 
     <div class="camera-info">
       <div>
@@ -1639,11 +1621,6 @@ function createCameraCard(cam, index) {
     </div>
   `;
 
-  card.querySelector(".fav")?.addEventListener("click", event => {
-    event.stopPropagation();
-    event.currentTarget.textContent = event.currentTarget.textContent === "♡" ? "♥" : "♡";
-  });
-
   card.addEventListener("click", () => {
     if (window.matchMedia("(max-width: 680px)").matches) {
       card.classList.toggle("expanded-mobile");
@@ -1651,6 +1628,10 @@ function createCameraCard(cam, index) {
     }
 
     openCameraFullscreen(cam);
+  });
+
+  card.addEventListener("click", () => {
+    card.classList.toggle("is-open");
   });
 
   return card;
