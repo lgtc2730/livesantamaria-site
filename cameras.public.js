@@ -235,7 +235,7 @@ window.LSM_CAMERAS = [
       lat: 36.946241,
       lon: -25.146948,
       bearing: 160,
-      fov: 65
+      fov: 90
     },
 
     sponsor: {
