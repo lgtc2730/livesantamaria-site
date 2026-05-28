@@ -436,9 +436,9 @@ window.LSM_CAMERAS = [
     type: "future",
     url: null,
     refresh: null,
-    fallbackImage: null,
+    fallbackImage: "./assets/fallback/maia-norte.jpeg",
 
-    preview: "./assets/previews/maia-norte.jpeg",
+    preview: "http://anjos.olho.mariense.pt/maia/camera.m3u8",
     message: "Brevemente",
     status: "Brevemente",
 
