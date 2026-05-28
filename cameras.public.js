@@ -184,6 +184,36 @@ window.LSM_CAMERAS = [
     enabled: true
   },
 
+  {
+    id: "maia-norte",
+    name: "Maia Norte",
+    region: "Este",
+    type: "hls",
+    url: null,
+    refresh: null,
+    fallbackImage: "./assets/fallback/maia-norte.jpeg",
+
+    preview: "http://anjos.olho.mariense.pt/maia/camera.m3u8",
+    message: "Brevemente",
+    status: "Brevemente",
+
+    position: {
+      lat: 36.944280,
+      lon: -25.016115,
+      bearing: 360,
+      fov: 65
+    },
+
+    sponsor: {
+      name: "Carlos Andrade e Rui Chaves",
+      logo: null,
+      url: null,
+      label: "Sponsor"
+    },
+
+    enabled: true
+  },
+
   // ==========================================================
   // FUTURE CAMERAS
   // ==========================================================
@@ -429,35 +459,6 @@ window.LSM_CAMERAS = [
     enabled: true
   },
 
-  {
-    id: "maia-norte",
-    name: "Maia Norte",
-    region: "Este",
-    type: "future",
-    url: null,
-    refresh: null,
-    fallbackImage: "./assets/fallback/maia-norte.jpeg",
-
-    preview: "http://anjos.olho.mariense.pt/maia/camera.m3u8",
-    message: "Brevemente",
-    status: "Brevemente",
-
-    position: {
-      lat: 36.944280,
-      lon: -25.016115,
-      bearing: 360,
-      fov: 65
-    },
-
-    sponsor: {
-      name: "Carlos Andrade e Rui Chaves",
-      logo: null,
-      url: null,
-      label: "Sponsor"
-    },
-
-    enabled: true
-  },
 
   {
     id: "neutra",
