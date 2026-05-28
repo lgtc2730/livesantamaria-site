@@ -1173,6 +1173,29 @@
       .camera-name { font-size: 1rem; }
       .camera-region { font-size: .76rem; }
 
+      .camera-card.compact-mobile.expanded-mobile {
+        display: block;
+        aspect-ratio: 16 / 11;
+        min-height: unset;
+      }
+
+      .camera-card.compact-mobile.expanded-mobile video,
+      .camera-card.compact-mobile.expanded-mobile img {
+        height: 100%;
+      }
+
+      .camera-card.compact-mobile.expanded-mobile .camera-info {
+        left: 0;
+        top: auto;
+        bottom: 0;
+        padding: 17px;
+        align-items: flex-end;
+      }
+
+      .camera-card.compact-mobile.expanded-mobile .viewer-count {
+        position: static;
+      }
+
       .map-label { display: none; }
       .map-fov { width: 68px; height: 68px; }
       .map-dot { width: 15px; height: 15px; }
@@ -1234,7 +1257,7 @@
         <button data-section="map">MAPA</button>
         <button data-section="forecast">PREVISÃO</button>
         <button data-section="about">SOBRE</button>
-        <button id="topTvButton" type="button">📺 TV</button>
+        <button id="topTvButton" type="button">📺 SLIDE-SHOW</button>
       </nav>
     </header>
 
@@ -1341,7 +1364,7 @@
     <button data-section="map"><span>🗺️</span>Mapa</button>
     <button data-section="forecast"><span>☀️</span>Previsão</button>
     <button data-section="about"><span>ℹ️</span>Sobre</button>
-    <button id="mobileTvButton" type="button"><span>⋯</span>TV</button>
+    <button id="mobileTvButton" type="button"><span>🎞️</span>Slides</button>
   </nav>
 
   <div class="tv-mode" id="tvMode">
@@ -1479,9 +1502,7 @@ function createCameraCard(cam, index) {
   const card = document.createElement("article");
   card._cam = cam;
   card.className = `camera-card ${cam.type === "future" ? "future-card" : ""}`;
-  if (index === 0 && window.matchMedia("(max-width: 680px)").matches && activeFilter === "all") {
-    card.classList.add("featured-card");
-  } else if (window.matchMedia("(max-width: 680px)").matches) {
+  if (window.matchMedia("(max-width: 680px)").matches) {
     card.classList.add("compact-mobile");
   }
 
@@ -1532,7 +1553,14 @@ function createCameraCard(cam, index) {
     event.currentTarget.textContent = event.currentTarget.textContent === "♡" ? "♥" : "♡";
   });
 
-  card.addEventListener("click", () => openCameraFullscreen(cam));
+  card.addEventListener("click", () => {
+    if (window.matchMedia("(max-width: 680px)").matches) {
+      card.classList.toggle("expanded-mobile");
+      return;
+    }
+
+    openCameraFullscreen(cam);
+  });
 
   return card;
 }
