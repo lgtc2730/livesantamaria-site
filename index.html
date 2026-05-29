@@ -514,6 +514,17 @@
       place-items: center;
     }
 
+    .camera-sponsor a {
+      color: rgba(255,255,255,.88);
+      font-size: .78rem;
+      font-weight: 650;
+      text-decoration: none;
+    }
+
+    .camera-sponsor a:hover {
+      color: var(--blue2);
+    }
+
     .camera-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1844,9 +1855,19 @@ function createCameraCard(cam, index) {
         <div class="camera-name">${escapeHtml(cam.name)}</div>
 
         ${
-          cam.message
-            ? `<div class="camera-message">${escapeHtml(cam.message)}</div>`
-            : ""
+          needsSponsor(cam)
+            ? `
+              <div class="camera-message">
+                Procuramos patrocinador
+              </div>
+            `
+            : cam.message
+              ? `
+                <div class="camera-message">
+                  ${escapeHtml(cam.message)}
+                </div>
+              `
+              : ""
         }
 
         ${
@@ -1854,7 +1875,22 @@ function createCameraCard(cam, index) {
             ? `
               <div class="camera-sponsor">
                 <span>${escapeHtml(cam.sponsor.label || "Sponsor")}</span>
-                <strong>${escapeHtml(cam.sponsor.name)}</strong>
+
+                ${
+                  cam.sponsor.url
+                    ? `
+                      <a
+                        href="${escapeHtml(cam.sponsor.url)}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        ${escapeHtml(cam.sponsor.name)} ↗
+                      </a>
+                    `
+                    : `
+                      <strong>${escapeHtml(cam.sponsor.name)}</strong>
+                    `
+                }
               </div>
             `
             : ""
@@ -2206,10 +2242,6 @@ function openCameraFullscreen(cam) {
       <div class="fs-name">${escapeHtml(cam.name)}</div>
       <div>${escapeHtml(getRegion(cam))} · Live Santa Maria</div>
     </div>
-    <div class="status-badge ${cam.type === "future" ? "future" : ""}">
-      <span class="dot ${cam.type === "future" ? "" : "ok"}"></span>
-      <span>${cam.type === "future" ? escapeHtml(cam.status ?? "") : "LIVE"}</span>
-    </div>
   `;
 
   fsStage.appendChild(media);
@@ -2263,10 +2295,6 @@ function renderTvCamera(cam) {
       <div>Live Santa Maria</div>
     </div>
 
-    <div class="status-badge">
-      <span class="dot ok"></span>
-      <span>SLIDE-SHOW</span>
-    </div>
   `;
 
   tvStage.appendChild(media);
@@ -2538,6 +2566,13 @@ function renderNetworkTimeline() {
         : ""
     }
   `;
+}
+
+function needsSponsor(cam) {
+  return (
+    cam.type === "future" &&
+    (!cam.sponsor || !cam.sponsor.name)
+  );
 }
 
 setHeroBackground();

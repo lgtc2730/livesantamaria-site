@@ -113,8 +113,8 @@ window.LVSM_CAMERAS = [
     position: {
       lat: 36.9952,
       lon: -25.0554,
-      bearing: 180,
-      fov: 65
+      bearing: 140,
+      fov: 90
     },
 
     sponsor: {
@@ -266,7 +266,7 @@ window.LVSM_CAMERAS = [
 
     preview: "./assets/previews/marina-club-motard.jpeg",
     message: null,
-    status: "Brevemente",
+    status: "Em preparação",
     commissioned: null,
 
     position: {
@@ -297,7 +297,7 @@ window.LVSM_CAMERAS = [
 
     preview: "./assets/previews/pico-alto-nascente.jpeg",
     message: null,
-    status: "Brevemente",
+    status: "Aguarda patrocínio",
     commissioned: null,
 
     position: {
@@ -328,7 +328,7 @@ window.LVSM_CAMERAS = [
 
     preview: "./assets/previews/pico-alto-poente.jpeg",
     message: null,
-    status: "Brevemente",
+    status: "Aguarda patrocínio",
     commissioned: null,
 
     position: {
@@ -401,9 +401,9 @@ window.LVSM_CAMERAS = [
     },
 
     sponsor: {
-      name: "Disponível para apoio",
+      name: "Ricardo Sebastião",
       logo: null,
-      url: "mailto:livesantamaria.project@gmail.com",
+      url: null,
       label: "Sponsor"
     },
 
@@ -452,7 +452,7 @@ window.LVSM_CAMERAS = [
     fallbackImage: null,
 
     preview: "./assets/previews/maia-sul.jpeg",
-    message: "Brevemente",
+    message: "Vista sobre a Baia e Farol da Maia",
     status: "Aguarda Patrocinio",
     commissioned: null,
 
@@ -466,8 +466,8 @@ window.LVSM_CAMERAS = [
     sponsor: {
       name: null,
       logo: null,
-      url: "mailto:livesantamaria.project@gmail.com",
-      label: "Sponsor"
+      url: null,
+      label: null
     },
 
     enabled: true
@@ -490,6 +490,7 @@ window.LVSM_CAMERAS = [
     position: null,
 
     sponsor: null,
+    url: "mailto:livesantamaria.project@gmail.com",
 
     enabled: true
   }
