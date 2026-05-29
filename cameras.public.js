@@ -370,7 +370,7 @@ window.LSM_CAMERAS = [
 
   {
     id: "farol-maia",
-    name: "Maia, Farol Gonçalo Velho",
+    name: "Maia-Farol",
     region: "Este",
     type: "future",
     url: null,
@@ -401,7 +401,7 @@ window.LSM_CAMERAS = [
 
   {
     id: "porto-do-castelo",
-    name: "Porto do Castelo",
+    name: "Porto Castelo",
     region: "Sul",
     type: "future",
     url: null,

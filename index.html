@@ -786,11 +786,15 @@
     }
 
     .future-dot {
-      background: #7dd3fc;
+      background: hwb(46 4% 4%);
     }
 
     .live-dot {
       background: #35e27c;
+    }
+
+    .offline .dot {
+      background: #e11d48;
     }
 
     .map-camera {
@@ -836,9 +840,17 @@
       z-index: 4;
     }
 
-    .map-camera.live .map-dot { background: var(--ok); }
-    .map-camera.future .map-dot { background: var(--future); }
+    .map-camera.live .map-dot {
+      background: #35e27c;
+    }
 
+    .map-camera.future .map-dot {
+      background: #f59e0b;
+    }
+
+    .map-camera.offline .map-dot {
+      background: #e11d48;
+    }
     .map-label {
       position: absolute;
       left: var(--label-x, 16px);
@@ -1531,6 +1543,19 @@ function mediaLooksAlive(video) {
     video.videoHeight > 0;
 }
 
+function setMapStatus(cam, status) {
+  if (!cam?.id) return;
+
+  const marker = document.querySelector(
+    `.map-camera[data-camera-id="${cam.id}"]`
+  );
+
+  if (!marker) return;
+
+  marker.classList.remove("live", "future", "offline");
+  marker.classList.add(status);
+}
+
 function setCardLive(block) {
   const badge = block.querySelector(".status-badge");
   const badgeText = badge?.querySelector("span:last-child");
@@ -1539,6 +1564,7 @@ function setCardLive(block) {
   badge.className = "status-badge";
   badgeText.textContent = "LIVE";
   block.classList.remove("has-fallback-active");
+  setMapStatus(block._cam, "live");
 }
 
 function setCardOffline(block) {
@@ -1556,6 +1582,7 @@ function setCardOffline(block) {
     fallback.src = cam.fallbackImage;
     block.classList.add("has-fallback-active");
   }
+  setMapStatus(block._cam, "offline");
 }
 
 function setCardChecking(block) {
@@ -1570,7 +1597,7 @@ function setCardChecking(block) {
 }
 
 function isOffline(cam) {
-  return cam.type !== "future" && !cam.isLive;
+  return cam.status === "OFFLINE";
 }
 
 function createCameraCard(cam, index) {
@@ -1843,7 +1870,15 @@ function renderCameraMap() {
     const pos = latLonToMapPosition(cam.position.lat, cam.position.lon);
     const item = document.createElement("button");
 
-    item.className = `map-camera ${cam.type === "future" ? "future" : "live"}`;
+    const mapStatus =
+      cam.type === "future"
+        ? "future"
+        : isOffline(cam)
+          ? "offline"
+          : "live";
+
+    item.className = `map-camera ${mapStatus}`;
+    item.dataset.cameraId = cam.id;
     item.type = "button";
     item.title = cam.name;
     item.setAttribute("aria-label", `Ver câmara ${cam.name}`);
@@ -1858,11 +1893,16 @@ function renderCameraMap() {
     item.style.setProperty("--fov-bottom", `${50 + halfOpen}%`);
 
     const labelOffsets = {
-      "praia-poente": { x: -92, y: 18 },
-      "praia-nascente": { x: 18, y: -14 },
-      "farol-maia": { x: -132, y: 24 },
-      "maia-sul": { x: -76, y: 16 },
-      "maia-norte": { x: -88, y: -12 }
+      "praia-poente": { x: -48, y: 25 },
+      "praia-nascente": { x: -68, y: -24 },
+      "farol-maia": { x: -88, y: -16 },
+      "maia-sul": { x: -78, y: -12 },
+      "maia-norte": { x: -98, y: -12 },
+      "porto-do-castelo": { x: -110, y: 15 },
+      "pico-alto-nascente": { x: -68, y: -27 },
+      "pico-alto-poente": { x: -68, y: 28 },
+      "cnsm": { x: -68, y: -24 }
+
     };
     const offset = labelOffsets[cam.id] || { x: 16, y: 0 };
     item.style.setProperty("--label-x", `${offset.x}px`);
@@ -1877,6 +1917,19 @@ function renderCameraMap() {
     item.addEventListener("click", () => openCameraFullscreen(cam));
     overlay.appendChild(item);
   });
+}
+
+function setMapStatus(cam, status) {
+  if (!cam?.id) return;
+
+  const marker = document.querySelector(
+    `.map-camera[data-camera-id="${cam.id}"]`
+  );
+
+  if (!marker) return;
+
+  marker.classList.remove("live", "future", "offline");
+  marker.classList.add(status);
 }
 
 function destroyMediaInstance(instanceName) {
