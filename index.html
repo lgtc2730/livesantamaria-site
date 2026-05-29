@@ -2194,9 +2194,22 @@ document.addEventListener("keydown", event => {
   }
 });
 
+let lastMobileMode = window.matchMedia("(max-width: 680px)").matches;
+
 window.addEventListener("resize", () => {
+  const currentMobileMode = window.matchMedia("(max-width: 680px)").matches;
+
+  // No telemóvel, o scroll pode disparar resize.
+  // Só redesenhamos se mudou mesmo entre mobile/desktop.
+  if (currentMobileMode === lastMobileMode) return;
+
+  lastMobileMode = currentMobileMode;
+
   renderCameras();
-  if (currentSection === "map") renderCameraMap();
+
+  if (currentSection === "map") {
+    renderCameraMap();
+  }
 });
 
 setHeroBackground();
