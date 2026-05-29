@@ -26,7 +26,7 @@
       --danger: #ff6b82;
       --shadow: 0 24px 70px rgba(0,0,0,.44);
       --radius: 22px;
-      --banner-image: url("./assets/banner-sma-ocean.png?v=1");
+      --banner-image: url("./assets/banner-sma-ocean-bg-clean.png?v=2");
       --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
 
@@ -71,15 +71,15 @@
     }
 
     .topbar {
-      min-height: 72px;
+      min-height: 68px;
       display: grid;
-      grid-template-columns: auto 1fr auto;
+      grid-template-columns: auto 1fr;
       align-items: center;
       gap: 22px;
       position: sticky;
       top: 0;
       z-index: 1000;
-      padding: 12px 0;
+      padding: 10px 0;
       background: linear-gradient(180deg, rgba(5,12,20,.94), rgba(5,12,20,.72) 72%, transparent);
       backdrop-filter: blur(18px);
     }
@@ -196,13 +196,13 @@
 
     .hero {
       position: relative;
-      min-height: clamp(118px, 13.6vw, 205px);
-      border-radius: 24px;
+      min-height: clamp(132px, 11.8vw, 188px);
+      border-radius: 22px;
       overflow: hidden;
       border: 1px solid rgba(255,255,255,.18);
       box-shadow: var(--shadow);
       background-image: var(--banner-image);
-      background-size: cover;
+      background-size: 100% 100%;
       background-position: center;
       background-repeat: no-repeat;
       isolation: isolate;
@@ -248,6 +248,146 @@
       outline: 2px solid rgba(126,215,255,.92);
       outline-offset: -4px;
       background: rgba(24,119,255,.10);
+    }
+
+
+
+    .hero-live-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 28px;
+
+      padding:
+        clamp(14px, 1.6vw, 24px)
+        clamp(20px, 2.6vw, 42px);
+
+      padding-left: clamp(380px, 28vw, 560px);
+    }
+
+    .hero-title-block {
+      border-left: 0;
+      padding-left: clamp(18px, 2vw, 34px);
+    }
+
+    .hero-live-title {
+      font-size: clamp(1.6rem, 2.8vw, 3.2rem);
+    }
+
+    .hero-live-subtitle {
+      margin-top: 2px;
+      font-size: clamp(1rem, 1.8vw, 1.7rem);
+      font-weight: 760;
+      opacity: .96;
+    }
+
+    .hero-live-tagline {
+      margin-top: 10px;
+      color: rgba(220,238,255,.82);
+      font-size: clamp(.78rem, .95vw, 1rem);
+    }
+
+    .hero-live-stats {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(18px, 2vw, 34px);
+      color: rgba(255,255,255,.9);
+      white-space: nowrap;
+    }
+
+    .hero-stat {
+      display: grid;
+      gap: 3px;
+      line-height: 1.05;
+    }
+
+    .hero-stat-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-stat strong {
+      font-size: clamp(.9rem, 1vw, 1.05rem);
+      font-weight: 650;
+      letter-spacing: -.01em;
+    }
+
+    .hero-stat small {
+      color: rgba(255,255,255,.72);
+      font-size: clamp(.68rem, .78vw, .82rem);
+      font-weight: 600;
+      padding-left: 18px;
+    }
+
+    .hero-live-stats span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-live-divider {
+      display: none;
+    }
+
+    .hero-weather {
+      border-left: 0;
+      padding-left: 0;
+    }
+
+    .hero-weather-icon {
+      font-size: clamp(1.45rem, 1.9vw, 2.15rem);
+      line-height: 1;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,.25));
+    }
+
+    .hero-weather strong {
+      font-size: clamp(1.3rem, 2vw, 2.2rem);
+      line-height: 1;
+      letter-spacing: -.03em;
+    }
+
+    .hero-weather small {
+      display: block;
+      margin-top: 5px;
+      color: rgba(255,255,255,.78);
+      font-size: clamp(.64rem, .76vw, .86rem);
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .hero-map-dynamic {
+      pointer-events: auto;
+      justify-self: end;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-width: clamp(104px, 8.8vw, 140px);
+      height: clamp(38px, 3.3vw, 50px);
+      padding: 0 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.22);
+      background: rgba(10, 23, 40, .54);
+      color: var(--text);
+      font-weight: 900;
+      font-size: clamp(.72rem, .85vw, .92rem);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+    }
+
+    .hero-map-dynamic:hover {
+      background: rgba(24,119,255,.18);
+      border-color: rgba(126,215,255,.36);
     }
 
     .hero h1 {
@@ -422,25 +562,26 @@
       pointer-events: none;
     }
 
-    .status-badge,
-    .fav {
-      position: absolute;
-      z-index: 3;
-      top: 14px;
-    }
-
     .status-badge {
+      position: absolute;
+      z-index: 5;
+      top: 14px;
       left: 14px;
+
       display: inline-flex;
       align-items: center;
       gap: 6px;
+
       border-radius: 8px;
       padding: 5px 8px;
+
       font-size: .7rem;
       font-weight: 950;
+
       background: rgba(3, 37, 18, .78);
       border: 1px solid rgba(39,223,117,.28);
       color: #eafff2;
+
       backdrop-filter: blur(10px);
     }
 
@@ -452,19 +593,6 @@
     .status-badge.offline {
       background: rgba(60, 12, 22, .78);
       border-color: rgba(255,107,130,.32);
-    }
-
-    .fav {
-      right: 14px;
-      width: 30px;
-      height: 30px;
-      display: grid;
-      place-items: center;
-      border: 0;
-      background: transparent;
-      color: white;
-      font-size: 1.45rem;
-      text-shadow: 0 3px 15px rgba(0,0,0,.6);
     }
 
     .camera-info {
@@ -592,6 +720,83 @@
       inset: 0;
     }
 
+    .camera-message {
+      margin-top: 6px;
+
+      font-size: .92rem;
+      color: rgba(255,255,255,.82);
+
+      text-shadow: 0 2px 10px rgba(0,0,0,.45);
+    }
+
+    .camera-sponsor {
+      margin-top: 12px;
+
+      display: grid;
+      gap: 2px;
+    }
+
+    .camera-sponsor span {
+      font-size: .52rem;
+
+      letter-spacing: .16em;
+      text-transform: uppercase;
+
+      color: rgba(255,255,255,.48);
+
+      font-weight: 800;
+    }
+
+    .camera-sponsor strong {
+      font-size: .78rem;
+
+      color: rgba(255,255,255,.88);
+
+      font-weight: 650;
+    }
+
+    .camera-state {
+      position: absolute;
+
+      right: 14px;
+      bottom: 14px;
+
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+
+      padding: 8px 12px;
+
+      border-radius: 999px;
+
+      background: rgba(0,0,0,.34);
+      backdrop-filter: blur(8px);
+
+      font-size: .78rem;
+      font-weight: 700;
+
+      color: rgba(255,255,255,.96);
+    }
+
+    .future-dot,
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .future-dot {
+      background: hwb(46 4% 4%);
+    }
+
+    .live-dot {
+      background: #35e27c;
+    }
+
+    .offline .dot {
+      background: #e11d48;
+    }
+
     .map-camera {
       position: absolute;
       left: var(--x);
@@ -635,9 +840,17 @@
       z-index: 4;
     }
 
-    .map-camera.live .map-dot { background: var(--ok); }
-    .map-camera.future .map-dot { background: var(--future); }
+    .map-camera.live .map-dot {
+      background: #35e27c;
+    }
 
+    .map-camera.future .map-dot {
+      background: #f59e0b;
+    }
+
+    .map-camera.offline .map-dot {
+      background: #e11d48;
+    }
     .map-label {
       position: absolute;
       left: var(--label-x, 16px);
@@ -798,21 +1011,75 @@
 
     .hidden { display: none !important; }
 
+    .view-actions {
+      display: none;
+    }
+
+    @media (max-width: 1350px) {
+      .hero-live-overlay {
+        grid-template-columns: minmax(170px, .55fr) minmax(260px, .86fr) minmax(132px, .35fr) minmax(94px, .25fr);
+        padding-left: clamp(330px, 27vw, 390px);
+        gap: 10px;
+      }
+
+      .hero-live-tagline {
+        display: none;
+      }
+
+      .hero-live-stats {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+
+        color: rgba(255,255,255,.84);
+
+        font-weight: 700;
+        font-size: .88rem;
+
+        white-space: nowrap;
+      }
+
+      .hero-weather {
+        padding-left: 14px;
+      }
+    }
+
+    @media (max-width: 1080px) {
+      .hero-live-overlay {
+        grid-template-columns: minmax(160px, .6fr) minmax(240px, .95fr) minmax(118px, .34fr);
+        padding-left: clamp(250px, 26vw, 315px);
+      }
+
+      .hero-map-dynamic {
+        display: none;
+      }
+
+      .hero-live-divider {
+        display: none;
+      }
+
+      .hero-live-stats {
+        justify-content: flex-start;
+      }
+    }
+
+
     @media (max-width: 1180px) {
       .camera-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       .hero { grid-template-columns: 1fr; }
       .weather-card { max-width: 520px; }
     }
 
-    @media (max-width: 820px) {
+    @media (max-width: 680px) {
+
       .app {
         padding: 10px 12px calc(92px + var(--safe-bottom));
       }
 
       .topbar {
-        grid-template-columns: 1fr auto;
-        min-height: 68px;
-        padding: 10px 0;
+        grid-template-columns: 1fr;
+        min-height: 64px;
+        padding: 8px 0;
       }
 
       .brand { min-width: 0; }
@@ -821,16 +1088,16 @@
       .brand-title { font-size: 1rem; line-height: .92; }
       .brand-sub { font-size: .62rem; letter-spacing: .12em; }
 
-      .nav,
-      .weather-mini { display: none; }
-      .mobile-menu { display: grid; place-items: center; }
+      .nav { display: none; }
 
       .hero {
-        min-height: clamp(112px, 31vw, 190px);
+        min-height: 150px;
         border-radius: 18px;
         border: 1px solid rgba(255,255,255,.14);
         box-shadow: 0 18px 44px rgba(0,0,0,.38);
-        background-position: center;
+
+        background-position: 8% center;
+        background-size: cover;
       }
 
       .hero-map-button {
@@ -838,6 +1105,67 @@
         width: 21%;
         height: 42%;
         border-radius: 14px;
+      }
+
+      .hero-live-overlay {
+        display: grid;
+        grid-template-columns: 1fr;
+
+        align-content: center;
+        justify-items: start;
+
+        gap: 6px;
+
+        padding: 14px 14px 14px 58%;
+
+        pointer-events: none;
+      }
+
+      .hero-title-block {
+        border-left: 0;
+        padding-left: 0;
+      }
+
+      .hero-live-title {
+        font-size: 1.55rem;
+      }
+
+      .hero-live-subtitle {
+        font-size: .95rem;
+      }
+
+      .hero-live-tagline {
+        display: none;
+      }
+
+      .hero-live-stats {
+        display: none;
+      }
+
+      .hero-live-stats span {
+        gap: 5px;
+      }
+
+      .hero-weather {
+        border-left: 0;
+        padding-left: 0;
+
+        justify-content: flex-start;
+
+        gap: 7px;
+      }
+
+      .hero-weather-icon {
+        font-size: 1.35rem;
+      }
+
+      .hero-weather strong {
+        font-size: 1.35rem;
+      }
+
+      .hero-weather small {
+        font-size: .68rem;
+        max-width: 120px;
       }
 
       .weather-card {
@@ -899,12 +1227,6 @@
         padding: 3px 6px;
       }
 
-      .camera-card:not(.featured-card).compact-mobile .fav {
-        top: 8px;
-        right: 8px;
-        font-size: 1.1rem;
-      }
-
       .camera-card:not(.featured-card).compact-mobile .camera-info {
         left: 132px;
         top: 0;
@@ -922,14 +1244,66 @@
       .camera-name { font-size: 1rem; }
       .camera-region { font-size: .76rem; }
 
+      .camera-card.compact-mobile.expanded-mobile {
+        display: block;
+        aspect-ratio: 16 / 11;
+        min-height: unset;
+      }
+
+      .camera-card.compact-mobile.expanded-mobile video,
+      .camera-card.compact-mobile.expanded-mobile img {
+        height: 100%;
+      }
+
+      .camera-card.compact-mobile .camera-info {
+        pointer-events: none;
+      }
+
+      .camera-card.compact-mobile.expanded-mobile .camera-info {
+        left: 0;
+        top: auto;
+        bottom: 0;
+        padding: 17px;
+        align-items: flex-end;
+        pointer-events: auto;
+      }
+
+      .camera-card.compact-mobile.expanded-mobile .viewer-count {
+        position: static;
+      }
+
+      .camera-card:hover {
+        transform: none;
+        border-color: var(--border);
+        filter: none;
+      }
+
+      .camera-card.compact-mobile.expanded-mobile {
+        border-color: rgba(66,183,255,.35);
+        filter: saturate(1.04);
+      }
+
       .map-label { display: none; }
       .map-fov { width: 68px; height: 68px; }
       .map-dot { width: 15px; height: 15px; }
-      .map-head, .panel-pad { padding: 16px; }
-      .island-map-wrap { margin: 0 12px 14px; border-radius: 16px; }
 
-      .bottom-nav { display: grid; }
-      .footer { display: none; }
+      .map-head,
+      .panel-pad {
+        padding: 16px;
+      }
+
+      .island-map-wrap {
+        margin: 0 12px 14px;
+        border-radius: 16px;
+      }
+
+      .bottom-nav {
+        display: grid;
+      }
+
+      .footer {
+        display: none;
+      }
     }
 
     @media (max-width: 380px) {
@@ -970,37 +1344,49 @@
         <button data-section="map">MAPA</button>
         <button data-section="forecast">PREVISÃO</button>
         <button data-section="about">SOBRE</button>
+        <button id="topTvButton" type="button">📺 SLIDE-SHOW</button>
       </nav>
-
-      <div class="weather-mini">
-        <span class="icon">🌤️</span>
-        <div>
-          <strong id="miniTemp">—</strong>
-          <small>Santa Maria</small>
-        </div>
-      </div>
-
-      <button class="mobile-menu icon-button" id="tvModeButton" title="Modo TV">☰</button>
     </header>
 
     <section class="hero" id="hero" aria-label="Live Santa Maria — a ilha, em tempo real">
-      <div class="hero-accessibility" aria-live="polite">
-        <h1>Live Santa Maria</h1>
-        <p>A ilha, em tempo real.</p>
-        <span id="onlineCount">— câmaras online</span>
-        <span id="watchingNow">— a ver agora</span>
-        <span id="lastUpdate">Última actualização: —</span>
-        <span id="weatherTemp">—</span>
-        <span id="weatherSummary">Meteorologia Santa Maria</span>
-        <span id="weatherWind">—</span>
-        <span id="weatherHum">—</span>
-        <span id="weatherSea">—</span>
-        <span id="weatherIcon">🌤️</span>
-      </div>
+      <div class="hero-live-overlay" aria-live="polite">
+        <div class="hero-title-block">
+          <div class="hero-live-title">LIVE</div>
+          <div class="hero-live-subtitle">SANTA MARIA</div>
+          <div class="hero-live-tagline">A ilha, em tempo real.</div>
+        </div>
 
-      <button class="hero-map-button" type="button" data-section-jump="map" aria-label="Ver mapa das câmaras">
-        Ver mapa
-      </button>
+        <div class="hero-live-stats">
+          <div class="hero-stat">
+            <div class="hero-stat-top">
+              <span class="dot ok"></span>
+              <strong id="onlineCount">— câmaras</strong>
+            </div>
+            <small>online</small>
+          </div>
+
+          <div class="hero-stat">
+            <div class="hero-stat-top">
+              <span>♙</span>
+              <strong id="watchingNow">— pessoas</strong>
+            </div>
+            <small>a ver agora</small>
+          </div>
+        </div>
+
+        <div class="hero-weather">
+          <span class="hero-weather-icon" id="weatherIcon">🌤️</span>
+          <div>
+            <strong id="weatherTemp">—</strong>
+            <small id="weatherSummary">Meteorologia Santa Maria</small>
+            <span class="hero-accessibility" id="weatherWind">—</span>
+            <span class="hero-accessibility" id="weatherHum">—</span>
+            <span class="hero-accessibility" id="weatherSea">—</span>
+          </div>
+        </div>
+
+
+      </div>
     </section>
 
     <main>
@@ -1017,11 +1403,6 @@
             <button class="chip" data-filter="centro">Centro</button>
           </div>
 
-          <div class="view-actions">
-            <button class="icon-button active" id="gridViewBtn" title="Grelha">▦</button>
-            <button class="icon-button" id="listViewBtn" title="Lista">☷</button>
-            <button class="primary-button" data-section-jump="map">📍 VER MAPA</button>
-          </div>
         </div>
 
         <section class="camera-grid" id="cameraContainer"></section>
@@ -1065,7 +1446,7 @@
     <button data-section="map"><span>🗺️</span>Mapa</button>
     <button data-section="forecast"><span>☀️</span>Previsão</button>
     <button data-section="about"><span>ℹ️</span>Sobre</button>
-    <button id="mobileTvButton" type="button"><span>⋯</span>TV</button>
+    <button id="mobileTvButton" type="button"><span>🎞️</span>Slides</button>
   </nav>
 
   <div class="tv-mode" id="tvMode">
@@ -1082,6 +1463,7 @@
 const container = document.getElementById("cameraContainer");
 const PUBLIC_CAMERAS = (window.LSM_CAMERAS || []).filter(cam => cam.enabled !== false);
 const liveCameras = PUBLIC_CAMERAS.filter(cam => cam.type !== "future" && cam.url);
+const expandedMobileCards = new Set();
 
 let activeFilter = "all";
 let listMode = false;
@@ -1106,16 +1488,7 @@ function addCacheBuster(url) {
 }
 
 function getRegion(cam) {
-  if (cam.region) return String(cam.region);
-  const id = `${cam.id} ${cam.name}`.toLowerCase();
-
-  if (id.includes("norte") || id.includes("lagoinhas")) return "Norte";
-  if (id.includes("sul") || id.includes("praia") || id.includes("castelo")) return "Sul";
-  if (id.includes("maia") || id.includes("farol")) return "Este";
-  if (id.includes("poente") || id.includes("pico alto")) return "Oeste";
-  if (id.includes("anjos") || id.includes("marina") || id.includes("clube") || id.includes("cnsm")) return "Centro";
-
-  return "Santa Maria";
+  return cam.region ?? "";
 }
 
 function getPreview(cam) {
@@ -1146,14 +1519,20 @@ function updateCounts() {
   const online = liveCameras.length;
   const watching = liveCameras.reduce((sum, cam, index) => sum + viewerCount(cam, index), 0);
 
-  document.getElementById("onlineCount").textContent =
-    `${online} ${online === 1 ? "câmara online" : "câmaras online"}`;
+  setText(
+    "onlineCount",
+    `${online} ${online === 1 ? "câmara" : "câmaras"}`
+  );
 
-  document.getElementById("watchingNow").textContent =
-    `${watching} a ver agora`;
+  setText(
+    "watchingNow",
+    `${watching} pessoas`
+  );
 
-  document.getElementById("lastUpdate").textContent =
-    `Última actualização: ${new Date().toLocaleTimeString("pt-PT")}`;
+  setText(
+    "lastUpdate",
+    new Date().toLocaleTimeString("pt-PT")
+  );
 }
 
 function mediaLooksAlive(video) {
@@ -1164,6 +1543,19 @@ function mediaLooksAlive(video) {
     video.videoHeight > 0;
 }
 
+function setMapStatus(cam, status) {
+  if (!cam?.id) return;
+
+  const marker = document.querySelector(
+    `.map-camera[data-camera-id="${cam.id}"]`
+  );
+
+  if (!marker) return;
+
+  marker.classList.remove("live", "future", "offline");
+  marker.classList.add(status);
+}
+
 function setCardLive(block) {
   const badge = block.querySelector(".status-badge");
   const badgeText = badge?.querySelector("span:last-child");
@@ -1172,6 +1564,7 @@ function setCardLive(block) {
   badge.className = "status-badge";
   badgeText.textContent = "LIVE";
   block.classList.remove("has-fallback-active");
+  setMapStatus(block._cam, "live");
 }
 
 function setCardOffline(block) {
@@ -1189,6 +1582,7 @@ function setCardOffline(block) {
     fallback.src = cam.fallbackImage;
     block.classList.add("has-fallback-active");
   }
+  setMapStatus(block._cam, "offline");
 }
 
 function setCardChecking(block) {
@@ -1202,18 +1596,25 @@ function setCardChecking(block) {
   }
 }
 
+function isOffline(cam) {
+  return cam.status === "OFFLINE";
+}
+
 function createCameraCard(cam, index) {
   const card = document.createElement("article");
   card._cam = cam;
   card.className = `camera-card ${cam.type === "future" ? "future-card" : ""}`;
-  if (index === 0 && window.matchMedia("(max-width: 820px)").matches && activeFilter === "all") {
-    card.classList.add("featured-card");
-  } else if (window.matchMedia("(max-width: 820px)").matches) {
+
+  if (window.matchMedia("(max-width: 680px)").matches) {
     card.classList.add("compact-mobile");
   }
 
   card.id = `camera-${cam.id}`;
   card.dataset.type = cam.type;
+
+  if (expandedMobileCards.has(cam.id)) {
+    card.classList.add("expanded-mobile");
+  }
 
   let mediaHtml = "";
   if (cam.type === "snapshot") {
@@ -1230,34 +1631,83 @@ function createCameraCard(cam, index) {
     `;
   }
 
-  const statusClass = cam.type === "future" ? "future" : "";
-  const statusText = cam.type === "future" ? (cam.status || "BREVEMENTE") : "A VERIFICAR";
-  const message = cam.message ? `<div class="camera-message">${escapeHtml(cam.message)}</div>` : "";
+  const statusText = cam.type === "future"
+    ? (cam.status ?? "")
+    : "A VERIFICAR";
 
   card.innerHTML = `
     ${mediaHtml}
-    <div class="status-badge ${statusClass}">
+    <div class="status-badge ${cam.type === "future" ? "future" : isOffline(cam) ? "offline" : "live"}">
       <span class="dot ${cam.type === "future" ? "" : "ok"}"></span>
       <span>${escapeHtml(statusText).toUpperCase()}</span>
     </div>
-    <button class="fav" type="button" aria-label="Favorito">♡</button>
 
     <div class="camera-info">
       <div>
         <div class="camera-name">${escapeHtml(cam.name)}</div>
-        <div class="camera-region">${escapeHtml(getRegion(cam))}</div>
-        ${message}
+
+        ${
+          cam.message
+            ? `<div class="camera-message">${escapeHtml(cam.message)}</div>`
+            : ""
+        }
+
+        ${
+          cam.sponsor?.name
+            ? `
+              <div class="camera-sponsor">
+                <span>${escapeHtml(cam.sponsor.label || "Sponsor")}</span>
+                <strong>${escapeHtml(cam.sponsor.name)}</strong>
+              </div>
+            `
+            : ""
+        }
       </div>
-      <div class="viewer-count">♙ ${viewerCount(cam, index)}</div>
     </div>
   `;
 
-  card.querySelector(".fav")?.addEventListener("click", event => {
-    event.stopPropagation();
-    event.currentTarget.textContent = event.currentTarget.textContent === "♡" ? "♥" : "♡";
+  let pointerStartX = 0;
+  let pointerStartY = 0;
+  let pointerMoved = false;
+
+  card.addEventListener("pointerdown", (e) => {
+    if (e.pointerType !== "touch") return;
+
+    pointerStartX = e.clientX;
+    pointerStartY = e.clientY;
+    pointerMoved = false;
   });
 
-  card.addEventListener("click", () => openCameraFullscreen(cam));
+  card.addEventListener("pointermove", (e) => {
+    if (e.pointerType !== "touch") return;
+
+    const deltaX = Math.abs(e.clientX - pointerStartX);
+    const deltaY = Math.abs(e.clientY - pointerStartY);
+
+    if (deltaX > 18 || deltaY > 18) {
+      pointerMoved = true;
+    }
+  });
+
+  card.addEventListener("pointerup", (e) => {
+    if (e.target.closest("button, a, video, select")) return;
+
+    if (window.matchMedia("(max-width: 680px)").matches) {
+      if (e.pointerType === "touch" && pointerMoved) return;
+
+      card.classList.toggle("expanded-mobile");
+
+      if (card.classList.contains("expanded-mobile")) {
+        expandedMobileCards.add(cam.id);
+      } else {
+        expandedMobileCards.delete(cam.id);
+      }
+
+      return;
+    }
+
+    openCameraFullscreen(cam);
+  });
 
   return card;
 }
@@ -1420,7 +1870,15 @@ function renderCameraMap() {
     const pos = latLonToMapPosition(cam.position.lat, cam.position.lon);
     const item = document.createElement("button");
 
-    item.className = `map-camera ${cam.type === "future" ? "future" : "live"}`;
+    const mapStatus =
+      cam.type === "future"
+        ? "future"
+        : isOffline(cam)
+          ? "offline"
+          : "live";
+
+    item.className = `map-camera ${mapStatus}`;
+    item.dataset.cameraId = cam.id;
     item.type = "button";
     item.title = cam.name;
     item.setAttribute("aria-label", `Ver câmara ${cam.name}`);
@@ -1435,11 +1893,16 @@ function renderCameraMap() {
     item.style.setProperty("--fov-bottom", `${50 + halfOpen}%`);
 
     const labelOffsets = {
-      "praia-poente": { x: -92, y: 18 },
-      "praia-nascente": { x: 18, y: -14 },
-      "farol-maia": { x: -132, y: 24 },
-      "maia-sul": { x: -76, y: 16 },
-      "maia-norte": { x: -88, y: -12 }
+      "praia-poente": { x: -48, y: 25 },
+      "praia-nascente": { x: -68, y: -24 },
+      "farol-maia": { x: -88, y: -16 },
+      "maia-sul": { x: -78, y: -12 },
+      "maia-norte": { x: -98, y: -12 },
+      "porto-do-castelo": { x: -110, y: 15 },
+      "pico-alto-nascente": { x: -68, y: -27 },
+      "pico-alto-poente": { x: -68, y: 28 },
+      "cnsm": { x: -68, y: -24 }
+
     };
     const offset = labelOffsets[cam.id] || { x: 16, y: 0 };
     item.style.setProperty("--label-x", `${offset.x}px`);
@@ -1454,6 +1917,19 @@ function renderCameraMap() {
     item.addEventListener("click", () => openCameraFullscreen(cam));
     overlay.appendChild(item);
   });
+}
+
+function setMapStatus(cam, status) {
+  if (!cam?.id) return;
+
+  const marker = document.querySelector(
+    `.map-camera[data-camera-id="${cam.id}"]`
+  );
+
+  if (!marker) return;
+
+  marker.classList.remove("live", "future", "offline");
+  marker.classList.add(status);
 }
 
 function destroyMediaInstance(instanceName) {
@@ -1535,7 +2011,7 @@ function openCameraFullscreen(cam) {
     </div>
     <div class="status-badge ${cam.type === "future" ? "future" : ""}">
       <span class="dot ${cam.type === "future" ? "" : "ok"}"></span>
-      <span>${cam.type === "future" ? escapeHtml(cam.status || "Brevemente") : "LIVE"}</span>
+      <span>${cam.type === "future" ? escapeHtml(cam.status ?? "") : "LIVE"}</span>
     </div>
   `;
 
@@ -1553,36 +2029,51 @@ function closeFullscreenCamera() {
 }
 
 function renderTvCamera(cam) {
+
   const tvStage = document.getElementById("tvStage");
+
   destroyMediaInstance("tv");
+
   tvStage.innerHTML = "";
 
-  const media = cam.type === "snapshot" ? document.createElement("img") : document.createElement("video");
+  const media =
+    cam.type === "snapshot"
+      ? document.createElement("img")
+      : document.createElement("video");
+
   attachMediaToElement(media, cam, "tv");
 
   media.addEventListener("error", () => {
+
     if (cam.fallbackImage) {
-      media.replaceWith(Object.assign(document.createElement("img"), {
-        src: cam.fallbackImage,
-        alt: cam.name
-      }));
+
+      const fallback = document.createElement("img");
+
+      fallback.src = cam.fallbackImage;
+      fallback.alt = cam.name;
+
+      media.replaceWith(fallback);
     }
   });
 
   const info = document.createElement("div");
+
   info.className = "tv-info";
+
   info.innerHTML = `
     <div>
       <div class="tv-name">${escapeHtml(cam.name)}</div>
-      <div>${escapeHtml(getRegion(cam))} · Live Santa Maria</div>
+      <div>Live Santa Maria</div>
     </div>
+
     <div class="status-badge">
       <span class="dot ok"></span>
-      <span>Modo TV</span>
+      <span>SLIDE-SHOW</span>
     </div>
   `;
 
   tvStage.appendChild(media);
+
   tvStage.appendChild(info);
 }
 
@@ -1656,6 +2147,11 @@ function weatherCodeToText(code) {
   return "Tempo actual";
 }
 
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
 async function updateWeather() {
   try {
     const url =
@@ -1679,22 +2175,23 @@ async function updateWeather() {
     const icon = weatherCodeToIcon(code);
     const text = weatherCodeToText(code);
 
-    document.getElementById("miniTemp").textContent = `${temp}°C`;
-    document.getElementById("weatherTemp").textContent = `${temp}°C`;
-    document.getElementById("weatherIcon").textContent = icon;
-    document.getElementById("weatherSummary").textContent = text;
-    document.getElementById("weatherWind").textContent = `${wind} km/h ${dir}`;
-    document.getElementById("weatherHum").textContent = `${hum}%`;
-    document.getElementById("weatherSea").textContent = rain > 0 ? `${rain} mm` : "—";
-    document.getElementById("lastUpdate").textContent =
-      `Última actualização: ${new Date().toLocaleTimeString("pt-PT")}`;
+    const miniTempEl = document.getElementById("miniTemp");
+    if (miniTempEl) miniTempEl.textContent = `${temp}°C`;
+    setText("weatherTemp", `${temp}°C`);
+    setText("weatherIcon", icon);
+    setText("weatherSummary", text);
+    setText("weatherWind", `${wind} km/h ${dir}`);
+    setText("weatherHum", `${hum}%`);
+    setText("weatherSea", rain > 0 ? `${rain} mm` : "—");
+    setText("lastUpdate", new Date().toLocaleTimeString("pt-PT"));
 
     renderForecast(data.daily || {});
   } catch (err) {
     console.warn("Erro meteo:", err);
-    document.getElementById("weatherTemp").textContent = "—";
-    document.getElementById("miniTemp").textContent = "—";
-    document.getElementById("weatherSummary").textContent = "Meteorologia indisponível";
+    setText("weatherTemp", "—");
+    const miniTempEl = document.getElementById("miniTemp");
+    if (miniTempEl) miniTempEl.textContent = "—";
+    setText("weatherSummary", "Meteorologia indisponível");
   }
 }
 
@@ -1738,21 +2235,7 @@ document.querySelectorAll("[data-section-jump]").forEach(btn => {
   btn.addEventListener("click", () => setSection(btn.dataset.sectionJump));
 });
 
-document.getElementById("gridViewBtn")?.addEventListener("click", () => {
-  listMode = false;
-  document.getElementById("gridViewBtn").classList.add("active");
-  document.getElementById("listViewBtn").classList.remove("active");
-  renderCameras();
-});
-
-document.getElementById("listViewBtn")?.addEventListener("click", () => {
-  listMode = true;
-  document.getElementById("listViewBtn").classList.add("active");
-  document.getElementById("gridViewBtn").classList.remove("active");
-  renderCameras();
-});
-
-document.getElementById("tvModeButton")?.addEventListener("click", startTvMode);
+document.getElementById("topTvButton")?.addEventListener("click", startTvMode);
 document.getElementById("mobileTvButton")?.addEventListener("click", startTvMode);
 document.getElementById("tvCloseButton")?.addEventListener("click", stopTvMode);
 document.getElementById("fullscreenCloseButton")?.addEventListener("click", closeFullscreenCamera);
@@ -1764,9 +2247,22 @@ document.addEventListener("keydown", event => {
   }
 });
 
+let lastMobileMode = window.matchMedia("(max-width: 680px)").matches;
+
 window.addEventListener("resize", () => {
+  const currentMobileMode = window.matchMedia("(max-width: 680px)").matches;
+
+  // No telemóvel, o scroll pode disparar resize.
+  // Só redesenhamos se mudou mesmo entre mobile/desktop.
+  if (currentMobileMode === lastMobileMode) return;
+
+  lastMobileMode = currentMobileMode;
+
   renderCameras();
-  if (currentSection === "map") renderCameraMap();
+
+  if (currentSection === "map") {
+    renderCameraMap();
+  }
 });
 
 setHeroBackground();

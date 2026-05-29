@@ -885,6 +885,50 @@
       background: rgba(255,255,255,.04);
     }
 
+    .sea-card {
+      margin: 18px 0 22px;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+    }
+
+    .sea-card-title {
+      font-size: 1.05rem;
+      font-weight: 950;
+      margin-bottom: 14px;
+    }
+
+    .sea-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .sea-grid div {
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.045);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .sea-grid span {
+      display: block;
+      color: var(--muted);
+      font-size: .78rem;
+      margin-bottom: 5px;
+    }
+
+    .sea-grid strong {
+      font-size: 1.15rem;
+    }
+
+    @media (max-width: 680px) {
+      .sea-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .tv-mode {
       display: none;
       position: fixed;
@@ -1367,10 +1411,10 @@
 
           <div class="hero-stat">
             <div class="hero-stat-top">
-              <span>♙</span>
-              <strong id="watchingNow">— pessoas</strong>
+              <span>📍</span>
+              <strong id="futureCount">— futuras</strong>
             </div>
-            <small>a ver agora</small>
+            <small>em preparação</small>
           </div>
         </div>
 
@@ -1421,9 +1465,27 @@
 
       <section class="forecast-section" id="forecastSection">
         <div class="panel-pad">
-          <h2>Previsão</h2>
+          <div class="sea-card" id="seaCard">
+            <div class="sea-card-title">🌊 Estado do Mar</div>
+
+            <div class="sea-grid">
+              <div>
+                <span>Ondulação</span>
+                <strong id="seaWaveHeight">—</strong>
+              </div>
+              <div>
+                <span>Período</span>
+                <strong id="seaWavePeriod">—</strong>
+              </div>
+              <div>
+                <span>Direcção</span>
+                <strong id="seaWaveDirection">—</strong>
+              </div>
+            </div>
+          </div>
+         <h2>Previsão</h2>
           <p>Dados meteorológicos actuais e previsão simples para consulta rápida.</p>
-          <div class="forecast-days" id="forecastDays"></div>
+          <div class="forecast-days" id="forecastDays"></div>                
         </div>
       </section>
 
@@ -1464,6 +1526,14 @@ const container = document.getElementById("cameraContainer");
 const PUBLIC_CAMERAS = (window.LSM_CAMERAS || []).filter(cam => cam.enabled !== false);
 const liveCameras = PUBLIC_CAMERAS.filter(cam => cam.type !== "future" && cam.url);
 const expandedMobileCards = new Set();
+const cameraRuntimeStatus = new Map();
+
+PUBLIC_CAMERAS.forEach(cam => {
+  cameraRuntimeStatus.set(
+    cam.id,
+    cam.type === "future" ? "future" : "checking"
+  );
+});
 
 let activeFilter = "all";
 let listMode = false;
@@ -1515,9 +1585,46 @@ function setHeroBackground() {
   }
 }
 
+async function updateSeaState() {
+  try {
+    const url =
+      "https://marine-api.open-meteo.com/v1/marine" +
+      "?latitude=36.97639" +
+      "&longitude=-25.125" +
+      "&hourly=wave_height,wave_period,wave_direction" +
+      "&timezone=Atlantic%2FAzores" +
+      "&forecast_days=1";
+
+    const response = await fetch(url, { cache: "no-store" });
+    const data = await response.json();
+
+    const hourly = data.hourly || {};
+    const nowIndex = 0;
+
+    const height = Number(hourly.wave_height?.[nowIndex]);
+    const period = Number(hourly.wave_period?.[nowIndex]);
+    const direction = Number(hourly.wave_direction?.[nowIndex]);
+
+    setText("seaWaveHeight", Number.isFinite(height) ? `${height.toFixed(1)} m` : "—");
+    setText("seaWavePeriod", Number.isFinite(period) ? `${Math.round(period)} s` : "—");
+    setText("seaWaveDirection", degreesToCompass(direction));
+  } catch (err) {
+    console.warn("Erro estado do mar:", err);
+    setText("seaWaveHeight", "—");
+    setText("seaWavePeriod", "—");
+    setText("seaWaveDirection", "—");
+  }
+}
+
 function updateCounts() {
-  const online = liveCameras.length;
-  const watching = liveCameras.reduce((sum, cam, index) => sum + viewerCount(cam, index), 0);
+
+  const online = liveCameras.filter(cam =>
+    cameraRuntimeStatus.get(cam.id) === "live"
+  ).length;
+
+  const future = PUBLIC_CAMERAS.filter(
+    cam => cam.type === "future"
+  ).length;
 
   setText(
     "onlineCount",
@@ -1525,13 +1632,8 @@ function updateCounts() {
   );
 
   setText(
-    "watchingNow",
-    `${watching} pessoas`
-  );
-
-  setText(
-    "lastUpdate",
-    new Date().toLocaleTimeString("pt-PT")
+    "futureCount",
+    `${future} ${future === 1 ? "futura" : "futuras"}`
   );
 }
 
@@ -1564,6 +1666,8 @@ function setCardLive(block) {
   badge.className = "status-badge";
   badgeText.textContent = "LIVE";
   block.classList.remove("has-fallback-active");
+  cameraRuntimeStatus.set(block._cam.id, "live");
+  updateCounts();
   setMapStatus(block._cam, "live");
 }
 
@@ -1582,6 +1686,8 @@ function setCardOffline(block) {
     fallback.src = cam.fallbackImage;
     block.classList.add("has-fallback-active");
   }
+  cameraRuntimeStatus.set(block._cam.id, "offline");
+  updateCounts();
   setMapStatus(block._cam, "offline");
 }
 
@@ -2272,6 +2378,8 @@ renderCameraMap();
 updateWeather();
 setInterval(updateCounts, 60 * 1000);
 setInterval(updateWeather, 10 * 60 * 1000);
+updateSeaState();
+setInterval(updateSeaState, 30 * 60 * 1000);
 </script>
 </body>
 </html>
