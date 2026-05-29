@@ -16,7 +16,7 @@ window.LSM_CAMERAS = [
     preview: null,
     message: null,
     status: null,
-
+    commissioned: "2024-05",
     position: {
       lat: 36.946593,
       lon: -25.147747,
@@ -46,6 +46,7 @@ window.LSM_CAMERAS = [
     preview: null,
     message: null,
     status: null,
+    commissioned: "2025-04",
 
     position: {
       lat: 37.0039,
@@ -76,6 +77,7 @@ window.LSM_CAMERAS = [
     preview: null,
     message: null,
     status: null,
+    commissioned: "2023-01",
 
     position: {
       lat: 36.9843,
@@ -106,6 +108,7 @@ window.LSM_CAMERAS = [
     preview: null,
     message: null,
     status: null,
+    commissioned: "2024-05",
 
     position: {
       lat: 36.9952,
@@ -136,6 +139,7 @@ window.LSM_CAMERAS = [
     preview: null,
     message: null,
     status: null,
+    commissioned: "2023-05",
 
     position: {
       lat: 36.952592,
@@ -166,7 +170,8 @@ window.LSM_CAMERAS = [
     preview: null,
     message: null,
     status: null,
-
+    commissioned: "2025-05",
+    
     position: {
       lat: 36.950908,
       lon: -25.095411,
@@ -196,7 +201,8 @@ window.LSM_CAMERAS = [
     preview: "http://anjos.olho.mariense.pt/maia/camera.m3u8",
     message: "Brevemente",
     status: "Brevemente",
-
+    commissioned: "2025-05",
+    
     position: {
       lat: 36.944280,
       lon: -25.016115,
@@ -230,6 +236,7 @@ window.LSM_CAMERAS = [
     preview: "./assets/previews/anjos-blues.jpg",
     message: null,
     status: "Em preparação",
+    commissioned: null,
 
     position: {
       lat: 37.00799592,
@@ -260,6 +267,7 @@ window.LSM_CAMERAS = [
     preview: "./assets/previews/marina-club-motard.jpeg",
     message: null,
     status: "Brevemente",
+    commissioned: null,
 
     position: {
       lat: 36.946241,
@@ -290,6 +298,7 @@ window.LSM_CAMERAS = [
     preview: "./assets/previews/pico-alto-nascente.jpeg",
     message: null,
     status: "Brevemente",
+    commissioned: null,
 
     position: {
       lat: 36.979503,
@@ -320,6 +329,7 @@ window.LSM_CAMERAS = [
     preview: "./assets/previews/pico-alto-poente.jpeg",
     message: null,
     status: "Brevemente",
+    commissioned: null,
 
     position: {
       lat: 36.979503,
@@ -350,6 +360,7 @@ window.LSM_CAMERAS = [
     preview: "./assets/previews/ilheu-lagoinhas.jpg",
     message: "Futura vista sobre o ilhéu e costa norte",
     status: "Aguarda patrocínio",
+    commissioned: null,
 
     position: {
       lat: 37.005331,
@@ -370,7 +381,7 @@ window.LSM_CAMERAS = [
 
   {
     id: "farol-maia",
-    name: "Maia-Farol",
+    name: "Maia Farol",
     region: "Este",
     type: "future",
     url: null,
@@ -380,6 +391,7 @@ window.LSM_CAMERAS = [
     preview: "./assets/previews/farol-maia.jpeg",
     message: "Vista sobre a Maia",
     status: "Brevemente",
+    commissioned: null,
 
     position: {
       lat: 36.930009,
@@ -411,6 +423,7 @@ window.LSM_CAMERAS = [
     preview: "./assets/previews/porto-do-castelo.jpeg",
     message: "Vista sobre o Porto do Castelo",
     status: "Brevemente",
+    commissioned: null,
 
     position: {
       lat: 36.929928,
@@ -441,6 +454,7 @@ window.LSM_CAMERAS = [
     preview: "./assets/previews/maia-sul.jpeg",
     message: "Brevemente",
     status: "Aguarda Patrocinio",
+    commissioned: null,
 
     position: {
       lat: 36.938183,

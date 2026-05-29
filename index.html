@@ -1054,6 +1054,44 @@
       display: none;
     }
 
+    .network-timeline {
+      margin-top: 22px;
+    }
+
+    .network-timeline h3 {
+      margin: 0 0 14px;
+      font-size: 1.1rem;
+    }
+
+    .timeline-group {
+      margin-top: 16px;
+    }
+
+    .timeline-group-title {
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-weight: 900;
+    }
+
+    .timeline-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 13px 14px;
+      margin-bottom: 10px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+    }
+
+    .timeline-row span {
+      color: var(--muted);
+    }
+
+    .timeline-row strong {
+      font-weight: 850;
+    }
+
     @media (max-width: 1350px) {
       .hero-live-overlay {
         grid-template-columns: minmax(170px, .55fr) minmax(260px, .86fr) minmax(132px, .35fr) minmax(94px, .25fr);
@@ -1488,6 +1526,7 @@
         <div class="panel-pad">
           <h2>Live Santa Maria</h2>
           <p>Uma janela simples e rápida para observar Santa Maria: mar, céu, costa e lugares da ilha. As imagens servem de apoio informal à observação meteorológica e marítima.</p>
+          <div class="network-timeline" id="networkTimeline"></div>
           <p style="margin-top:14px;">Contacto: <a href="mailto:livesantamaria.project@gmail.com">livesantamaria.project@gmail.com</a></p>
         </div>
       </section>
@@ -2366,10 +2405,77 @@ window.addEventListener("resize", () => {
   }
 });
 
+function formatCommissioned(value) {
+  if (!value) return "";
+
+  const [year, month] = String(value).split("-");
+  const date = new Date(Number(year), Number(month) - 1, 1);
+
+  return new Intl.DateTimeFormat("pt-PT", {
+    month: "long",
+    year: "numeric"
+  }).format(date);
+}
+
+function renderNetworkTimeline() {
+  const holder = document.getElementById("networkTimeline");
+  if (!holder) return;
+
+  const active = PUBLIC_CAMERAS
+    .filter(cam => cam.commissioned)
+    .sort((a, b) => String(a.commissioned).localeCompare(String(b.commissioned)));
+
+  const future = PUBLIC_CAMERAS
+    .filter(cam => cam.type === "future" && cam.name);
+
+  const groups = {};
+
+  active.forEach(cam => {
+    const label = formatCommissioned(cam.commissioned);
+    if (!groups[label]) groups[label] = [];
+    groups[label].push(cam);
+  });
+
+  holder.innerHTML = `
+    <h3>História da rede</h3>
+
+    ${Object.entries(groups).map(([label, cams]) => `
+      <div class="timeline-group">
+        <div class="timeline-group-title">${escapeHtml(label)}</div>
+
+        ${cams.map(cam => `
+          <div class="timeline-row">
+            <strong>✓ ${escapeHtml(cam.name)}</strong>
+            <span>${escapeHtml(getRegion(cam))}</span>
+          </div>
+        `).join("")}
+      </div>
+    `).join("")}
+
+    ${
+      future.length
+        ? `
+          <div class="timeline-group">
+            <div class="timeline-group-title">Em preparação</div>
+
+            ${future.map(cam => `
+              <div class="timeline-row">
+                <strong>○ ${escapeHtml(cam.name)}</strong>
+                <span>${escapeHtml(getRegion(cam))}</span>
+              </div>
+            `).join("")}
+          </div>
+        `
+        : ""
+    }
+  `;
+}
+
 setHeroBackground();
 updateCounts();
 renderCameras();
 renderCameraMap();
+renderNetworkTimeline();
 updateWeather();
 setInterval(updateCounts, 60 * 1000);
 setInterval(updateWeather, 10 * 60 * 1000);
