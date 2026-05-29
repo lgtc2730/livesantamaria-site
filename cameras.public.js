@@ -1,4 +1,4 @@
-window.LSM_CAMERAS = [
+window.LVSM_CAMERAS = [
 
   // ==========================================================
   // LIVE CAMERAS
@@ -492,6 +492,23 @@ window.LSM_CAMERAS = [
     sponsor: null,
 
     enabled: true
+  }
+
+];
+
+window.LVSM_MILESTONES = [
+  {
+    date: "2026-05",
+    icon: "🚀",
+    title: "Arranque da rede pública LVSM",
+    text: "Primeira versão pública do Live Santa Maria com câmaras em directo, previsão meteorológica, estado do mar e mapa da rede."
+  },
+
+  {
+    date: "2026-07",
+    icon: "🏔️",
+    title: "Cobertura do Pico Alto",
+    text: "Entrada em serviço das câmaras do Pico Alto."
   }
 
 ];

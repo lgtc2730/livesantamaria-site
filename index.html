@@ -1092,6 +1092,16 @@
       font-weight: 850;
     }
 
+    .milestone-row {
+      background: rgba(24,119,255,.10);
+      border-color: rgba(66,183,255,.22);
+    }
+
+    .milestone-row span {
+      max-width: 58%;
+      text-align: right;
+    }
+
     @media (max-width: 1350px) {
       .hero-live-overlay {
         grid-template-columns: minmax(170px, .55fr) minmax(260px, .86fr) minmax(132px, .35fr) minmax(94px, .25fr);
@@ -1557,7 +1567,7 @@
 
 <script>
 const container = document.getElementById("cameraContainer");
-const PUBLIC_CAMERAS = (window.LSM_CAMERAS || []).filter(cam => cam.enabled !== false);
+const PUBLIC_CAMERAS = (window.LVSM_CAMERAS || []).filter(cam => cam.enabled !== false);
 const liveCameras = PUBLIC_CAMERAS.filter(cam => cam.type !== "future" && cam.url);
 const expandedMobileCards = new Set();
 const cameraRuntimeStatus = new Map();
@@ -2421,6 +2431,8 @@ function renderNetworkTimeline() {
   const holder = document.getElementById("networkTimeline");
   if (!holder) return;
 
+  const milestones = window.LVSM_MILESTONES || [];
+
   const active = PUBLIC_CAMERAS
     .filter(cam => cam.commissioned)
     .sort((a, b) => String(a.commissioned).localeCompare(String(b.commissioned)));
@@ -2428,29 +2440,39 @@ function renderNetworkTimeline() {
   const future = PUBLIC_CAMERAS
     .filter(cam => cam.type === "future" && cam.name);
 
-  const groups = {};
-
-  active.forEach(cam => {
-    const label = formatCommissioned(cam.commissioned);
-    if (!groups[label]) groups[label] = [];
-    groups[label].push(cam);
-  });
+  const dates = Array.from(new Set([
+    ...active.map(cam => cam.commissioned),
+    ...milestones.map(item => item.date)
+  ])).sort();
 
   holder.innerHTML = `
     <h3>História da rede</h3>
 
-    ${Object.entries(groups).map(([label, cams]) => `
-      <div class="timeline-group">
-        <div class="timeline-group-title">${escapeHtml(label)}</div>
+    ${dates.map(date => {
+      const cams = active.filter(cam => cam.commissioned === date);
+      const items = milestones.filter(item => item.date === date);
+      const label = formatCommissioned(date);
 
-        ${cams.map(cam => `
-          <div class="timeline-row">
-            <strong>✓ ${escapeHtml(cam.name)}</strong>
-            <span>${escapeHtml(getRegion(cam))}</span>
-          </div>
-        `).join("")}
-      </div>
-    `).join("")}
+      return `
+        <div class="timeline-group">
+          <div class="timeline-group-title">${escapeHtml(label)}</div>
+
+          ${items.map(item => `
+            <div class="timeline-row milestone-row">
+              <strong>${escapeHtml(item.icon || "🚀")} ${escapeHtml(item.title)}</strong>
+              <span>${escapeHtml(item.text || "")}</span>
+            </div>
+          `).join("")}
+
+          ${cams.map(cam => `
+            <div class="timeline-row">
+              <strong>✓ ${escapeHtml(cam.name)}</strong>
+              <span>${escapeHtml(getRegion(cam))}</span>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }).join("")}
 
     ${
       future.length
