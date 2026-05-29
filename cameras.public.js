@@ -36,7 +36,7 @@ window.LVSM_CAMERAS = [
 
   {
     id: "anjos-porto",
-    name: "Anjos Porto",
+    name: "Anjos-Porto",
     region: "Norte",
     type: "hls",
     url: "https://anjos-cam.livesantamaria.org/cam1/index.m3u8",
@@ -67,16 +67,16 @@ window.LVSM_CAMERAS = [
 
   {
     id: "slourenco-norte",
-    name: "São Lourenço Norte",
+    name: "São Lourenço-Norte",
     region: "Este",
-    type: "snapshot",
-    url: "https://www.spotazores.com/camaras/SMALOU01/QXGAcurrent.jpg",
+    type: "future", // "snapshot",
+    url: null, // "https://www.spotazores.com/camaras/SMALOU01/QXGAcurrent.jpg"
     refresh: 15000,
     fallbackImage: "./assets/fallback/slourenco-norte.jpg",
 
     preview: null,
     message: null,
-    status: null,
+    status: "OFFLINE",
     commissioned: "2023-01",
 
     position: {
@@ -87,7 +87,7 @@ window.LVSM_CAMERAS = [
     },
 
     sponsor: {
-      name: null,
+      name: "SpotAzores",
       logo: null,
       url: null,
       label: null
@@ -98,7 +98,7 @@ window.LVSM_CAMERAS = [
 
   {
     id: "slourenco-sul",
-    name: "São Lourenço Sul",
+    name: "São Lourenço-Sul",
     region: "Este",
     type: "hls",
     url: "https://slourenco-sul-cam.livesantamaria.org/cam1/index.m3u8",
@@ -113,15 +113,15 @@ window.LVSM_CAMERAS = [
     position: {
       lat: 36.9952,
       lon: -25.0554,
-      bearing: 140,
+      bearing: 150,
       fov: 90
     },
 
     sponsor: {
-      name: null,
+      name: "Deolinda Melo",
       logo: null,
       url: null,
-      label: null
+      label: "Apoio de"
     },
 
     enabled: true
@@ -129,16 +129,16 @@ window.LVSM_CAMERAS = [
 
   {
     id: "praia-nascente",
-    name: "Praia Nascente",
+    name: "Praia-Nascente",
     region: "Sul",
-    type: "snapshot",
+    type: "future", // "snapshot",
     url: "https://www.spotazores.com/camaras/SMAFOR01/VGAcurrent.jpg",
     refresh: 15000,
     fallbackImage: "./assets/fallback/praia-nascente.jpg",
 
     preview: null,
     message: null,
-    status: null,
+    status: "OFFLINE", // null,
     commissioned: "2023-05",
 
     position: {
@@ -160,7 +160,7 @@ window.LVSM_CAMERAS = [
 
   {
     id: "praia-poente",
-    name: "Praia Poente",
+    name: "Praia-Poente",
     region: "Sul",
     type: "hls",
     url: "https://praia-poente-cam.livesantamaria.org/cam1/index.m3u8",
@@ -180,7 +180,7 @@ window.LVSM_CAMERAS = [
     },
 
     sponsor: {
-      name: "Deolinda Melo",
+      name: "Apartamentos Mar e Sol",
       logo: null,
       url: null,
       label: "Apoio de"
@@ -191,7 +191,7 @@ window.LVSM_CAMERAS = [
 
   {
     id: "maia-norte",
-    name: "Maia Norte",
+    name: "Maia-Norte",
     region: "Este",
     type: "hls",
     url: null,
@@ -226,7 +226,7 @@ window.LVSM_CAMERAS = [
 
   {
     id: "anjos-blues",
-    name: "Anjos Blues",
+    name: "Anjos-Blues",
     region: "Norte",
     type: "future",
     url: null,
@@ -288,7 +288,7 @@ window.LVSM_CAMERAS = [
 
   {
     id: "pico-alto-nascente",
-    name: "Pico Alto Nascente",
+    name: "Pico Alto-Nascente",
     region: "Centro",
     type: "future",
     url: null,
@@ -319,7 +319,7 @@ window.LVSM_CAMERAS = [
 
   {
     id: "pico-alto-poente",
-    name: "Pico Alto Poente",
+    name: "Pico Alto-Poente",
     region: "Centro",
     type: "future",
     url: null,
@@ -381,7 +381,7 @@ window.LVSM_CAMERAS = [
 
   {
     id: "farol-maia",
-    name: "Maia Farol",
+    name: "Maia-Farol",
     region: "Este",
     type: "future",
     url: null,
@@ -444,7 +444,7 @@ window.LVSM_CAMERAS = [
 
   {
     id: "maia-sul",
-    name: "Maia Sul",
+    name: "Maia-Sul",
     region: "Este",
     type: "future",
     url: null,
