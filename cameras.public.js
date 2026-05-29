@@ -193,14 +193,14 @@ window.LVSM_CAMERAS = [
     id: "maia-norte",
     name: "Maia-Norte",
     region: "Este",
-    type: "hls",
+    type: "future",
     url: null,
     refresh: null,
     fallbackImage: "./assets/fallback/maia-norte.jpeg",
 
     preview: "http://anjos.olho.mariense.pt/maia/camera.m3u8",
-    message: "Brevemente",
-    status: "Brevemente",
+    message: null,
+    status: "Em preparação",
     commissioned: "2025-05",
     
     position: {
@@ -223,37 +223,6 @@ window.LVSM_CAMERAS = [
   // ==========================================================
   // FUTURE CAMERAS
   // ==========================================================
-
-  {
-    id: "anjos-blues",
-    name: "Anjos-Blues",
-    region: "Norte",
-    type: "future",
-    url: null,
-    refresh: null,
-    fallbackImage: null,
-
-    preview: "./assets/previews/anjos-blues.jpg",
-    message: null,
-    status: "Em preparação",
-    commissioned: null,
-
-    position: {
-      lat: 37.00799592,
-      lon: -25.15193926,
-      bearing: 50,
-      fov: 65
-    },
-
-    sponsor: {
-      name: "Assoc. Escravos da Cadainha",
-      logo: null,
-      url: null,
-      label: "Apoio de"
-    },
-
-    enabled: true
-  },
 
   {
     id: "marina-club-motard",
@@ -287,62 +256,31 @@ window.LVSM_CAMERAS = [
   },
 
   {
-    id: "pico-alto-nascente",
-    name: "Pico Alto-Nascente",
-    region: "Centro",
+    id: "anjos-blues",
+    name: "Anjos-Blues",
+    region: "Norte",
     type: "future",
     url: null,
     refresh: null,
     fallbackImage: null,
 
-    preview: "./assets/previews/pico-alto-nascente.jpeg",
+    preview: "./assets/previews/anjos-blues.jpg",
     message: null,
-    status: "Aguarda patrocínio",
+    status: "Em preparação",
     commissioned: null,
 
     position: {
-      lat: 36.979503,
-      lon: -25.090873,
-      bearing: 90,
-      fov: 90
-    },
-
-    sponsor: {
-      name: null,
-      logo: null,
-      url: null,
-      label: "Sponsor"
-    },
-
-    enabled: true
-  },
-
-  {
-    id: "pico-alto-poente",
-    name: "Pico Alto-Poente",
-    region: "Centro",
-    type: "future",
-    url: null,
-    refresh: null,
-    fallbackImage: null,
-
-    preview: "./assets/previews/pico-alto-poente.jpeg",
-    message: null,
-    status: "Aguarda patrocínio",
-    commissioned: null,
-
-    position: {
-      lat: 36.979503,
-      lon: -25.090873,
-      bearing: 270,
+      lat: 37.00799592,
+      lon: -25.15193926,
+      bearing: 50,
       fov: 65
     },
 
     sponsor: {
-      name: null,
+      name: "Assoc. Escravos da Cadainha",
       logo: null,
       url: null,
-      label: "Sponsor"
+      label: "Apoio de"
     },
 
     enabled: true
@@ -366,6 +304,37 @@ window.LVSM_CAMERAS = [
       lat: 37.005331,
       lon: -25.068010,
       bearing: 310,
+      fov: 65
+    },
+
+    sponsor: {
+      name: null,
+      logo: null,
+      url: null,
+      label: null
+    },
+
+    enabled: true
+  },
+
+  {
+    id: "maia-sul",
+    name: "Maia-Sul",
+    region: "Este",
+    type: "future",
+    url: null,
+    refresh: null,
+    fallbackImage: null,
+
+    preview: "./assets/previews/maia-sul.jpeg",
+    message: "Vista sobre a Baia e Farol da Maia",
+    status: "Aguarda Patrocinio",
+    commissioned: null,
+
+    position: {
+      lat: 36.938183,
+      lon: -25.015193,
+      bearing: 180,
       fov: 65
     },
 
@@ -443,23 +412,54 @@ window.LVSM_CAMERAS = [
   },
 
   {
-    id: "maia-sul",
-    name: "Maia-Sul",
-    region: "Este",
+    id: "pico-alto-nascente",
+    name: "Pico Alto-Nascente",
+    region: "Centro",
     type: "future",
     url: null,
     refresh: null,
     fallbackImage: null,
 
-    preview: "./assets/previews/maia-sul.jpeg",
-    message: "Vista sobre a Baia e Farol da Maia",
-    status: "Aguarda Patrocinio",
+    preview: "./assets/previews/pico-alto-nascente.jpeg",
+    message: null,
+    status: "Aguarda patrocínio",
     commissioned: null,
 
     position: {
-      lat: 36.938183,
-      lon: -25.015193,
-      bearing: 180,
+      lat: 36.979503,
+      lon: -25.090873,
+      bearing: 90,
+      fov: 90
+    },
+
+    sponsor: {
+      name: null,
+      logo: null,
+      url: null,
+      label: "Sponsor"
+    },
+
+    enabled: true
+  },
+
+  {
+    id: "pico-alto-poente",
+    name: "Pico Alto-Poente",
+    region: "Centro",
+    type: "future",
+    url: null,
+    refresh: null,
+    fallbackImage: null,
+
+    preview: "./assets/previews/pico-alto-poente.jpeg",
+    message: null,
+    status: "Aguarda patrocínio",
+    commissioned: null,
+
+    position: {
+      lat: 36.979503,
+      lon: -25.090873,
+      bearing: 270,
       fov: 65
     },
 
@@ -467,37 +467,36 @@ window.LVSM_CAMERAS = [
       name: null,
       logo: null,
       url: null,
-      label: null
+      label: "Sponsor"
     },
 
     enabled: true
-  },
+  },  
 
+  {
+    id: "promo-cmvp",
+    name: "Santa Maria, Açores",
+    region: null,
+    type: "promo",
+    url: "https://www.youtube.com/watch?v=W9SgW4EWn30&t=9s",
+    refresh: null,
+    fallbackImage: null,
 
-{
-  id: "promo-cmvp",
-  name: "Santa Maria, Açores",
-  region: null,
-  type: "promo",
-  url: "https://www.youtube.com/watch?v=W9SgW4EWn30&t=9s",
-  refresh: null,
-  fallbackImage: null,
+    preview: "./assets/previews/neutra.jpg",
+    message: "Descubra a beleza autêntica da ilha do sol.",
+    status: "Ver vídeo",
 
-  preview: "./assets/previews/neutra.jpg",
-  message: "Descubra a beleza autêntica da ilha do sol.",
-  status: "Ver vídeo",
+    position: null,
 
-  position: null,
+    sponsor: {
+      name: "Câmara Municipal de Vila do Porto",
+      logo: null,
+      url: "https://www.cm-viladoporto.pt",
+      label: "Vídeo promocional"
+    },
 
-  sponsor: {
-    name: "Câmara Municipal de Vila do Porto",
-    logo: null,
-    url: "https://www.cm-viladoporto.pt",
-    label: "Vídeo promocional"
-  },
-
-  enabled: true
-}
+    enabled: true
+  }
 
 ];
 
