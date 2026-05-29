@@ -1102,6 +1102,35 @@
       text-align: right;
     }
 
+    .support-card {
+      margin-top: 22px;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(66,183,255,.22);
+      background: rgba(24,119,255,.08);
+    }
+
+    .support-card h3 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+    }
+
+    .support-card p {
+      margin: 10px 0 0;
+    }
+
+    .support-link {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 16px;
+      min-height: 40px;
+      padding: 0 16px;
+      border-radius: 999px;
+      background: rgba(24,119,255,.34);
+      border: 1px solid rgba(66,183,255,.28);
+      font-weight: 900;
+    }
+
     @media (max-width: 1350px) {
       .hero-live-overlay {
         grid-template-columns: minmax(170px, .55fr) minmax(260px, .86fr) minmax(132px, .35fr) minmax(94px, .25fr);
@@ -1536,7 +1565,25 @@
         <div class="panel-pad">
           <h2>Live Santa Maria</h2>
           <p>Uma janela simples e rápida para observar Santa Maria: mar, céu, costa e lugares da ilha. As imagens servem de apoio informal à observação meteorológica e marítima.</p>
+
+          <div class="support-card">
+            <h3>Quer apoiar este projecto?</h3>
+
+            <p>Algumas zonas da ilha de Santa Maria ainda não têm cobertura e estão assinaladas como “Procuramos patrocinador”.</p>
+
+            <p>Com um apoio estimado de <strong>120 €</strong>, é possível adquirir uma webcam e um webserver. Estes equipamentos serão sempre seus, podendo reavê-los a qualquer momento ou no final do projecto.</p>
+
+            <p>A equipa Live Santa Maria assegura a compra, configuração, programação e manutenção técnica do equipamento.</p>
+
+            <p>Em contrapartida, o seu nome, marca ou link poderá ser apresentado junto da imagem transmitida na página Live Santa Maria.</p>
+
+            <a class="support-link" href="mailto:livesantamaria.project@gmail.com">
+              Contactar o projecto
+            </a>
+          </div>
+
           <div class="network-timeline" id="networkTimeline"></div>
+
           <p style="margin-top:14px;">Contacto: <a href="mailto:livesantamaria.project@gmail.com">livesantamaria.project@gmail.com</a></p>
         </div>
       </section>
