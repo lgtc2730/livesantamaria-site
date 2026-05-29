@@ -90,7 +90,7 @@ window.LVSM_CAMERAS = [
       name: "SpotAzores",
       logo: null,
       url: null,
-      label: null
+      label: "Em parceria com"
     },
 
     enabled: true
@@ -152,7 +152,7 @@ window.LVSM_CAMERAS = [
       name: "SpotAzores",
       logo: null,
       url: null,
-      label: null
+      label: "Em parceria com"
     },
 
     enabled: true
@@ -483,7 +483,7 @@ window.LVSM_CAMERAS = [
   refresh: null,
   fallbackImage: null,
 
-  preview: null, // "./assets/previews/neutra.jpg",
+  preview: "./assets/previews/neutra.jpg",
   message: "Descubra a beleza autêntica da ilha do sol.",
   status: "Ver vídeo",
 
