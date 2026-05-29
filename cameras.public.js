@@ -474,26 +474,30 @@ window.LVSM_CAMERAS = [
   },
 
 
-  {
-    id: "neutra",
-    name: null,
-    region: null,
-    type: "future",
-    url: null,
-    refresh: null,
-    fallbackImage: null,
+{
+  id: "promo-cmvp",
+  name: "Santa Maria, Açores",
+  region: null,
+  type: "promo",
+  url: "https://www.youtube.com/watch?v=W9SgW4EWn30&t=9s",
+  refresh: null,
+  fallbackImage: null,
 
-    preview: "./assets/previews/neutra.jpg",
-    message: null,
-    status: null,
+  preview: null, // "./assets/previews/neutra.jpg",
+  message: "Descubra a beleza autêntica da ilha do sol.",
+  status: "Ver vídeo",
 
-    position: null,
+  position: null,
 
-    sponsor: null,
-    url: "mailto:livesantamaria.project@gmail.com",
+  sponsor: {
+    name: "Câmara Municipal de Vila do Porto",
+    logo: null,
+    url: "https://www.cm-viladoporto.pt",
+    label: "Vídeo promocional"
+  },
 
-    enabled: true
-  }
+  enabled: true
+}
 
 ];
 

@@ -1809,6 +1809,7 @@ function isOffline(cam) {
 }
 
 function createCameraCard(cam, index) {
+  
   const card = document.createElement("article");
   card._cam = cam;
   card.className = `camera-card ${cam.type === "future" ? "future-card" : ""}`;
@@ -1825,7 +1826,11 @@ function createCameraCard(cam, index) {
   }
 
   let mediaHtml = "";
-  if (cam.type === "snapshot") {
+  if (cam.type === "promo") {
+    mediaHtml = `
+      <img class="live-media" src="${escapeHtml(getPreview(cam))}" alt="${escapeHtml(cam.name)}">
+    `;
+  } else if (cam.type === "snapshot") {
     mediaHtml = `
       <img class="live-media" alt="${escapeHtml(cam.name)}">
       <img class="fallback-media" src="${escapeHtml(cam.fallbackImage || getPreview(cam))}" alt="${escapeHtml(cam.name)}">
@@ -1839,9 +1844,12 @@ function createCameraCard(cam, index) {
     `;
   }
 
-  const statusText = cam.type === "future"
-    ? (cam.status ?? "")
-    : "A VERIFICAR";
+  const statusText =
+    cam.type === "promo"
+      ? (cam.status ?? "Ver vídeo")
+      : cam.type === "future"
+        ? (cam.status ?? "")
+        : "A VERIFICAR";
 
   card.innerHTML = `
     ${mediaHtml}
@@ -1924,6 +1932,12 @@ function createCameraCard(cam, index) {
 
   card.addEventListener("pointerup", (e) => {
     if (e.target.closest("button, a, video, select")) return;
+
+    if (cam.type === "promo") {
+      if (e.pointerType === "touch" && pointerMoved) return;
+      window.open(cam.url, "_blank", "noopener,noreferrer");
+      return;
+    }
 
     if (window.matchMedia("(max-width: 680px)").matches) {
       if (e.pointerType === "touch" && pointerMoved) return;
