@@ -118,7 +118,7 @@ window.LVSM_CAMERAS = [
     },
 
     sponsor: {
-      name: "Assoc. Escravos da Cadeinha",
+      name: "Escravos da Cadeinha",
       logo: "./assets/sponsors/escravos-cadeinha.jpg",
       url: "https://escravosdacadeinha.com/",
       label: "Apoio de"
