@@ -764,6 +764,37 @@
       color: rgba(255,255,255,.88);
 
       font-weight: 650;
+        }
+
+    .camera-sponsor-logo {
+      position: absolute;
+      right: 5px;
+      bottom: 5px;
+      z-index: 4;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 3px 6px;
+      max-width: 150px;
+      max-height: 55px;
+
+      background: transparent;
+      opacity: .75;
+
+      pointer-events: none;
+    }
+
+    .camera-sponsor-logo img {
+      display: block;
+      max-width: 100%;
+      max-height: 28px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,.55));
     }
 
     .camera-state {
@@ -935,6 +966,38 @@
       }
     }
 
+    .tv-sponsor-logo {
+      position: absolute;
+
+      right: 24px;
+      bottom: 24px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      max-width: 220px;
+      max-height: 80px;
+
+      opacity: .75;
+
+      pointer-events: none;
+    }
+
+    .tv-sponsor-logo img {
+      display: block;
+
+      max-width: 100%;
+      max-height: 70px;
+
+      width: auto;
+      height: auto;
+
+      object-fit: contain;
+
+      filter: drop-shadow(0 3px 8px rgba(0,0,0,.6));
+    }
+
     .tv-mode {
       display: none;
       position: fixed;
@@ -975,6 +1038,38 @@
       gap: 16px;
       color: white;
       text-shadow: 0 3px 18px rgba(0,0,0,.7);
+    }
+
+    .fullscreen-sponsor-logo {
+      position: absolute;
+
+      right: 24px;
+      bottom: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      max-width: 220px;
+      max-height: 80px;
+
+      opacity: .75;
+
+      pointer-events: none;
+    }
+
+    .fullscreen-sponsor-logo img {
+      display: block;
+
+      max-width: 100%;
+      max-height: 70px;
+
+      width: auto;
+      height: auto;
+
+      object-fit: contain;
+
+      filter: drop-shadow(0 3px 8px rgba(0,0,0,.6));
     }
 
     .tv-info::before,
@@ -1903,6 +1998,19 @@ function createCameraCard(cam, index) {
             `
             : ""
         }
+
+        ${
+          cam.sponsor?.logo
+            ? `
+              <div class="camera-sponsor-logo">
+                <img
+                  src="${escapeHtml(cam.sponsor.logo)}"
+                  alt="${escapeHtml(cam.sponsor.name || "Sponsor")}"
+                >
+              </div>
+            `
+            : ""
+        }        
       </div>
     </div>
   `;
@@ -2269,6 +2377,19 @@ function openCameraFullscreen(cam) {
     </div>
   `;
 
+  if (cam.sponsor?.logo) {
+    const logo = document.createElement("div");
+
+    logo.className = "fullscreen-sponsor-logo";
+
+    logo.innerHTML = `
+      <img
+        src="${escapeHtml(cam.sponsor.logo)}"
+        alt="${escapeHtml(cam.sponsor.name || "Sponsor")}"
+      >
+    `;
+    info.appendChild(logo);
+  }
   fsStage.appendChild(media);
   fsStage.appendChild(info);
   fsMode.classList.add("show");
@@ -2319,11 +2440,23 @@ function renderTvCamera(cam) {
       <div class="tv-name">${escapeHtml(cam.name)}</div>
       <div>Live Santa Maria</div>
     </div>
-
   `;
 
-  tvStage.appendChild(media);
+  if (cam.sponsor?.logo) {
+    const logo = document.createElement("div");
+    logo.className = "tv-sponsor-logo";
 
+    logo.innerHTML = `
+      <img
+        src="${escapeHtml(cam.sponsor.logo)}"
+        alt="${escapeHtml(cam.sponsor.name || "Sponsor")}"
+      >
+    `;
+
+    info.appendChild(logo);
+  }
+
+  tvStage.appendChild(media);
   tvStage.appendChild(info);
 }
 

@@ -26,7 +26,7 @@ window.LVSM_CAMERAS = [
 
     sponsor: {
       name: "Clube Naval Santa Maria",
-      logo: null,
+      logo: "./assets/sponsors/cnsm.jpeg",
       url: "https://www.cnsantamaria.pt/",
       label: "Sponsor"
     },
@@ -88,7 +88,7 @@ window.LVSM_CAMERAS = [
 
     sponsor: {
       name: "SpotAzores",
-      logo: null,
+      logo: "./assets/sponsors/spotazores.jpeg",
       url: "https://spotazores.com/",
       label: "Em parceria com"
     },
@@ -150,7 +150,7 @@ window.LVSM_CAMERAS = [
 
     sponsor: {
       name: "SpotAzores",
-      logo: null,
+      logo: "./assets/sponsors/spotazores.jpeg",
       url: "https://spotazores.com/",
       label: "Em parceria com"
     },
@@ -181,7 +181,7 @@ window.LVSM_CAMERAS = [
 
     sponsor: {
       name: "Apartamentos Mar e Sol",
-      logo: null,
+      logo: "./assets/sponsors/apartamentos-maresol.jpeg",
       url: "https://www.apartamentosmaresol.com/",
       label: "Apoio de"
     },
@@ -247,7 +247,7 @@ window.LVSM_CAMERAS = [
 
     sponsor: {
       name: "Assoc. Escravos da Cadeinha",
-      logo: "./assets/sponsors/escravos-da-cadeinha.jpeg",
+      logo: "./assets/sponsors/escravos-cadeinha.jpeg",
       url: "https://escravosdacadeinha.com/",
       label: "Apoio de"
     },
