@@ -27,8 +27,8 @@ window.LVSM_CAMERAS = [
     sponsor: {
       name: "Clube Naval Santa Maria",
       logo: null,
-      url: null,
-      label: null
+      url: "https://www.cnsantamaria.pt/",
+      label: "Sponsor"
     },
 
     enabled: true
@@ -216,8 +216,8 @@ window.LVSM_CAMERAS = [
 
     sponsor: {
       name: "Clube Motard Santa Maria",
-      logo: "./assets/sponsors/o-ilheu.png",
-      url: "https://example.com",
+      logo: "./assets/sponsors/clube-motard.jpeg",
+      url: null,
       label: "Sponsor"
     },
 
@@ -247,7 +247,7 @@ window.LVSM_CAMERAS = [
 
     sponsor: {
       name: "Assoc. Escravos da Cadeinha",
-      logo: "./assets/sponsors/escravos-da-cadeinha.jpg",
+      logo: "./assets/sponsors/escravos-da-cadeinha.jpeg",
       url: "https://escravosdacadeinha.com/",
       label: "Apoio de"
     },
@@ -490,7 +490,7 @@ window.LVSM_CAMERAS = [
 
     sponsor: {
       name: "Câmara Municipal de Vila do Porto",
-      logo: null,
+      logo: "./assets/sponsors/cmvp.png",
       url: "https://www.cm-viladoporto.pt",
       label: "Vídeo promocional"
     },

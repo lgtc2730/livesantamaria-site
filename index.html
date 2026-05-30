@@ -2075,7 +2075,18 @@ function loadHls(card, cam) {
 function renderCameras() {
   container.innerHTML = "";
 
-  const visible = PUBLIC_CAMERAS.filter(cameraMatchesFilter);
+  const typeOrder = {
+    hls: 1,
+    snapshot: 1,
+    future: 2,
+    promo: 3
+  };
+
+  const visible = PUBLIC_CAMERAS
+    .filter(cameraMatchesFilter)
+    .sort((a, b) => {
+      return (typeOrder[a.type] || 99) - (typeOrder[b.type] || 99);
+    });
 
   container.classList.toggle("camera-list", listMode);
 
