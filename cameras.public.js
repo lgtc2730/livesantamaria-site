@@ -5,6 +5,37 @@ window.LVSM_CAMERAS = [
   // ==========================================================
 
   {
+    id: "marina-club-motard",
+    name: "Marina-Club Motard",
+    region: "Sul",
+    type: "future",
+    url: null,
+    refresh: null,
+    fallbackImage: null,
+
+    preview: "./assets/previews/marina-club-motard.jpeg",
+    message: null,
+    status: "Em preparação",
+    commissioned: null,
+
+    position: {
+      lat: 36.946241,
+      lon: -25.146948,
+      bearing: 160,
+      fov: 90
+    },
+
+    sponsor: {
+      name: "Clube Motard Santa Maria",
+      logo: "./assets/sponsors/clube-motard.jpeg",
+      url: null,
+      label: "Sponsor"
+    },
+
+    enabled: true
+  },
+
+  {
     id: "cnsm",
     name: "Marina-Clube Naval",
     region: "Sul",
@@ -58,165 +89,6 @@ window.LVSM_CAMERAS = [
     sponsor: {
       name: "Ricardo Sebastião",
       logo: null,
-      url: null,
-      label: "Sponsor"
-    },
-
-    enabled: true
-  },
-
-  {
-    id: "slourenco-norte",
-    name: "São Lourenço-Norte",
-    region: "Este",
-    type: "future", // "snapshot",
-    url: null, // "https://www.spotazores.com/camaras/SMALOU01/QXGAcurrent.jpg"
-    refresh: 15000,
-    fallbackImage: "./assets/fallback/slourenco-norte.jpg",
-
-    preview: null,
-    message: null,
-    status: "OFFLINE",
-    commissioned: "2023-01",
-
-    position: {
-      lat: 36.9843,
-      lon: -25.0503,
-      bearing: 330,
-      fov: 65
-    },
-
-    sponsor: {
-      name: "SpotAzores",
-      logo: "./assets/sponsors/spotazores.jpeg",
-      url: "https://spotazores.com/",
-      label: "Em parceria com"
-    },
-
-    enabled: true
-  },
-
-  {
-    id: "slourenco-sul",
-    name: "São Lourenço-Sul",
-    region: "Este",
-    type: "hls",
-    url: "https://slourenco-sul-cam.livesantamaria.org/cam1/index.m3u8",
-    refresh: null,
-    fallbackImage: "./assets/fallback/slourenco-sul.jpg",
-
-    preview: null,
-    message: null,
-    status: null,
-    commissioned: "2024-05",
-
-    position: {
-      lat: 36.9952,
-      lon: -25.0554,
-      bearing: 150,
-      fov: 90
-    },
-
-    sponsor: {
-      name: "Deolinda Melo",
-      logo: null,
-      url: null,
-      label: "Apoio de"
-    },
-
-    enabled: true
-  },
-
-  {
-    id: "praia-nascente",
-    name: "Praia-Nascente",
-    region: "Sul",
-    type: "future", // "snapshot",
-    url: "https://www.spotazores.com/camaras/SMAFOR01/VGAcurrent.jpg",
-    refresh: 15000,
-    fallbackImage: "./assets/fallback/praia-nascente.jpg",
-
-    preview: null,
-    message: null,
-    status: "OFFLINE", // null,
-    commissioned: "2023-05",
-
-    position: {
-      lat: 36.952592,
-      lon: -25.102554,
-      bearing: 100,
-      fov: 65
-    },
-
-    sponsor: {
-      name: "SpotAzores",
-      logo: "./assets/sponsors/spotazores.jpeg",
-      url: "https://spotazores.com/",
-      label: "Em parceria com"
-    },
-
-    enabled: true
-  },
-
-  {
-    id: "praia-poente",
-    name: "Praia-Poente",
-    region: "Sul",
-    type: "hls",
-    url: "https://praia-poente-cam.livesantamaria.org/cam1/index.m3u8",
-    refresh: null,
-    fallbackImage: "./assets/fallback/praia-poente.jpg",
-
-    preview: null,
-    message: null,
-    status: null,
-    commissioned: "2025-05",
-    
-    position: {
-      lat: 36.950908,
-      lon: -25.095411,
-      bearing: 270,
-      fov: 65
-    },
-
-    sponsor: {
-      name: "Apartamentos Mar e Sol",
-      logo: "./assets/sponsors/apartamentos-maresol.jpeg",
-      url: "https://www.apartamentosmaresol.com/",
-      label: "Apoio de"
-    },
-
-    enabled: true
-  },
-
-  // ==========================================================
-  // FUTURE CAMERAS
-  // ==========================================================
-
-  {
-    id: "marina-club-motard",
-    name: "Marina-Club Motard",
-    region: "Sul",
-    type: "future",
-    url: null,
-    refresh: null,
-    fallbackImage: null,
-
-    preview: "./assets/previews/marina-club-motard.jpeg",
-    message: null,
-    status: "Em preparação",
-    commissioned: null,
-
-    position: {
-      lat: 36.946241,
-      lon: -25.146948,
-      bearing: 160,
-      fov: 90
-    },
-
-    sponsor: {
-      name: "Clube Motard Santa Maria",
-      logo: "./assets/sponsors/clube-motard.jpeg",
       url: null,
       label: "Sponsor"
     },
@@ -281,6 +153,68 @@ window.LVSM_CAMERAS = [
       logo: null,
       url: null,
       label: null
+    },
+
+    enabled: true
+  },
+
+  {
+    id: "slourenco-norte",
+    name: "São Lourenço-Norte",
+    region: "Este",
+    type: "future", // "snapshot",
+    url: null, // "https://www.spotazores.com/camaras/SMALOU01/QXGAcurrent.jpg"
+    refresh: 15000,
+    fallbackImage: "./assets/fallback/slourenco-norte.jpg",
+
+    preview: null,
+    message: null,
+    status: "OFFLINE",
+    commissioned: "2023-01",
+
+    position: {
+      lat: 36.9843,
+      lon: -25.0503,
+      bearing: 330,
+      fov: 65
+    },
+
+    sponsor: {
+      name: "SpotAzores",
+      logo: "./assets/sponsors/spotazores.jpeg",
+      url: "https://spotazores.com/",
+      label: "Em parceria com"
+    },
+
+    enabled: true
+  },
+
+  {
+    id: "slourenco-sul",
+    name: "São Lourenço-Sul",
+    region: "Este",
+    type: "hls",
+    url: "https://slourenco-sul-cam.livesantamaria.org/cam1/index.m3u8",
+    refresh: null,
+    fallbackImage: "./assets/fallback/slourenco-sul.jpg",
+
+    preview: null,
+    message: null,
+    status: null,
+    commissioned: "2024-05",
+
+    position: {
+      lat: 36.9952,
+      lon: -25.0554,
+      bearing: 150,
+      fov: 90
+    },
+
+    sponsor: {
+      name: "Deolinda Melo",
+      logo: null,
+      url: null,
+      label: "Apoio de"
     },
 
     enabled: true
@@ -406,6 +340,68 @@ window.LVSM_CAMERAS = [
       logo: null,
       url: null,
       label: "Sponsor"
+    },
+
+    enabled: true
+  },
+
+  {
+    id: "praia-nascente",
+    name: "Praia-Nascente",
+    region: "Sul",
+    type: "future", // "snapshot",
+    url: "https://www.spotazores.com/camaras/SMAFOR01/VGAcurrent.jpg",
+    refresh: 15000,
+    fallbackImage: "./assets/fallback/praia-nascente.jpg",
+
+    preview: null,
+    message: null,
+    status: "OFFLINE", // null,
+    commissioned: "2023-05",
+
+    position: {
+      lat: 36.952592,
+      lon: -25.102554,
+      bearing: 100,
+      fov: 65
+    },
+
+    sponsor: {
+      name: "SpotAzores",
+      logo: "./assets/sponsors/spotazores.jpeg",
+      url: "https://spotazores.com/",
+      label: "Em parceria com"
+    },
+
+    enabled: true
+  },
+
+  {
+    id: "praia-poente",
+    name: "Praia-Poente",
+    region: "Sul",
+    type: "hls",
+    url: "https://praia-poente-cam.livesantamaria.org/cam1/index.m3u8",
+    refresh: null,
+    fallbackImage: "./assets/fallback/praia-poente.jpg",
+
+    preview: null,
+    message: null,
+    status: null,
+    commissioned: "2025-05",
+    
+    position: {
+      lat: 36.950908,
+      lon: -25.095411,
+      bearing: 270,
+      fov: 65
+    },
+
+    sponsor: {
+      name: "Apartamentos Mar e Sol",
+      logo: "./assets/sponsors/apartamentos-maresol.jpeg",
+      url: "https://www.apartamentosmaresol.com/",
+      label: "Apoio de"
     },
 
     enabled: true
