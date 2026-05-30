@@ -482,7 +482,7 @@ window.LVSM_CAMERAS = [
     refresh: null,
     fallbackImage: null,
 
-    preview: "./assets/previews/neutra.jpg",
+    preview: "./assets/previews/explore-sma.jpeg",
     message: "Descubra a beleza autêntica da ilha do sol.",
     status: "Ver vídeo",
 
