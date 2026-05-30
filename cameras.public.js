@@ -89,7 +89,7 @@ window.LVSM_CAMERAS = [
     sponsor: {
       name: "SpotAzores",
       logo: null,
-      url: null,
+      url: "https://spotazores.com/",
       label: "Em parceria com"
     },
 
@@ -151,7 +151,7 @@ window.LVSM_CAMERAS = [
     sponsor: {
       name: "SpotAzores",
       logo: null,
-      url: null,
+      url: "https://spotazores.com/",
       label: "Em parceria com"
     },
 
@@ -182,39 +182,8 @@ window.LVSM_CAMERAS = [
     sponsor: {
       name: "Apartamentos Mar e Sol",
       logo: null,
-      url: null,
+      url: "https://www.apartamentosmaresol.com/",
       label: "Apoio de"
-    },
-
-    enabled: true
-  },
-
-  {
-    id: "maia-norte",
-    name: "Maia-Norte",
-    region: "Este",
-    type: "future",
-    url: null,
-    refresh: null,
-    fallbackImage: "./assets/fallback/maia-norte.jpeg",
-
-    preview: "http://anjos.olho.mariense.pt/maia/camera.m3u8",
-    message: null,
-    status: "Em preparação",
-    commissioned: "2025-05",
-    
-    position: {
-      lat: 36.944280,
-      lon: -25.016115,
-      bearing: 360,
-      fov: 65
-    },
-
-    sponsor: {
-      name: "Carlos Andrade e Rui Chaves",
-      logo: null,
-      url: null,
-      label: "Sponsor"
     },
 
     enabled: true
@@ -277,9 +246,9 @@ window.LVSM_CAMERAS = [
     },
 
     sponsor: {
-      name: "Assoc. Escravos da Cadainha",
-      logo: null,
-      url: null,
+      name: "Assoc. Escravos da Cadeinha",
+      logo: "./assets/sponsors/escravos-da-cadeinha.jpg",
+      url: "https://escravosdacadeinha.com/",
       label: "Apoio de"
     },
 
@@ -343,6 +312,37 @@ window.LVSM_CAMERAS = [
       logo: null,
       url: null,
       label: null
+    },
+
+    enabled: true
+  },
+
+  {
+    id: "maia-norte",
+    name: "Maia-Norte",
+    region: "Este",
+    type: "future",
+    url: null,
+    refresh: null,
+    fallbackImage: "./assets/fallback/maia-norte.jpeg",
+
+    preview: null, //"http://anjos.olho.mariense.pt/maia/camera.m3u8",
+    message: null,
+    status: "Em preparação",
+    commissioned: "2025-05",
+    
+    position: {
+      lat: 36.944280,
+      lon: -25.016115,
+      bearing: 360,
+      fov: 65
+    },
+
+    sponsor: {
+      name: "Carlos Andrade e Rui Chaves",
+      logo: null,
+      url: null,
+      label: "Sponsor"
     },
 
     enabled: true
