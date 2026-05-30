@@ -1,7 +1,7 @@
 window.LVSM_CAMERAS = [
 
   // ==========================================================
-  // LIVE CAMERAS
+  // LIVE SANTA MARIA CAMERAS
   // ==========================================================
 
   {
@@ -502,6 +502,13 @@ window.LVSM_MILESTONES = [
     icon: "🚀",
     title: "Arranque da rede pública LVSM",
     text: "Primeira versão pública do Live Santa Maria com câmaras em directo, previsão meteorológica, estado do mar e mapa da rede."
+  },
+
+  {
+    date: "2026-05",
+    icon: "✨",
+    title: "Frontend V2.2",
+    text: "Introdução do estado do mar, milestones, sponsors, promo cards e identidade visual reforçada."
   },
 
   {
