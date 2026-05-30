@@ -1312,6 +1312,7 @@
 
       width: calc(100% - 24px);
       max-width: none;
+      min-height: 220px;
 
       transform: translateX(-50%) !important;
 
@@ -1319,11 +1320,23 @@
     }
 
     .map-popup img {
-      height: 92px;
+      height: 220px;
     }
 
     .map-popup-body {
-      padding: 12px;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+
+      padding: 54px 14px 14px;
+
+      background: linear-gradient(
+        180deg,
+        transparent 0%,
+        rgba(0,0,0,.88) 54%,
+        rgba(0,0,0,.94) 100%
+      );
     }
 
     .map-popup-title {
