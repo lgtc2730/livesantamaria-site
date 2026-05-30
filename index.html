@@ -675,6 +675,42 @@
     .list-card b { display: block; font-size: .92rem; }
     .list-card span { display: block; color: var(--muted); font-size: .76rem; margin-top: 4px; }
 
+    .partners-grid {
+      margin-top: 18px;
+
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+
+      justify-content: flex-start;
+    }
+
+    .partner-card {
+      flex: 0 0 180px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      min-height: 90px;
+      padding: 12px;
+
+      border-radius: 14px;
+      border: 1px solid var(--line);
+
+      background: rgba(255,255,255,.04);
+    }
+
+    .partner-card img {
+      max-width: 150px;
+      max-height: 50px;
+
+      width: auto;
+      height: auto;
+
+      object-fit: contain;
+    }
+
     .map-popup {
       position: absolute;
       left: var(--popup-x);
@@ -1787,6 +1823,16 @@
         <div class="panel-pad">
           <h2>Live Santa Maria</h2>
           <p>Uma janela simples e rápida para observar Santa Maria: mar, céu, costa e lugares da ilha. As imagens servem de apoio informal à observação meteorológica e marítima.</p>
+
+          <div class="partners-section">
+            <h3>Parceiros e Patrocinadores</h3>
+
+            <p>
+              Organizações, empresas e particulares que ajudam a tornar possível a rede Live Santa Maria.
+            </p>
+
+            <div id="partnersGrid" class="partners-grid"></div>
+          </div>
 
           <div class="support-card">
             <h3>Quer apoiar este projecto?</h3>
@@ -2935,11 +2981,42 @@ function needsSponsor(cam) {
   );
 }
 
+function renderPartners() {
+  const holder = document.getElementById("partnersGrid");
+  if (!holder) return;
+
+  const partners = [];
+
+  PUBLIC_CAMERAS.forEach(cam => {
+    if (!cam.sponsor?.name) return;
+    if (!cam.sponsor?.logo) return;
+
+    if (!partners.find(p => p.name === cam.sponsor.name)) {
+      partners.push(cam.sponsor);
+    }
+  });
+
+  holder.innerHTML = partners.map(partner => `
+    <a
+      class="partner-card"
+      href="${partner.url || "#"}"
+      ${partner.url ? 'target="_blank" rel="noopener noreferrer"' : ""}
+    >
+      <img
+        src="${partner.logo}"
+        alt="${partner.name}"
+      >
+    </a>
+  `).join("");
+}
+
 setHeroBackground();
 updateCounts();
 renderCameras();
 renderCameraMap();
 renderNetworkTimeline();
+renderPartners();
+
 updateWeather();
 setInterval(updateCounts, 60 * 1000);
 setInterval(updateWeather, 10 * 60 * 1000);

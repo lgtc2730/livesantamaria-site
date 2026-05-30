@@ -38,6 +38,15 @@
 - Estados Live / Future / Offline
 - Ajustes de posicionamento de etiquetas
 
+### Mapa V2
+- Popup informativo ao clicar nas câmaras
+- Preview da localização
+- Estado da câmara
+- Informação de patrocinador
+- Acesso direto ao fullscreen
+- Layout adaptativo desktop/mobile
+- Posicionamento inteligente junto aos limites do mapa
+
 ### Meteorologia
 - Integração Open-Meteo
 - Previsão diária
