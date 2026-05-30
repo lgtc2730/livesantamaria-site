@@ -56,10 +56,10 @@ window.LVSM_CAMERAS = [
     },
 
     sponsor: {
-      name: null,
+      name: "Ricardo Sebastião",
       logo: null,
       url: null,
-      label: null
+      label: "Sponsor"
     },
 
     enabled: true
