@@ -1305,6 +1305,46 @@
       font-weight: 900;
     }
 
+    .map-popup {
+      left: 50% !important;
+      top: auto !important;
+      bottom: 12px;
+
+      width: calc(100% - 24px);
+      max-width: none;
+
+      transform: translateX(-50%) !important;
+
+      border-radius: 18px;
+    }
+
+    .map-popup img {
+      height: 92px;
+    }
+
+    .map-popup-body {
+      padding: 12px;
+    }
+
+    .map-popup-title {
+      font-size: .92rem;
+    }
+
+    .map-popup-meta,
+    .map-popup-sponsor {
+      font-size: .74rem;
+    }
+
+    .map-popup-actions {
+      margin-top: 10px;
+    }
+
+    .map-popup-actions button {
+      min-height: 34px;
+      padding: 0 11px;
+      font-size: .72rem;
+    }
+
     @media (max-width: 1350px) {
       .hero-live-overlay {
         grid-template-columns: minmax(170px, .55fr) minmax(260px, .86fr) minmax(132px, .35fr) minmax(94px, .25fr);
