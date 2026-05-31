@@ -596,8 +596,14 @@
     }
 
     .status-badge.future {
-      background: rgba(15, 56, 78, .78);
-      border-color: rgba(116,215,255,.32);
+      background: rgba(92, 58, 0, .78);
+      border-color: rgba(245,158,11,.38);
+      color: #fff4d6;
+    }
+
+    .status-badge.future .dot {
+      background: #f59e0b;
+      box-shadow: 0 0 14px rgba(245,158,11,.7);
     }
 
     .status-badge.offline {
@@ -2466,12 +2472,18 @@ function renderCameraMap() {
     const pos = latLonToMapPosition(cam.position.lat, cam.position.lon);
     const item = document.createElement("button");
 
+    const runtimeStatus = cameraRuntimeStatus.get(cam.id);
+
     const mapStatus =
       cam.type === "future"
         ? "future"
-        : isOffline(cam)
+        : runtimeStatus === "offline"
           ? "offline"
-          : "live";
+          : isOffline(cam)
+            ? "offline"
+            : runtimeStatus === "live"
+              ? "live"
+              : "live";
 
     item.className = `map-camera ${mapStatus}`;
     item.dataset.cameraId = cam.id;

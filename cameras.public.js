@@ -429,9 +429,9 @@ window.LVSM_CAMERAS = [
     },
 
     sponsor: {
-      name: null,
-      logo: null,
-      url: null,
+      name: "NAV Portugal",
+      logo: "./assets/sponsors/nav-portugal.jpeg",
+      url: "https://www.nav.pt/",
       label: "Sponsor"
     },
 
@@ -460,9 +460,9 @@ window.LVSM_CAMERAS = [
     },
 
     sponsor: {
-      name: null,
-      logo: null,
-      url: null,
+      name: "NAV Portugal",
+      logo: "./assets/sponsors/nav-portugal.jpeg",
+      url: "https://www.nav.pt/",
       label: "Sponsor"
     },
 
@@ -484,20 +484,20 @@ window.LVSM_CAMERAS = [
     commissioned: null,
 
     position: {
-      lat: 36.979503,
-      lon: -25.090873,
-      bearing: 270,
-      fov: 65
+      lat: 36.975991,
+      lon: -25.166998,
+      bearing: 160,
+      fov: 90
     },
 
     sponsor: {
-      name: null,
-      logo: null,
-      url: null,
+      name: "Aeroporto de Santa Maria",
+      logo: "./assets/sponsors/vinci.jpeg",
+      url: "https://www.ana.pt/pt",
       label: "Sponsor"
     },
 
-    enabled: false
+    enabled: true
   },
 
   {
