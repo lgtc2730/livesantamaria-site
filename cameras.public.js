@@ -470,6 +470,37 @@ window.LVSM_CAMERAS = [
   },  
 
   {
+    id: "aeroporto",
+    name: "Aeroporto",
+    region: "Centro",
+    type: "future",
+    url: null,
+    refresh: null,
+    fallbackImage: null,
+
+    preview: "./assets/previews/aeroporto.jpeg",
+    message: null,
+    status: "Aguarda patrocínio",
+    commissioned: null,
+
+    position: {
+      lat: 36.979503,
+      lon: -25.090873,
+      bearing: 270,
+      fov: 65
+    },
+
+    sponsor: {
+      name: null,
+      logo: null,
+      url: null,
+      label: "Sponsor"
+    },
+
+    enabled: false
+  },
+
+  {
     id: "promo-cmvp",
     name: "Santa Maria, Açores",
     region: null,
