@@ -956,23 +956,6 @@
       z-index: 6;
     }
 
-    .forecast-days {
-      display: grid;
-      gap: 10px;
-      margin-top: 18px;
-    }
-
-    .forecast-row {
-      display: grid;
-      grid-template-columns: 1fr auto auto;
-      align-items: center;
-      gap: 14px;
-      padding: 14px;
-      border-radius: 14px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.04);
-    }
-
     .sea-card {
       margin: 18px 0;
     }
@@ -982,28 +965,46 @@
       font-size: 1.1rem;
     }
 
-    .sea-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .sea-grid,
+    .forecast-days {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
 
-      padding: 14px;
+    .sea-row,
+    .forecast-row {
+      display: block;
 
-      border-radius: 14px;
+      padding: 14px 16px;
+
+      border-radius: 16px;
       border: 1px solid var(--line);
 
       background: rgba(255,255,255,.04);
-
-      margin-bottom: 10px;
     }
 
-    .sea-row span {
+    .sea-row span,
+    .forecast-row strong {
+      display: block;
+
+      color: var(--muted);
+      font-size: .76rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .sea-row strong,
+    .forecast-row span {
+      display: block;
+
+      margin-top: 7px;
+
       color: var(--text);
-      font-weight: 700;
-    }
-
-    .sea-row strong {
-      font-size: 1rem;
+      font-size: 1.25rem;
+      font-weight: 950;
     }
 
 
@@ -1916,19 +1917,21 @@
           <div class="sea-card">
             <h3>🌊 Estado do Mar</h3>
 
-            <div class="sea-row">
-              <span>Ondulação</span>
-              <strong id="seaWaveHeight">—</strong>
-            </div>
+            <div class="sea-grid">
+              <div class="sea-row">
+                <span>Ondulação</span>
+                <strong id="seaWaveHeight">—</strong>
+              </div>
 
-            <div class="sea-row">
-              <span>Período</span>
-              <strong id="seaWavePeriod">—</strong>
-            </div>
+              <div class="sea-row">
+                <span>Período</span>
+                <strong id="seaWavePeriod">—</strong>
+              </div>
 
-            <div class="sea-row">
-              <span>Direcção</span>
-              <strong id="seaWaveDirection">—</strong>
+              <div class="sea-row">
+                <span>Direcção</span>
+                <strong id="seaWaveDirection">—</strong>
+              </div>
             </div>
           </div>
          <h2>Previsão</h2>

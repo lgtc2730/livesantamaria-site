@@ -1,6 +1,77 @@
 # Live Santa Maria - Histórico de Versões
 
 #########################################################################################
+## freeze-v2.4 (2026-05-31)
+
+### Meteorologia
+
+* Integração do METAR oficial do Aeroporto de Santa Maria (LPAZ)
+* Nova arquitetura meteorológica:
+
+  * METAR = observação atual
+  * Open-Meteo = previsão
+* Hero alimentado por observações meteorológicas reais
+* Substituição da condição meteorológica baseada exclusivamente em modelos de previsão
+
+### Observação Atual
+
+* Novo cartão "Observação Actual"
+* Informação meteorológica em tempo real proveniente do METAR LPAZ
+* Exibição de:
+
+  * Estado do tempo
+  * Temperatura
+  * Ponto de orvalho
+  * Pressão atmosférica (QNH)
+  * Vento
+  * Visibilidade
+  * Cobertura de nuvens
+  * Hora da observação
+
+### Interpretação METAR
+
+* Conversão automática dos códigos METAR para linguagem legível
+* Suporte para fenómenos meteorológicos:
+
+  * Nevoeiro (FG)
+  * Névoa (BR)
+  * Chuvisco (DZ)
+  * Chuva (RA)
+  * Trovoada (TS)
+* Interpretação da cobertura de nuvens:
+
+  * FEW → Pouco nublado
+  * SCT → Parcialmente nublado
+  * BKN → Muito nublado
+  * OVC → Encoberto
+  * SKC / CLR / CAVOK → Céu limpo
+
+### Visibilidade
+
+* Classificação qualitativa da visibilidade:
+
+  * Excelente
+  * Boa
+  * Moderada
+  * Reduzida
+  * Muito reduzida
+
+### Infraestrutura
+
+* Implementação de proxy METAR através de Cloudflare Pages Functions
+* Fallback automático entre múltiplas fontes METAR:
+
+  * AviationWeather
+  * NOAA
+* Cache otimizada para reduzir pedidos externos
+
+### Melhorias Gerais
+
+* Maior fidelidade das condições meteorológicas observadas na ilha
+* Melhor alinhamento entre a informação apresentada e as imagens das câmaras
+* Aumento da credibilidade e precisão da componente meteorológica do Live Santa Maria
+
+#########################################################################################
 ## freeze-v2.3 (2026-05-31)
 
 ### Branding
