@@ -81,7 +81,8 @@ export async function onRequest(context) {
         {
           ok: true,
           station: "LPAZ",
-          source: source.name,
+          source: "METAR LPAZ",
+          provider: source.name,
           raw,
           fetched_at: new Date().toISOString()
         },

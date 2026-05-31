@@ -2934,7 +2934,10 @@ async function fetchLatestMetar() {
     throw new Error(data?.error || "METAR indisponível");
   }
 
-  return parseMetar(data.raw, data.source || "Live Santa Maria METAR");
+  return parseMetar(
+    data.raw,
+    "METAR LPAZ"
+  );
 }
 
 function extractMetarLine(text) {
@@ -3002,7 +3005,7 @@ function metarCondition(weatherTokens, cloudTokens, allTokens) {
   }
 
   if (cloudTokens.some(token => token.startsWith("SCT"))) {
-    return { icon: "⛅", text: "Nublado" };
+    return { icon: "⛅", text: "Parcialmente nublado" };
   }
 
   if (cloudTokens.some(token => token.startsWith("FEW"))) {
@@ -3043,14 +3046,34 @@ function parseMetarWind(token) {
 }
 
 function parseMetarVisibility(token, allTokens) {
-  if (allTokens.includes("CAVOK")) return ">10 km";
-  if (!token) return "—";
-  if (token === "9999") return ">10 km";
 
-  const metres = Number(token);
+  let metres = null;
+
+  if (allTokens.includes("CAVOK") || token === "9999") {
+    metres = 10000;
+  } else {
+    metres = Number(token);
+  }
+
   if (!Number.isFinite(metres)) return "—";
-  if (metres >= 1000) return `${(metres / 1000).toFixed(1).replace(".0", "")} km`;
-  return `${metres} m`;
+
+  if (metres >= 10000) {
+    return "Excelente (>10 km)";
+  }
+
+  if (metres >= 8000) {
+    return "Boa";
+  }
+
+  if (metres >= 3000) {
+    return "Moderada";
+  }
+
+  if (metres >= 1000) {
+    return "Reduzida";
+  }
+
+  return `Muito reduzida (${metres} m)`;
 }
 
 function parseCloudHeight(token) {
