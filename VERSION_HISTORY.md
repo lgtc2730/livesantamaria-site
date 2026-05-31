@@ -1,5 +1,77 @@
 # Live Santa Maria - Histórico de Versões
 
+#########################################################################################
+## freeze-v2.3 (2026-05-31)
+
+### Branding
+
+* Novo slogan:
+
+  * "Uma janela para Santa Maria"
+  * "Mar, céu e costa em tempo real"
+* Hero simplificado e reorganizado
+
+### Hero
+
+* Adicionado contador de câmaras online
+* Adicionado contador de localizações em preparação
+* Melhorias de layout e responsividade
+
+### Câmaras
+
+* Novo tipo de câmara:
+
+  * `promo`
+* Uniformização dos estados:
+
+  * LIVE
+  * EM PREPARAÇÃO
+  * OFFLINE
+
+### Mapa Interativo V2
+
+* Introdução do novo mapa interativo
+* Visualização geográfica das câmaras
+* Campo de visão (FOV) por localização
+* Popup informativo com preview da câmara
+* Integração de patrocinadores
+* Abertura direta em fullscreen
+* Posicionamento inteligente junto aos limites do mapa
+* Melhor experiência em dispositivos móveis
+
+### Timeline
+
+* Nova secção Timeline
+* Geração automática a partir de:
+
+  * `commissioned`
+  * `LVSM_MILESTONES`
+
+### Estado do Mar
+
+* Nova secção com dados Open-Meteo Marine
+* Exibição de:
+
+  * Ondulação
+  * Período
+  * Direção da ondulação
+
+### Parceiros e Patrocinadores
+
+* Nova secção "About"
+* Geração automática a partir da configuração dos sponsors
+
+### Promo Cards
+
+* Introdução dos cartões promocionais para futuras localizações e objetivos do projeto
+
+### Melhorias Gerais
+
+* Ajustes de CSS para desktop e mobile
+* Melhorias de usabilidade em telemóveis
+* Correções de layout e estabilidade
+
+#########################################################################################
 ## freeze-v2.2 (2026-05-30)
 
 ### Branding
@@ -86,11 +158,22 @@
 - Timeline funcional
 - Promo cards funcionais
 
+#########################################################################################
 ## freeze-v2.1 (2026-05-29)
 - Frontend V2 estabilizado
 
+#########################################################################################
 ## freeze-v2.1-beta (2026-05-28)
 - Testes e estabilização
 
+#########################################################################################
 ## freeze-v2.0 (2026-05-26)
 - Primeira versão estável do Frontend V2
+
+#########################################################################################
+## freeze-v1.0 (2026-05-25)
+- Versão estável do Frontend V1
+
+#########################################################################################
+## Initial Commit (2026-05-09)
+- Criação da plataforma para o Projeto LVSM
