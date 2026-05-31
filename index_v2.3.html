@@ -1006,74 +1006,6 @@
       font-size: 1rem;
     }
 
-
-    .metar-card {
-      margin: 18px 0;
-      padding: 18px;
-      border-radius: 18px;
-      border: 1px solid rgba(66,183,255,.18);
-      background: rgba(24,119,255,.07);
-    }
-
-    .metar-card h3 {
-      margin: 0 0 6px;
-      font-size: 1.1rem;
-    }
-
-    .metar-card p {
-      margin: 0 0 14px;
-      color: var(--muted);
-      font-size: .9rem;
-    }
-
-    .metar-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-
-    .metar-item {
-      padding: 13px;
-      border-radius: 14px;
-      border: 1px solid var(--line);
-      background: rgba(255,255,255,.04);
-    }
-
-    .metar-item span {
-      display: block;
-      color: var(--muted);
-      font-size: .76rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-    }
-
-    .metar-item strong {
-      display: block;
-      margin-top: 5px;
-      font-size: .98rem;
-    }
-
-    .metar-raw {
-      margin-top: 12px;
-      padding: 12px;
-      border-radius: 14px;
-      border: 1px solid var(--line);
-      background: rgba(0,0,0,.18);
-      color: rgba(255,255,255,.76);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: .78rem;
-      line-height: 1.45;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-
-    @media (max-width: 680px) {
-      .metar-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
     @media (max-width: 680px) {
       .sea-grid {
         grid-template-columns: 1fr;
@@ -1859,60 +1791,6 @@
 
       <section class="forecast-section" id="forecastSection">
         <div class="panel-pad">
-          <div class="metar-card" id="metarCard">
-            <h3>🛫 Observação actual — METAR LPAZ</h3>
-            <p>Dados observados no Aeroporto de Santa Maria. Usados para o estado actual no banner.</p>
-
-            <div class="metar-grid">
-              <div class="metar-item">
-                <span>Estado</span>
-                <strong id="metarCondition">—</strong>
-              </div>
-
-              <div class="metar-item">
-                <span>Temperatura</span>
-                <strong id="metarTemp">—</strong>
-              </div>
-
-              <div class="metar-item">
-                <span>Ponto de orvalho</span>
-                <strong id="metarDewpoint">—</strong>
-              </div>
-
-              <div class="metar-item">
-                <span>Vento</span>
-                <strong id="metarWind">—</strong>
-              </div>
-
-              <div class="metar-item">
-                <span>Visibilidade</span>
-                <strong id="metarVisibility">—</strong>
-              </div>
-
-              <div class="metar-item">
-                <span>Pressão</span>
-                <strong id="metarPressure">—</strong>
-              </div>
-
-              <div class="metar-item">
-                <span>Nuvens</span>
-                <strong id="metarClouds">—</strong>
-              </div>
-
-              <div class="metar-item">
-                <span>Actualizado</span>
-                <strong id="metarTime">—</strong>
-              </div>
-
-              <div class="metar-item">
-                <span>Fonte</span>
-                <strong id="metarSource">—</strong>
-              </div>
-            </div>
-
-            <div class="metar-raw" id="metarRaw">METAR indisponível.</div>
-          </div>
-
           <div class="sea-card">
             <h3>🌊 Estado do Mar</h3>
 
@@ -2907,282 +2785,34 @@ function setText(id, value) {
   if (el) el.textContent = value;
 }
 
-async function fetchJsonWithTimeout(url, timeout = 9000) {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeout);
-
-  try {
-    const response = await fetch(url, {
-      cache: "no-store",
-      signal: controller.signal
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    return await response.json();
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-async function fetchLatestMetar() {
-  const data = await fetchJsonWithTimeout("/api/metar");
-
-  if (!data?.ok || !data.raw) {
-    throw new Error(data?.error || "METAR indisponível");
-  }
-
-  return parseMetar(data.raw, data.source || "Live Santa Maria METAR");
-}
-
-function extractMetarLine(text) {
-  return String(text || "")
-    .split(/\r?\n/)
-    .map(line => line.trim())
-    .filter(Boolean)
-    .find(line => /^(METAR\s+|SPECI\s+)?LPAZ\b/.test(line)) || "";
-}
-
-function parseMetar(raw, sourceName) {
-  const cleanRaw = String(raw || "").trim().replace(/\s+/g, " ");
-  const tokens = cleanRaw.split(" ");
-  const stationIndex = tokens.findIndex(token => token === "LPAZ");
-  const relevantTokens = stationIndex >= 0 ? tokens.slice(stationIndex + 1) : tokens;
-
-  const timeToken = relevantTokens.find(token => /^\d{6}Z$/.test(token));
-  const windToken = relevantTokens.find(token => /^(VRB|\d{3})\d{2,3}(G\d{2,3})?KT$/.test(token));
-  const visibilityToken = relevantTokens.find(token => /^(\d{4}|9999|CAVOK)$/.test(token));
-  const tempToken = relevantTokens.find(token => /^(M?\d{2})\/(M?\d{2})$/.test(token));
-  const pressureToken = relevantTokens.find(token => /^Q\d{4}$/.test(token));
-  const cloudTokens = relevantTokens.filter(token => /^(FEW|SCT|BKN|OVC|VV)\d{3}|^(NSC|NCD|SKC|CLR)$/.test(token));
-  const weatherTokens = relevantTokens.filter(isMetarWeatherToken);
-
-  const condition = metarCondition(weatherTokens, cloudTokens, relevantTokens);
-  const temp = parseMetarTemperature(tempToken);
-  const wind = parseMetarWind(windToken);
-
-  return {
-    raw: cleanRaw,
-    source: sourceName,
-    icon: condition.icon,
-    text: condition.text,
-    temp: temp.temperature,
-    dewpoint: temp.dewpoint,
-    pressure: pressureToken ? Number(pressureToken.slice(1)) : null,
-    windText: wind.text,
-    visibilityText: parseMetarVisibility(visibilityToken, relevantTokens),
-    cloudsText: parseMetarClouds(cloudTokens, relevantTokens),
-    timeText: parseMetarTime(timeToken)
-  };
-}
-
-function isMetarWeatherToken(token) {
-  return /^(\+|-|VC)?(MI|PR|BC|DR|BL|SH|TS|FZ)?(DZ|RA|SN|SG|IC|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PY|SQ|FC|SS|DS)+$/.test(token);
-}
-
-function metarCondition(weatherTokens, cloudTokens, allTokens) {
-  const weather = weatherTokens.join(" ");
-
-  if (/TS/.test(weather)) return { icon: "⛈️", text: "Trovoada" };
-  if (/FG/.test(weather)) return { icon: "🌫️", text: "Nevoeiro" };
-  if (/BR|HZ/.test(weather)) return { icon: "🌫️", text: "Neblina" };
-  if (/DZ/.test(weather)) return { icon: "🌦️", text: "Chuvisco" };
-  if (/RA/.test(weather)) return { icon: "🌧️", text: "Chuva" };
-  if (/SN/.test(weather)) return { icon: "🌨️", text: "Neve" };
-  if (/CAVOK|SKC|CLR|NSC|NCD/.test(allTokens.join(" "))) return { icon: "☀️", text: "Céu limpo" };
-
-  if (cloudTokens.some(token => token.startsWith("OVC") || token.startsWith("VV"))) {
-    return { icon: "☁️", text: "Encoberto" };
-  }
-
-  if (cloudTokens.some(token => token.startsWith("BKN"))) {
-    return { icon: "☁️", text: "Muito nublado" };
-  }
-
-  if (cloudTokens.some(token => token.startsWith("SCT"))) {
-    return { icon: "⛅", text: "Nublado" };
-  }
-
-  if (cloudTokens.some(token => token.startsWith("FEW"))) {
-    return { icon: "🌤️", text: "Pouco nublado" };
-  }
-
-  return { icon: "🌤️", text: "Tempo actual" };
-}
-
-function parseSignedMetarTemp(value) {
-  if (!value) return null;
-  return value.startsWith("M") ? -Number(value.slice(1)) : Number(value);
-}
-
-function parseMetarTemperature(token) {
-  if (!token) return { temperature: null, dewpoint: null };
-  const [temperature, dewpoint] = token.split("/").map(parseSignedMetarTemp);
-  return { temperature, dewpoint };
-}
-
-function parseMetarWind(token) {
-  if (!token) return { text: "—" };
-
-  const match = token.match(/^(VRB|\d{3})(\d{2,3})(?:G(\d{2,3}))?KT$/);
-  if (!match) return { text: "—" };
-
-  const dir = match[1] === "VRB" ? "variável" : degreesToCompass(Number(match[1]));
-  const speedKt = Number(match[2]);
-  const gustKt = match[3] ? Number(match[3]) : null;
-  const speedKmh = Math.round(speedKt * 1.852);
-  const gustKmh = gustKt ? Math.round(gustKt * 1.852) : null;
-
-  return {
-    text: gustKmh
-      ? `${dir} ${speedKmh} km/h, rajadas ${gustKmh} km/h`
-      : `${dir} ${speedKmh} km/h`
-  };
-}
-
-function parseMetarVisibility(token, allTokens) {
-  if (allTokens.includes("CAVOK")) return ">10 km";
-  if (!token) return "—";
-  if (token === "9999") return ">10 km";
-
-  const metres = Number(token);
-  if (!Number.isFinite(metres)) return "—";
-  if (metres >= 1000) return `${(metres / 1000).toFixed(1).replace(".0", "")} km`;
-  return `${metres} m`;
-}
-
-function parseCloudHeight(token) {
-  const match = token.match(/^(FEW|SCT|BKN|OVC|VV)(\d{3})/);
-  if (!match) return null;
-  return Number(match[2]) * 100;
-}
-
-function parseMetarClouds(tokens, allTokens) {
-  if (allTokens.includes("CAVOK")) return "Sem nuvens significativas";
-  if (!tokens.length) return "—";
-
-  const labels = {
-    FEW: "Poucas nuvens",
-    SCT: "Nuvens dispersas",
-    BKN: "Muito nublado",
-    OVC: "Encoberto",
-    VV: "Céu obscurecido",
-    NSC: "Sem nuvens significativas",
-    NCD: "Sem nuvens detectadas",
-    SKC: "Céu limpo",
-    CLR: "Céu limpo"
-  };
-
-  return tokens.map(token => {
-    const prefix = token.slice(0, 3);
-    const height = parseCloudHeight(token);
-    return height ? `${labels[prefix] || prefix} a ${height} ft` : (labels[token] || token);
-  }).join(" · ");
-}
-
-function parseMetarTime(token) {
-  if (!token) return "—";
-
-  const day = Number(token.slice(0, 2));
-  const hour = Number(token.slice(2, 4));
-  const minute = Number(token.slice(4, 6));
-  const now = new Date();
-  let date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), day, hour, minute));
-
-  if (date.getTime() - now.getTime() > 14 * 24 * 60 * 60 * 1000) {
-    date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, day, hour, minute));
-  }
-
-  if (now.getTime() - date.getTime() > 20 * 24 * 60 * 60 * 1000) {
-    date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, day, hour, minute));
-  }
-
-  return new Intl.DateTimeFormat("pt-PT", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Atlantic/Azores"
-  }).format(date);
-}
-
-function updateMetarCard(metar) {
-  setText("metarCondition", `${metar.icon} ${metar.text}`);
-  setText("metarTemp", Number.isFinite(metar.temp) ? `${metar.temp}°C` : "—");
-  setText("metarDewpoint", Number.isFinite(metar.dewpoint) ? `${metar.dewpoint}°C` : "—");
-  setText("metarWind", metar.windText || "—");
-  setText("metarVisibility", metar.visibilityText || "—");
-  setText("metarPressure", Number.isFinite(metar.pressure) ? `${metar.pressure} hPa` : "—");
-  setText("metarClouds", metar.cloudsText || "—");
-  setText("metarTime", metar.timeText || "—");
-  setText("metarSource", metar.source || "METAR");
-  setText("metarRaw", metar.raw || "METAR indisponível.");
-}
-
-function updateMetarCardUnavailable() {
-  setText("metarCondition", "—");
-  setText("metarTemp", "—");
-  setText("metarDewpoint", "—");
-  setText("metarWind", "—");
-  setText("metarVisibility", "—");
-  setText("metarPressure", "—");
-  setText("metarClouds", "—");
-  setText("metarTime", "—");
-  setText("metarSource", "—");
-  setText("metarRaw", "METAR indisponível. A usar Open-Meteo como fallback no banner.");
-}
-
-async function fetchOpenMeteoWeather() {
-  const url =
-    "https://api.open-meteo.com/v1/forecast" +
-    "?latitude=36.97639" +
-    "&longitude=-25.125" +
-    "&current=temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,wind_direction_10m,precipitation,weather_code" +
-    "&daily=weather_code,temperature_2m_max,temperature_2m_min" +
-    "&timezone=Atlantic%2FAzores";
-
-  const response = await fetch(url, { cache: "no-store" });
-  return await response.json();
-}
-
 async function updateWeather() {
   try {
-    const data = await fetchOpenMeteoWeather();
+    const url =
+      "https://api.open-meteo.com/v1/forecast" +
+      "?latitude=36.97639" +
+      "&longitude=-25.125" +
+      "&current=temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,wind_direction_10m,precipitation,weather_code" +
+      "&daily=weather_code,temperature_2m_max,temperature_2m_min" +
+      "&timezone=Atlantic%2FAzores";
+
+    const response = await fetch(url, { cache: "no-store" });
+    const data = await response.json();
     const current = data.current || {};
 
-    const openMeteoTemp = Math.round(current.temperature_2m);
+    const temp = Math.round(current.temperature_2m);
     const hum = Math.round(current.relative_humidity_2m);
     const wind = Math.round(current.wind_speed_10m);
     const dir = degreesToCompass(current.wind_direction_10m);
     const rain = Number(current.precipitation ?? 0).toFixed(1);
     const code = Number(current.weather_code ?? 1);
-
-    let heroTemp = Number.isFinite(openMeteoTemp) ? openMeteoTemp : null;
-    let heroIcon = weatherCodeToIcon(code);
-    let heroText = weatherCodeToText(code);
-
-    try {
-      const metar = await fetchLatestMetar();
-      updateMetarCard(metar);
-
-      heroIcon = metar.icon;
-      heroText = metar.text;
-      if (Number.isFinite(metar.temp)) {
-        heroTemp = metar.temp;
-      }
-    } catch (metarErr) {
-      console.warn("METAR indisponível, fallback Open-Meteo:", metarErr);
-      updateMetarCardUnavailable();
-    }
+    const icon = weatherCodeToIcon(code);
+    const text = weatherCodeToText(code);
 
     const miniTempEl = document.getElementById("miniTemp");
-    if (miniTempEl) miniTempEl.textContent = Number.isFinite(heroTemp) ? `${heroTemp}°C` : "—";
-
-    setText("weatherTemp", Number.isFinite(heroTemp) ? `${heroTemp}°C` : "—");
-    setText("weatherIcon", heroIcon);
-    setText("weatherSummary", heroText);
+    if (miniTempEl) miniTempEl.textContent = `${temp}°C`;
+    setText("weatherTemp", `${temp}°C`);
+    setText("weatherIcon", icon);
+    setText("weatherSummary", text);
     setText("weatherWind", `${wind} km/h ${dir}`);
     setText("weatherHum", `${hum}%`);
     setText("weatherSea", rain > 0 ? `${rain} mm` : "—");
@@ -3195,7 +2825,6 @@ async function updateWeather() {
     const miniTempEl = document.getElementById("miniTemp");
     if (miniTempEl) miniTempEl.textContent = "—";
     setText("weatherSummary", "Meteorologia indisponível");
-    updateMetarCardUnavailable();
   }
 }
 
