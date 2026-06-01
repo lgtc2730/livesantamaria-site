@@ -1113,17 +1113,21 @@
       filter: drop-shadow(0 3px 8px rgba(0,0,0,.6));
     }
 
-    .tv-brand-logo {
-      margin-top: 8px;
+    .tv-lvsm-logo {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      z-index: 5;
+      opacity: 0.9;
+      pointer-events: none;
     }
 
-    .tv-brand-logo img {
-      width: 120px;
-      max-width: 120px;
+    .tv-lvsm-logo img {
+      width: 140px;
       height: auto;
       display: block;
-      opacity: 0.9;
       object-fit: contain;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,.5));
     }
 
     .tv-mode {
@@ -2015,7 +2019,9 @@
 <script>
 const container = document.getElementById("cameraContainer");
 const PUBLIC_CAMERAS = (window.LVSM_CAMERAS || []).filter(cam => cam.enabled !== false);
-const liveCameras = PUBLIC_CAMERAS.filter(cam => cam.type !== "future" && cam.url);
+const liveCameras = PUBLIC_CAMERAS.filter(cam =>
+  ["hls", "snapshot"].includes(cam.type) && cam.url
+);
 const expandedMobileCards = new Set();
 const cameraRuntimeStatus = new Map();
 
@@ -2824,11 +2830,18 @@ function renderTvCamera(cam) {
   info.innerHTML = `
     <div>
       <div class="tv-name">${escapeHtml(cam.name)}</div>
-      <div class="tv-brand-logo">
-        <img src="./assets/logo-lvsm-banner.png" alt="LVSM">
-      </div>
     </div>
   `;
+
+  const lvsmLogo = document.createElement("div");
+
+  lvsmLogo.className = "tv-lvsm-logo";
+
+  lvsmLogo.innerHTML = `
+    <img src="./assets/logo-lvsm-banner.png" alt="LVSM">
+  `;
+
+  tvStage.appendChild(lvsmLogo);
 
   if (cam.sponsor?.logo) {
     const logo = document.createElement("div");
