@@ -566,13 +566,13 @@ window.LVSM_MILESTONES = [
     icon: "✨",
     title: "Frontend V2.2",
     text: "Introdução do estado do mar, milestones, sponsors, promo cards e identidade visual reforçada."
-  },
-
-  {
-    date: "2026-07",
-    icon: "🏔️",
-    title: "Cobertura do Pico Alto",
-    text: "Entrada em serviço das câmaras do Pico Alto."
   }
+
+//  {
+//    date: "2026-07",
+//    icon: "🏔️",
+//    title: "Cobertura do Pico Alto",
+//    text: "Entrada em serviço das câmaras do Pico Alto."
+//  }
 
 ];
