@@ -523,8 +523,34 @@ window.LVSM_CAMERAS = [
     },
 
     enabled: true
+  },
+
+  {
+    id: "promo-villa-natura",
+    name: "Villa Natura",
+    region: null,
+    type: "promo",
+    url: "https://www.youtube.com/watch?v=T9Ok5fD-4Aw",
+    refresh: null,
+    fallbackImage: null,
+
+    preview: "./assets/previews/villa-natura.jpg",
+    message: "Ecoturismo e experiências autênticas em Santa Maria.",
+    status: "Ver vídeo",
+
+    position: null,
+
+    sponsor: {
+      name: "Villa Natura",
+      logo: "./assets/sponsors/villa-natura.png",
+      url: "https://villanaturaazores.com/pt/",
+      label: "Vídeo promocional"
+    },
+
+    enabled: true
   }
 
+  
 ];
 
 window.LVSM_MILESTONES = [
