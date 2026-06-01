@@ -1113,6 +1113,19 @@
       filter: drop-shadow(0 3px 8px rgba(0,0,0,.6));
     }
 
+    .tv-brand-logo {
+      margin-top: 8px;
+    }
+
+    .tv-brand-logo img {
+      width: 120px;
+      max-width: 120px;
+      height: auto;
+      display: block;
+      opacity: 0.9;
+      object-fit: contain;
+    }
+
     .tv-mode {
       display: none;
       position: fixed;
@@ -1130,10 +1143,10 @@
       position: relative;
     }
 
-    .tv-stage video,
-    .tv-stage img,
-    .fullscreen-stage video,
-    .fullscreen-stage img {
+    .tv-stage > video,
+    .tv-stage > img,
+    .fullscreen-stage > video,
+    .fullscreen-stage > img {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -1200,11 +1213,9 @@
       pointer-events: none;
     }
 
-    .tv-name,
-    .fs-name {
-      font-size: clamp(1.6rem, 4vw, 3.6rem);
-      font-weight: 950;
-      letter-spacing: -.04em;
+    .tv-name {
+      font-size: clamp(1.2rem, 2.2vw, 2.2rem);
+      font-weight: 900;
     }
 
     .close-button {
@@ -1774,7 +1785,7 @@
     <header class="topbar">
       <a class="brand" href="#" aria-label="Live Santa Maria">
         <div class="brand-logo">
-          <img src="./assets/logo-lvsm-banner.png" alt="Live Santa Maria">
+          <img src="./assets/logo-lvsm-banner.png" alt="LVSM">
         </div>
       </a>
 
@@ -2813,7 +2824,9 @@ function renderTvCamera(cam) {
   info.innerHTML = `
     <div>
       <div class="tv-name">${escapeHtml(cam.name)}</div>
-      <div>Live Santa Maria</div>
+      <div class="tv-brand-logo">
+        <img src="./assets/logo-lvsm-banner.png" alt="LVSM">
+      </div>
     </div>
   `;
 
@@ -2859,6 +2872,9 @@ function stopTvMode() {
   destroyMediaInstance("tv");
   tvStage.innerHTML = "";
   tvMode.classList.remove("show");
+  if (document.fullscreenElement) {
+    document.exitFullscreen().catch(() => {});
+  }
 }
 
 function setSection(section) {
@@ -3265,8 +3281,27 @@ document.querySelectorAll("[data-section-jump]").forEach(btn => {
   btn.addEventListener("click", () => setSection(btn.dataset.sectionJump));
 });
 
-document.getElementById("topTvButton")?.addEventListener("click", startTvMode);
-document.getElementById("mobileTvButton")?.addEventListener("click", startTvMode);
+async function requestTvFullscreen() {
+  if (document.fullscreenElement) return;
+
+  try {
+    await document.documentElement.requestFullscreen();
+  } catch (err) {
+    console.warn("Fullscreen não disponível:", err);
+  }
+}
+
+document.getElementById("topTvButton")?.addEventListener("click", async () => {
+  await requestTvFullscreen();
+  startTvMode();
+});
+
+document.getElementById("mobileTvButton")?.addEventListener("click", async () => {
+  await requestTvFullscreen();
+  startTvMode();
+});
+
+
 document.getElementById("tvCloseButton")?.addEventListener("click", stopTvMode);
 document.getElementById("fullscreenCloseButton")?.addEventListener("click", closeFullscreenCamera);
 
