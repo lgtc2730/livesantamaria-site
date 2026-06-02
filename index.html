@@ -170,12 +170,6 @@
       border-color: rgba(66,183,255,.32);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
     }
-
-    .promo-section {
-      margin-top: 32px;
-      padding-top: 24px;
-      border-top: 1px solid rgba(255,255,255,.08);
-    }    
     
     .weather-mini {
       display: flex;
@@ -2954,6 +2948,10 @@ function setSection(section) {
   currentSection = section;
 
   document.getElementById("camerasSection").classList.toggle("hidden", section !== "cameras");
+
+  document.getElementById("promoSection")
+    ?.classList.toggle("hidden", section !== "cameras");
+
   document.getElementById("mapSection").classList.toggle("active", section === "map");
   document.getElementById("forecastSection").classList.toggle("active", section === "forecast");
   document.getElementById("aboutSection").classList.toggle("active", section === "about");
