@@ -171,12 +171,6 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
     }
 
-    .promo-section {
-      margin-top: 32px;
-      padding-top: 24px;
-      border-top: 1px solid rgba(255,255,255,.08);
-    }    
-    
     .weather-mini {
       display: flex;
       align-items: center;
@@ -485,33 +479,6 @@
       align-items: center;
       gap: 14px;
       flex-wrap: wrap;
-    }
-
-    .section-head-right {
-      margin-left: auto;
-    }
-
-    .support-shortcut {
-      border: 1px solid rgba(66,183,255,.25);
-      background: rgba(24,119,255,.08);
-      color: var(--text);
-
-      border-radius: 999px;
-
-      min-height: 38px;
-      padding: 0 14px;
-
-      font-size: .82rem;
-      font-weight: 850;
-
-      cursor: pointer;
-
-      transition: all .18s ease;
-    }
-
-    .support-shortcut:hover {
-      background: rgba(24,119,255,.16);
-      border-color: rgba(66,183,255,.45);
     }
 
     .filters {
@@ -1106,14 +1073,6 @@
       .metar-grid {
         grid-template-columns: 1fr;
       }
-    }
-
-    @media (max-width: 680px) {
-
-      .section-head-right {
-        display: none;
-      }
-
     }
 
     @media (max-width: 680px) {
@@ -1901,12 +1860,6 @@
             <button class="chip" data-filter="centro">Centro</button>
           </div>
 
-          <div class="section-head-right">
-            <button id="supportShortcut" class="support-shortcut">
-              📢 Apoie o projecto
-            </button>
-          </div>
-
         </div>
 
         <section class="camera-grid" id="cameraContainer"></section>
@@ -2005,15 +1958,6 @@
         </div>
       </section>
 
-      <section class="promo-section" id="promoSection">
-        <div class="panel-pad">
-          <h2>Vídeos e Promoção</h2>
-          <p>Descubra Santa Maria e os parceiros do projecto.</p>
-
-          <section class="camera-grid" id="promoContainer"></section>
-        </div>
-      </section>
-
       <section class="about-card" id="aboutSection">
         <div class="panel-pad">
           <h2>Live Santa Maria</h2>
@@ -2029,7 +1973,7 @@
             <div id="partnersGrid" class="partners-grid"></div>
           </div>
 
-          <div class="support-card" id="supportCard">
+          <div class="support-card">
             <h3>Quer apoiar este projecto?</h3>
 
             <p>Algumas zonas da ilha de Santa Maria ainda não têm cobertura e estão assinaladas como “Procuramos patrocinador”.</p>
@@ -2550,7 +2494,6 @@ function renderCameras() {
   };
 
   const visible = PUBLIC_CAMERAS
-    .filter(cam => cam.type !== "promo")
     .filter(cameraMatchesFilter)
     .sort((a, b) => {
       return (typeOrder[a.type] || 99) - (typeOrder[b.type] || 99);
@@ -3374,26 +3317,6 @@ document.getElementById("mobileTvButton")?.addEventListener("click", async () =>
   startTvMode();
 });
 
-document.getElementById("supportShortcut")
-  ?.addEventListener("click", () => {
-
-    setSection("about");
-
-    setTimeout(() => {
-      const target = document.getElementById("supportCard");
-      if (!target) return;
-
-      const topbarOffset = 120;
-      const y = target.getBoundingClientRect().top + window.scrollY - topbarOffset;
-
-      window.scrollTo({
-        top: y,
-        behavior: "smooth"
-      });
-
-    }, 300);
-
-  });
 
 document.getElementById("tvCloseButton")?.addEventListener("click", stopTvMode);
 document.getElementById("fullscreenCloseButton")?.addEventListener("click", closeFullscreenCamera);
@@ -3537,32 +3460,12 @@ function renderPartners() {
   `).join("");
 }
 
-function renderPromos() {
-
-  const container = document.getElementById("promoContainer");
-
-  if (!container) return;
-
-  container.innerHTML = "";
-
-  PUBLIC_CAMERAS
-    .filter(cam => cam.type === "promo")
-    .forEach((cam, index) => {
-
-      const card = createCameraCard(cam, index);
-
-      container.appendChild(card);
-
-    });
-}
-
 setHeroBackground();
 updateCounts();
 renderCameras();
 renderCameraMap();
 renderNetworkTimeline();
 renderPartners();
-renderPromos();
 
 updateWeather();
 setInterval(updateCounts, 60 * 1000);
