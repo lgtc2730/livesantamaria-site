@@ -3071,6 +3071,27 @@ function parseMetar(raw, sourceName) {
   };
 }
 
+function parseMetarTimestamp(rawMetar) {
+  const match = rawMetar.match(/\b(\d{2})(\d{2})(\d{2})Z\b/);
+
+  if (!match) return null;
+
+  const [, day, hour, minute] = match;
+
+  const now = new Date();
+
+  const metarDate = new Date(Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    Number(day),
+    Number(hour),
+    Number(minute),
+    0
+  ));
+
+  return metarDate;
+}
+
 function isMetarWeatherToken(token) {
   return /^(\+|-|VC)?(MI|PR|BC|DR|BL|SH|TS|FZ)?(DZ|RA|SN|SG|IC|PL|GR|GS|UP|BR|FG|FU|VA|DU|SA|HZ|PY|SQ|FC|SS|DS)+$/.test(token);
 }
@@ -3278,6 +3299,24 @@ async function updateWeather() {
 
     try {
       const metar = await fetchLatestMetar();
+
+      const metarTime = parseMetarTimestamp(metar.raw);
+
+      if (metarTime) {
+        const ageHours =
+          (Date.now() - metarTime.getTime()) / 3600000;
+
+        console.log(
+          `METAR age: ${ageHours.toFixed(1)} h`
+        );
+
+        if (ageHours > 3) {
+          throw new Error(
+            `METAR antigo (${ageHours.toFixed(1)} h)`
+          );
+        }
+      }      
+
       updateMetarCard(metar);
 
       heroIcon = metar.icon;
