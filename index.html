@@ -3021,7 +3021,7 @@ async function fetchLatestMetar() {
   const data = await fetchJsonWithTimeout("/api/metar");
 
   if (!data?.ok || !data.raw) {
-    throw new Error(data?.error || "METAR indisponível");
+    throw new Error(data?.error || "METAR antigo (>3h).");
   }
 
   return parseMetar(
