@@ -751,6 +751,7 @@
 
     .map-section,
     .forecast-section,
+    .timelapse-section,
     .about-card {
       display: none;
       margin-top: 18px;
@@ -763,6 +764,7 @@
 
     .map-section.active,
     .forecast-section.active,
+    .timelapse-section.active,
     .about-card.active { display: block; }
 
     .map-head,
@@ -1034,6 +1036,58 @@
       font-weight: 950;
     }
 
+    .timelapse-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .timelapse-card {
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 22px;
+      background: rgba(5,18,32,.72);
+      backdrop-filter: blur(14px);
+      overflow: hidden;
+      box-shadow: 0 18px 50px rgba(0,0,0,.28);
+    }
+
+    .timelapse-card video {
+      width: 100%;
+      display: block;
+      background: #000;
+    }
+
+    .timelapse-info {
+      padding: 16px;
+    }
+
+    .timelapse-info h3 {
+      margin: 0 0 4px;
+    }
+
+    .timelapse-info p {
+      margin: 0 0 14px;
+      opacity: .75;
+    }
+
+    .timelapse-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .timelapse-buttons button {
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    .timelapse-buttons button:hover {
+      background: rgba(255,255,255,.16);
+    }    
 
     .metar-card {
       margin: 18px 0;
@@ -1835,6 +1889,7 @@
         <button class="active" data-section="cameras">CÂMARAS</button>
         <button data-section="map">MAPA</button>
         <button data-section="forecast">PREVISÃO</button>
+        <button data-section="timelapse">TIMELAPSE</button>
         <button data-section="about">SOBRE</button>
         <button id="topTvButton" type="button">📺 SLIDE-SHOW</button>
       </nav>
@@ -1999,6 +2054,18 @@
         </div>
       </section>
 
+      <section class="timelapse-section" id="timelapseSection">
+        <div class="section-header">
+          <p class="eyebrow">TIMELAPSE</p>
+          <h2>Santa Maria em movimento</h2>
+          <p class="section-subtitle">
+            Resumos em vídeo dos últimos dias, gerados localmente em câmaras selecionadas.
+          </p>
+        </div>
+
+        <div class="timelapse-grid" id="timelapseGrid"></div>
+      </section>
+      
       <section class="promo-section" id="promoSection">
         <div class="panel-pad">
           <h2>Vídeos e Promoção</h2>
@@ -2055,6 +2122,7 @@
     <button class="active" data-section="cameras"><span>📷</span>Câmaras</button>
     <button data-section="map"><span>🗺️</span>Mapa</button>
     <button data-section="forecast"><span>☀️</span>Previsão</button>
+    <button data-section="timelapse"><span>🎬</span>Time</button>
     <button data-section="about"><span>ℹ️</span>Sobre</button>
     <button id="mobileTvButton" type="button"><span>🎞️</span>Slides</button>
   </nav>
@@ -2954,6 +3022,7 @@ function setSection(section) {
 
   document.getElementById("mapSection").classList.toggle("active", section === "map");
   document.getElementById("forecastSection").classList.toggle("active", section === "forecast");
+  document.getElementById("timelapseSection").classList.toggle("active", section === "timelapse");
   document.getElementById("aboutSection").classList.toggle("active", section === "about");
 
   document.querySelectorAll("[data-section]").forEach(btn => {
@@ -3568,5 +3637,41 @@ setInterval(updateWeather, 10 * 60 * 1000);
 updateSeaState();
 setInterval(updateSeaState, 30 * 60 * 1000);
 </script>
+<script src="./timelapse.js"></script>
+
+<script>
+  function renderTimelapse() {
+    const grid = document.getElementById("timelapseGrid");
+    if (!grid || !Array.isArray(TIMELAPSE_CAMERAS)) return;
+
+    grid.innerHTML = "";
+
+    TIMELAPSE_CAMERAS
+      .filter(cam => cam.enabled)
+      .forEach(cam => {
+        const card = document.createElement("article");
+        card.className = "timelapse-card";
+
+        const firstVideo = cam.video;
+
+        card.innerHTML = `
+          <video controls preload="metadata" src="${firstVideo}"></video>
+
+          <div class="timelapse-info">
+            <h3>${cam.name}</h3>
+            <p>${cam.location}</p>
+            <p>🎬 ${cam.status}</p>
+          </div>
+        `;
+
+        const video = card.querySelector("video");
+
+        grid.appendChild(card);
+      });
+  }
+
+  document.addEventListener("DOMContentLoaded", renderTimelapse);
+</script>
+
 </body>
 </html>
