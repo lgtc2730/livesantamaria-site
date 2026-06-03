@@ -1970,7 +1970,7 @@
               </div>
             </div>
 
-            <div class="metar-raw" id="metarRaw">METAR indisponível.</div>
+            <div class="metar-raw" id="metarRaw">METAR antigo (>3h).</div>
           </div>
 
           <div class="sea-card">
@@ -3252,7 +3252,7 @@ function updateMetarCard(metar) {
   setText("metarClouds", metar.cloudsText || "—");
   setText("metarTime", metar.timeText || "—");
   setText("metarSource", metar.source || "METAR");
-  setText("metarRaw", metar.raw || "METAR indisponível.");
+  setText("metarRaw", metar.raw || "METAR antigo (>3h).");
 }
 
 function updateMetarCardUnavailable() {
@@ -3265,7 +3265,7 @@ function updateMetarCardUnavailable() {
   setText("metarClouds", "—");
   setText("metarTime", "—");
   setText("metarSource", "—");
-  setText("metarRaw", "METAR indisponível. A usar Open-Meteo como fallback no banner.");
+  setText("metarRaw", "METAR antigo (>3h). A usar Open-Meteo como fallback no banner.");
 }
 
 async function fetchOpenMeteoWeather() {
@@ -3325,7 +3325,9 @@ async function updateWeather() {
         heroTemp = metar.temp;
       }
     } catch (metarErr) {
-      console.warn("METAR indisponível, fallback Open-Meteo:", metarErr);
+      console.warn(
+        `METAR inválido (${err.message}), a usar Open-Meteo`
+      );
       updateMetarCardUnavailable();
     }
 
