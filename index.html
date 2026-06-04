@@ -3018,7 +3018,7 @@ async function fetchJsonWithTimeout(url, timeout = 9000) {
 }
 
 async function fetchLatestMetar() {
-  const data = await fetchJsonWithTimeout("/api/metar");
+  const data = await fetchJsonWithTimeout(`/api/metar?t=${Date.now()}`);
 
   if (!data?.ok || !data.raw) {
     throw new Error(data?.error || "METAR antigo (>3h).");

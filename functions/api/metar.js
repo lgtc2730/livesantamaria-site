@@ -2,7 +2,7 @@
 // Cloudflare Pages Function
 // Endpoint público: /api/metar
 
-const MAX_METAR_AGE_HOURS = 3;
+const MAX_METAR_AGE_HOURS = 2; // Limite de idade do METAR para ser considerado válido (em horas)
 
 const METAR_SOURCES = [
   {
@@ -21,8 +21,11 @@ function corsHeaders() {
     "Access-Control-Allow-Methods": "GET, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
 
-    // Para já, durante debug, evitamos cache.
-    "Cache-Control": "no-store"
+    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+    "Pragma": "no-cache",
+    "Expires": "0",
+    "CDN-Cache-Control": "no-store",
+    "Cloudflare-CDN-Cache-Control": "no-store"
   };
 }
 
