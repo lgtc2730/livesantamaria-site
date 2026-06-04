@@ -2,6 +2,8 @@
 // Cloudflare Pages Function
 // Endpoint público: /api/metar
 
+const MAX_METAR_AGE_HOURS = 3;
+
 const METAR_SOURCES = [
   {
     name: "AviationWeather",
@@ -18,7 +20,9 @@ function corsHeaders() {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
-    "Cache-Control": "public, max-age=300, s-maxage=300"
+
+    // Para já, durante debug, evitamos cache.
+    "Cache-Control": "no-store"
   };
 }
 
@@ -28,6 +32,66 @@ function extractMetarLine(text) {
     .map(line => line.trim())
     .filter(Boolean)
     .find(line => /^(METAR\s+|SPECI\s+)?LPAZ\b/.test(line)) || "";
+}
+
+function parseMetarObservedAt(raw) {
+  const match = String(raw || "").match(/\b(\d{2})(\d{2})(\d{2})Z\b/);
+  if (!match) return null;
+
+  const day = Number(match[1]);
+  const hour = Number(match[2]);
+  const minute = Number(match[3]);
+
+  const now = new Date();
+
+  let observedAt = new Date(Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    day,
+    hour,
+    minute,
+    0
+  ));
+
+  // Ajuste para viragem de mês.
+  if (observedAt.getTime() - now.getTime() > 14 * 24 * 60 * 60 * 1000) {
+    observedAt = new Date(Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth() - 1,
+      day,
+      hour,
+      minute,
+      0
+    ));
+  }
+
+  if (now.getTime() - observedAt.getTime() > 20 * 24 * 60 * 60 * 1000) {
+    observedAt = new Date(Date.UTC(
+      now.getUTCFullYear(),
+      now.getUTCMonth() + 1,
+      day,
+      hour,
+      minute,
+      0
+    ));
+  }
+
+  return observedAt;
+}
+
+function getMetarAgeHours(raw) {
+  const observedAt = parseMetarObservedAt(raw);
+  if (!observedAt) {
+    return {
+      observedAt: null,
+      ageHours: null
+    };
+  }
+
+  return {
+    observedAt,
+    ageHours: (Date.now() - observedAt.getTime()) / 3600000
+  };
 }
 
 async function fetchWithTimeout(url, timeout = 9000) {
@@ -66,7 +130,7 @@ export async function onRequest(context) {
     );
   }
 
-  let lastError = null;
+  const errors = [];
 
   for (const source of METAR_SOURCES) {
     try {
@@ -77,6 +141,20 @@ export async function onRequest(context) {
         throw new Error("METAR LPAZ não encontrado");
       }
 
+      const { observedAt, ageHours } = getMetarAgeHours(raw);
+
+      if (!observedAt || !Number.isFinite(ageHours)) {
+        throw new Error("Hora do METAR inválida");
+      }
+
+      if (ageHours < 0) {
+        throw new Error(`METAR com hora futura (${ageHours.toFixed(1)} h)`);
+      }
+
+      if (ageHours > MAX_METAR_AGE_HOURS) {
+        throw new Error(`METAR antigo (${ageHours.toFixed(1)} h)`);
+      }
+
       return Response.json(
         {
           ok: true,
@@ -84,12 +162,15 @@ export async function onRequest(context) {
           source: "METAR LPAZ",
           provider: source.name,
           raw,
+          observed_at: observedAt.toISOString(),
+          age_hours: Number(ageHours.toFixed(2)),
+          max_age_hours: MAX_METAR_AGE_HOURS,
           fetched_at: new Date().toISOString()
         },
         { headers: corsHeaders() }
       );
     } catch (err) {
-      lastError = `${source.name}: ${err.message}`;
+      errors.push(`${source.name}: ${err.message}`);
     }
   }
 
@@ -97,7 +178,9 @@ export async function onRequest(context) {
     {
       ok: false,
       station: "LPAZ",
-      error: lastError || "METAR indisponível"
+      error: errors.join(" | ") || "METAR indisponível",
+      max_age_hours: MAX_METAR_AGE_HOURS,
+      fetched_at: new Date().toISOString()
     },
     { status: 502, headers: corsHeaders() }
   );
