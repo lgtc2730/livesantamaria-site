@@ -1137,9 +1137,9 @@
 
     .timelapse-dashboard-main {
       display: grid;
-      grid-template-columns: 1.45fr 1fr;
+      grid-template-columns: minmax(0, 1.55fr) minmax(320px, 1fr);
+      gap: 36px;
       align-items: start;
-      row-gap: 18px;
     }
 
     .timelapse-left-column,
@@ -1147,15 +1147,19 @@
       display: grid;
       gap: 14px;
       align-content: start;
+      min-width: 0;
     }
     
     .timelapse-live-panel img,
-    .timelapse-video-panel video {
+    .timelapse-video-panel video,
+    .timelapse-play-card img {
       width: 100%;
+      max-width: 100%;
       aspect-ratio: 16 / 9;
       object-fit: cover;
       border-radius: 16px;
       background: #000;
+      display: block;
     }
 
     .timelapse-thumb-strip {
@@ -1289,6 +1293,7 @@
     @media (max-width: 680px) {
       .timelapse-dashboard-main {
         grid-template-columns: 1fr;
+        gap: 24px;
       }
 
       .timelapse-camera-choice {
