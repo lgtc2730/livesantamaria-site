@@ -91,19 +91,14 @@ function renderTimelapseCamera(cam) {
   return `
     <article class="timelapse-dashboard-card">
 
-      <div class="timelapse-info">
-        <h3>${tlEscape(cam.name)}</h3>
-        <p>
-          ${tlEscape(cam.location || "")}
-          ${updatedLabel ? ` · Actualizado em ${tlEscape(updatedLabel)}` : ""}
-        </p>
-      </div>
-
       <div class="timelapse-dashboard-main">
 
         <div class="timelapse-left-column">
           <section class="timelapse-live-panel">
-            <h4>Agora</h4>
+            <h4>
+              Agora
+              ${updatedLabel ? `<span class="timelapse-updated">Actualizado ${tlEscape(updatedLabel)}</span>` : ""}
+            </h4>
             <img src="${tlEscape(timelapseUrl(cam.currentThumb))}" alt="${tlEscape(cam.name)}">
           </section>
 
