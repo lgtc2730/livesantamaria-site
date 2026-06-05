@@ -107,10 +107,15 @@ function renderTimelapseCamera(cam) {
 
             <div class="timelapse-thumb-strip">
               ${todayItems.map(item => `
-                <div class="timelapse-thumb-item">
+                <button
+                  class="timelapse-thumb-item"
+                  type="button"
+                  data-timelapse-image="${tlEscape(timelapseUrl(item.thumb))}"
+                  data-timelapse-title="${tlEscape(cam.name)} — ${tlEscape(item.hour)}"
+                >
                   <img src="${tlEscape(timelapseUrl(item.thumb))}" alt="${tlEscape(item.hour)}">
                   <span>${tlEscape(item.hour)}</span>
-                </div>
+                </button>
               `).join("")}
             </div>
           </section>
@@ -205,6 +210,15 @@ function renderTimelapseDashboard() {
     });
   });
 
+  grid.querySelectorAll("[data-timelapse-image]").forEach(button => {
+    button.addEventListener("click", () => {
+      openTimelapseImage(
+        button.dataset.timelapseImage,
+        button.dataset.timelapseTitle
+      );
+    });
+  });
+
 }
 
 function openTimelapseVideo(videoUrl, title) {
@@ -241,6 +255,41 @@ function openTimelapseVideo(videoUrl, title) {
 
   const video = overlay.querySelector("video");
   video?.play?.().catch(() => {});
+}
+
+function openTimelapseImage(imageUrl, title) {
+  if (!imageUrl) return;
+
+  const overlay = document.createElement("div");
+  overlay.className = "timelapse-video-overlay";
+
+  overlay.innerHTML = `
+    <div class="timelapse-video-fullscreen">
+      <button class="timelapse-video-close" type="button" aria-label="Fechar">×</button>
+      <img
+        src="${tlEscape(imageUrl)}"
+        alt="${tlEscape(title || "Imagem timelapse")}"
+        class="timelapse-full-image"
+      >
+      <div class="timelapse-video-title">${tlEscape(title || "Imagem timelapse")}</div>
+    </div>
+  `;
+
+  overlay.querySelector(".timelapse-video-close")?.addEventListener("click", () => {
+    overlay.remove();
+  });
+
+  overlay.addEventListener("click", event => {
+    if (event.target === overlay) overlay.remove();
+  });
+
+  document.addEventListener("keydown", function escHandler(event) {
+    if (event.key !== "Escape") return;
+    overlay.remove();
+    document.removeEventListener("keydown", escHandler);
+  });
+
+  document.body.appendChild(overlay);
 }
 
 async function initTimelapseDashboard() {

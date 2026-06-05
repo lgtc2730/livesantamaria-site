@@ -1360,6 +1360,35 @@
       color: rgba(220, 235, 255, 0.52);
     }
 
+    .timelapse-thumb-item {
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .timelapse-thumb-item:hover img {
+      filter: brightness(1.12);
+      transform: scale(1.02);
+    }
+
+    .timelapse-thumb-item img {
+      transition: transform 0.18s ease, filter 0.18s ease;
+    }
+
+    .timelapse-full-image {
+      max-width: min(96vw, 1400px);
+      max-height: 86vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 18px;
+      background: #000;
+      display: block;
+    }
+
     .metar-card {
       margin: 18px 0;
       padding: 18px;
