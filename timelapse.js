@@ -1,6 +1,8 @@
 const TIMELAPSE_BASE_URL = "https://timelapse.livesantamaria.org";
 const TIMELAPSE_INDEX_URL = `${TIMELAPSE_BASE_URL}/index.json`;
 
+console.log("LVSM Timelapse JS remoto activo:", TIMELAPSE_INDEX_URL);
+
 function timelapseUrl(path) {
   if (!path) return "";
   if (path === "#") return "#";
