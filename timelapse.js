@@ -31,6 +31,18 @@ function formatTimelapseDate(dateStr) {
   return `${weekdays[date.getDay()]} ${String(date.getDate()).padStart(2, "0")} ${months[date.getMonth()]}`;
 }
 
+function formatTimelapseUpdated(value) {
+  if (!value) return "";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+
+  return date.toLocaleString("pt-PT", {
+    dateStyle: "short",
+    timeStyle: "short"
+  });
+}
+
 async function loadTimelapseIndex() {
   const response = await fetch(`${TIMELAPSE_INDEX_URL}?t=${Date.now()}`, {
     cache: "no-store"
@@ -64,6 +76,8 @@ function renderTimelapseCamera(cam) {
   const dailyItems = cam.daily || [];
   const todayItems = cam.today || [];
 
+  const updatedLabel = formatTimelapseUpdated(timelapseData?.updated);
+
   const previewDays = [...dailyItems];
 
   while (previewDays.length < 6) {
@@ -76,6 +90,15 @@ function renderTimelapseCamera(cam) {
 
   return `
     <article class="timelapse-dashboard-card">
+
+      <div class="timelapse-info">
+        <h3>${tlEscape(cam.name)}</h3>
+        <p>
+          ${tlEscape(cam.location || "")}
+          ${updatedLabel ? ` · Actualizado em ${tlEscape(updatedLabel)}` : ""}
+        </p>
+      </div>
+
       <div class="timelapse-dashboard-main">
 
         <div class="timelapse-left-column">
@@ -190,7 +213,7 @@ function renderTimelapseDashboard() {
 }
 
 function openTimelapseVideo(videoUrl, title) {
-  if (!videoUrl) return;
+  if (!videoUrl || videoUrl === "#") return;
 
   const overlay = document.createElement("div");
   overlay.className = "timelapse-video-overlay";
