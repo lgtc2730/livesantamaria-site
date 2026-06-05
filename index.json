@@ -1,0 +1,51 @@
+{
+  "updated": "2026-06-05T10:23:05+00:00",
+  "cameras": [
+    {
+      "id": "anjos-porto",
+      "name": "Anjos-Porto",
+      "location": "Anjos",
+      "enabled": true,
+      "status": "Experimental",
+      "currentThumb": "/thumbs/current.jpg",
+      "latest": {
+        "dayVideo": "/latest/latest-day.mp4",
+        "dayThumb": "/thumbs/daily/latest-day.jpg"
+      },
+      "daily": [
+        {
+          "date": "2026-06-04",
+          "video": "/daily/2026-06-04.mp4",
+          "thumb": "/thumbs/daily/2026-06-04.jpg"
+        }
+
+      ],
+      "today": [
+        {
+          "hour": "00:00",
+          "thumb": "/thumbs/today/00.jpg"
+        }
+,
+        {
+          "hour": "03:00",
+          "thumb": "/thumbs/today/03.jpg"
+        }
+,
+        {
+          "hour": "06:00",
+          "thumb": "/thumbs/today/06.jpg"
+        }
+,
+        {
+          "hour": "09:00",
+          "thumb": "/thumbs/today/09.jpg"
+        }
+
+      ],
+      "weekly": {
+        "video": "/weekly/latest-week.mp4",
+        "thumb": "/thumbs/weekly/latest-week.jpg"
+      }
+    }
+  ]
+}

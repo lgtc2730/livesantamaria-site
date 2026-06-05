@@ -1089,6 +1089,259 @@
       background: rgba(255,255,255,.16);
     }    
 
+    .timelapse-camera-selector {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .timelapse-camera-choice {
+      flex: 0 0 160px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,.055);
+      color: var(--text);
+      padding: 8px;
+      text-align: left;
+    }
+
+    .timelapse-camera-choice.active {
+      border-color: rgba(66,183,255,.55);
+      background: rgba(24,119,255,.16);
+    }
+
+    .timelapse-camera-choice img {
+      width: 100%;
+      height: 82px;
+      object-fit: cover;
+      border-radius: 12px;
+      display: block;
+    }
+
+    .timelapse-camera-choice span {
+      display: block;
+      margin-top: 7px;
+      font-weight: 900;
+      font-size: .85rem;
+    }
+
+    .timelapse-dashboard-card {
+      grid-column: 1 / -1;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(5,18,32,.72);
+      padding: 18px;
+    }
+
+    .timelapse-dashboard-main {
+      display: grid;
+      grid-template-columns: 1.45fr 1fr;
+      align-items: start;
+      row-gap: 18px;
+    }
+
+    .timelapse-left-column,
+    .timelapse-right-column {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+    
+    .timelapse-live-panel img,
+    .timelapse-video-panel video {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-radius: 16px;
+      background: #000;
+    }
+
+    .timelapse-thumb-strip {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .timelapse-thumb-item {
+      flex: 0 0 100px;
+      color: var(--text);
+    }
+
+    .timelapse-thumb-item img {
+      width: 100px;
+      height: 56px;
+      object-fit: cover;
+      border-radius: 10px;
+      display: block;
+      background: #000;
+    }
+
+    .timelapse-thumb-item span {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: .72rem;
+      text-align: center;
+    }
+
+    .timelapse-play-card {
+      position: relative;
+      width: 100%;
+      padding: 0;
+      border: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .timelapse-play-card img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      display: block;
+    }
+
+    .timelapse-play-icon {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 3rem;
+      color: white;
+      text-shadow: 0 4px 18px rgba(0,0,0,.8);
+      background: rgba(0,0,0,.18);
+    }
+
+    .timelapse-video-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: rgba(0,0,0,.92);
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .timelapse-video-fullscreen {
+      position: relative;
+      width: min(1200px, 96vw);
+    }
+
+    .timelapse-video-fullscreen video {
+      width: 100%;
+      max-height: 86vh;
+      border-radius: 18px;
+      background: #000;
+    }
+
+    .timelapse-video-close {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      z-index: 2;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.25);
+      background: rgba(0,0,0,.45);
+      color: white;
+      font-size: 1.6rem;
+    }
+
+    .timelapse-video-title {
+      margin-top: 10px;
+      color: rgba(255,255,255,.86);
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .timelapse-weekly-panel {
+      grid-column: auto;
+    }
+
+    .timelapse-weekly-placeholder {
+      aspect-ratio: 16 / 9;
+      border-radius: 12px;
+      border: 1px dashed rgba(255,255,255,.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      background: rgba(255,255,255,.035);
+      font-weight: 800;
+    }
+
+    .timelapse-video-panel {
+      margin-bottom: 0px;
+    }
+
+    .timelapse-mini-days {
+      margin-top: -8px;
+    }
+
+    .timelapse-mini-days h4 {
+      margin-top: 0 0 8px;
+    }
+
+    @media (max-width: 680px) {
+      .timelapse-dashboard-main {
+        grid-template-columns: 1fr;
+      }
+
+      .timelapse-camera-choice {
+        flex-basis: 132px;
+      }
+
+      .timelapse-camera-choice img {
+        height: 72px;
+      }
+    }
+
+    .timelapse-side-panel {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .timelapse-mini-days-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      max-width: 100%;
+      gap: 8px;
+    }
+
+    .timelapse-mini-day {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 0;
+      background: #000;
+      color: var(--text);
+    }
+
+    .timelapse-mini-day img {
+      width: 100%;
+      height: 78px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .timelapse-mini-day span {
+      position: absolute;
+      right: 6px;
+      bottom: 5px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.62);
+      color: white;
+      font-size: .68rem;
+      font-weight: 800;
+    }
+
     .metar-card {
       margin: 18px 0;
       padding: 18px;
@@ -2055,14 +2308,6 @@
       </section>
 
       <section class="timelapse-section" id="timelapseSection">
-        <div class="section-header">
-          <p class="eyebrow">TIMELAPSE</p>
-          <h2>Santa Maria em movimento</h2>
-          <p class="section-subtitle">
-            Resumos em vídeo dos últimos dias, gerados localmente em câmaras selecionadas.
-          </p>
-        </div>
-
         <div class="timelapse-grid" id="timelapseGrid"></div>
       </section>
       
@@ -3639,39 +3884,7 @@ setInterval(updateSeaState, 30 * 60 * 1000);
 </script>
 <script src="./timelapse.js"></script>
 
-<script>
-  function renderTimelapse() {
-    const grid = document.getElementById("timelapseGrid");
-    if (!grid || !Array.isArray(TIMELAPSE_CAMERAS)) return;
-
-    grid.innerHTML = "";
-
-    TIMELAPSE_CAMERAS
-      .filter(cam => cam.enabled)
-      .forEach(cam => {
-        const card = document.createElement("article");
-        card.className = "timelapse-card";
-
-        const firstVideo = cam.video;
-
-        card.innerHTML = `
-          <video controls preload="metadata" src="${firstVideo}"></video>
-
-          <div class="timelapse-info">
-            <h3>${cam.name}</h3>
-            <p>${cam.location}</p>
-            <p>🎬 ${cam.status}</p>
-          </div>
-        `;
-
-        const video = card.querySelector("video");
-
-        grid.appendChild(card);
-      });
-  }
-
-  document.addEventListener("DOMContentLoaded", renderTimelapse);
-</script>
+<script src="./timelapse.js?v=20260604-1"></script>
 
 </body>
 </html>
