@@ -1,4 +1,12 @@
-const TIMELAPSE_INDEX_URL = "./index.json";
+const TIMELAPSE_BASE_URL = "https://timelapse.livesantamaria.org";
+const TIMELAPSE_INDEX_URL = `${TIMELAPSE_BASE_URL}/index.json`;
+
+function timelapseUrl(path) {
+  if (!path) return "";
+  if (path === "#") return "#";
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  return `${TIMELAPSE_BASE_URL}${path}`;
+}
 
 let timelapseData = null;
 let activeTimelapseCameraId = null;
@@ -42,7 +50,7 @@ function renderTimelapseCameraSelector(cameras) {
           data-timelapse-camera="${tlEscape(cam.id)}"
           type="button"
         >
-          <img src="${tlEscape(cam.currentThumb)}" alt="${tlEscape(cam.name)}">
+          <img src="${tlEscape(timelapseUrl(cam.currentThumb))}" alt="${tlEscape(cam.name)}">
           <span>${tlEscape(cam.name)}</span>
         </button>
       `).join("")}
@@ -59,7 +67,7 @@ function renderTimelapseCamera(cam) {
   while (previewDays.length < 6) {
     previewDays.push({
       date: `2026-05-${String(30 - previewDays.length).padStart(2, "0")}`,
-      thumb: cam.currentThumb,
+      thumb: timelapseUrl(cam.currentThumb),
       video: "#"
     });
   }
@@ -71,7 +79,7 @@ function renderTimelapseCamera(cam) {
         <div class="timelapse-left-column">
           <section class="timelapse-live-panel">
             <h4>Agora</h4>
-            <img src="${tlEscape(cam.currentThumb)}" alt="${tlEscape(cam.name)}">
+            <img src="${tlEscape(timelapseUrl(cam.currentThumb))}" alt="${tlEscape(cam.name)}">
           </section>
 
           <section class="timelapse-strip-panel">
@@ -80,7 +88,7 @@ function renderTimelapseCamera(cam) {
             <div class="timelapse-thumb-strip">
               ${todayItems.map(item => `
                 <div class="timelapse-thumb-item">
-                  <img src="${tlEscape(item.thumb)}" alt="${tlEscape(item.hour)}">
+                  <img src="${tlEscape(timelapseUrl(item.thumb))}" alt="${tlEscape(item.hour)}">
                   <span>${tlEscape(item.hour)}</span>
                 </div>
               `).join("")}
@@ -95,10 +103,10 @@ function renderTimelapseCamera(cam) {
             <button
               class="timelapse-play-card"
               type="button"
-              data-timelapse-video="${tlEscape(cam.latest?.dayVideo)}"
+              data-timelapse-video="${tlEscape(timelapseUrl(cam.latest?.dayVideo))}"
               data-timelapse-title="${tlEscape(cam.name)} — Timelapse diário"
             >
-              <img src="${tlEscape(cam.latest?.dayThumb)}" alt="${tlEscape(cam.name)}">
+              <img src="${tlEscape(timelapseUrl(cam.latest?.dayThumb))}" alt="${tlEscape(cam.name)}">
               <span class="timelapse-play-icon">▶</span>
             </button>
           </section>
@@ -111,10 +119,10 @@ function renderTimelapseCamera(cam) {
                 <button
                   class="timelapse-mini-day"
                   type="button"
-                  data-timelapse-video="${tlEscape(item.video)}"
+                  data-timelapse-video="${tlEscape(timelapseUrl(item.video))}"
                   data-timelapse-title="${tlEscape(cam.name)} — ${tlEscape(formatTimelapseDate(item.date))}"
                 >
-                  <img src="${tlEscape(item.thumb)}" alt="${tlEscape(item.date)}">
+                  <img src="${tlEscape(timelapseUrl(item.thumb))}" alt="${tlEscape(item.date)}">
                   <span>${tlEscape(formatTimelapseDate(item.date))}</span>
                 </button>
               `).join("")}
@@ -127,10 +135,10 @@ function renderTimelapseCamera(cam) {
             <button
               class="timelapse-play-card"
               type="button"
-              data-timelapse-video="${tlEscape(cam.weekly?.video)}"
+              data-timelapse-video="${tlEscape(timelapseUrl(cam.weekly?.video))}"
               data-timelapse-title="${tlEscape(cam.name)} — Timelapse semanal"
             >
-              <img src="${tlEscape(cam.weekly?.thumb)}" alt="${tlEscape(cam.name)} semanal">
+              <img src="${tlEscape(timelapseUrl(cam.weekly?.thumb))}" alt="${tlEscape(cam.name)} semanal">
               <span class="timelapse-play-icon">▶</span>
             </button>
           </section>
