@@ -2173,6 +2173,166 @@
       .camera-card:not(.featured-card).compact-mobile video,
       .camera-card:not(.featured-card).compact-mobile img { height: 86px; }
     }
+
+    @media (max-width: 680px) and (orientation: portrait) {
+      .timelapse-dashboard-card {
+        overflow: hidden;
+      }
+
+      .timelapse-dashboard-main {
+        grid-template-columns: 1fr;
+        gap: 22px;
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .timelapse-left-column,
+      .timelapse-right-column {
+        min-width: 0;
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .timelapse-live-panel,
+      .timelapse-video-panel,
+      .timelapse-weekly-panel,
+      .timelapse-mini-days {
+        min-width: 0;
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .timelapse-live-panel img,
+      .timelapse-video-panel video,
+      .timelapse-play-card img {
+        width: 100%;
+        max-width: 100%;
+        display: block;
+      }
+
+      .timelapse-thumb-strip {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        max-width: 100%;
+        padding-bottom: 10px;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x proximity;
+      }
+
+      .timelapse-thumb-item {
+        flex: 0 0 82px;
+        scroll-snap-align: start;
+      }
+
+      .timelapse-thumb-item img {
+        width: 82px;
+        height: 46px;
+        object-fit: cover;
+      }
+    }
+
+    @media (max-width: 380px) and (orientation: portrait) {
+      .timelapse-thumb-item {
+        flex-basis: 76px;
+      }
+
+      .timelapse-thumb-item img {
+        width: 76px;
+        height: 43px;
+      }
+
+      .timelapse-dashboard-main {
+        gap: 18px;
+      }
+    }
+
+    @media (max-height: 520px) and (orientation: landscape) {
+      .topbar {
+        padding: 10px 18px;
+        gap: 14px;
+      }
+
+      .brand-logo img {
+        max-height: 74px;
+        width: auto;
+      }
+
+      .desktop-nav {
+        gap: 10px;
+      }
+
+      .desktop-nav button {
+        padding: 11px 18px;
+        font-size: 0.9rem;
+      }
+
+      .timelapse-dashboard-card {
+        overflow: hidden;
+      }
+
+      .timelapse-dashboard-main {
+        grid-template-columns: 1fr;
+        gap: 22px;
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .timelapse-left-column,
+      .timelapse-right-column {
+        min-width: 0;
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .timelapse-live-panel,
+      .timelapse-video-panel,
+      .timelapse-weekly-panel,
+      .timelapse-mini-days {
+        min-width: 0;
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .timelapse-live-panel img,
+      .timelapse-video-panel video,
+      .timelapse-play-card img {
+        width: 100%;
+        max-width: 100%;
+        display: block;
+      }
+
+      .timelapse-thumb-strip {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        max-width: 100%;
+        padding-bottom: 10px;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x proximity;
+      }
+
+      .timelapse-thumb-item {
+        flex: 0 0 82px;
+        scroll-snap-align: start;
+      }
+
+      .timelapse-thumb-item img {
+        width: 82px;
+        height: 46px;
+        object-fit: cover;
+      }
+    }
+
+    @media (max-height: 520px) and (orientation: landscape) {
+      #tvButton,
+      #mobileTvButton {
+        display: none !important;
+      }
+    }
+
   </style>
 </head>
 
@@ -2416,7 +2576,7 @@
     <button data-section="forecast"><span>☀️</span>Previsão</button>
     <button data-section="timelapse"><span>🎬</span>Time</button>
     <button data-section="about"><span>ℹ️</span>Sobre</button>
-    <button id="mobileTvButton" type="button"><span>🎞️</span>Slides</button>
+
   </nav>
 
   <div class="tv-mode" id="tvMode">
@@ -3729,7 +3889,7 @@ document.getElementById("topTvButton")?.addEventListener("click", async () => {
 });
 
 document.getElementById("mobileTvButton")?.addEventListener("click", async () => {
-  await requestTvFullscreen();
+
   startTvMode();
 });
 
