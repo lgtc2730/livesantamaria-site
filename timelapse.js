@@ -76,14 +76,13 @@ function renderTimelapseCamera(cam) {
   const dailyItems = cam.daily || [];
   const todayItems = cam.today || [];
 
-  const currentDay =
-    timelapseData?.updated
-      ? timelapseData.updated.slice(0, 10)
-      : "";
+  // O primeiro item de daily vem ordenado do mais recente para o mais antigo.
+  // Esse é o dia que já aparece em grande no bloco "Hoje".
+  const todayDailyDate = dailyItems[0]?.date || "";
+
+  const previewDays = dailyItems.filter(item => item.date !== todayDailyDate);
 
   const updatedLabel = formatTimelapseUpdated(timelapseData?.updated);
-
-  const previewDays = [...dailyItems];
 
   return `
     <article class="timelapse-dashboard-card">
