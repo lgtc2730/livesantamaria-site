@@ -1,14 +1,18 @@
-const TIMELAPSE_BASE_URL = "https://anjos-timelapse.livesantamaria.org";
-const TIMELAPSE_INDEX_URL = `${TIMELAPSE_BASE_URL}/index.json`;
+const TIMELAPSE_SOURCES = [
+  {
+    id: "anjos-porto",
+    baseUrl: "https://anjos-timelapse.livesantamaria.org"
+  }
+];
 
-function timelapseUrl(path) {
+function timelapseUrl(path, baseUrl = "") {
   if (!path) return "";
   if (path === "#") return "#";
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
-  return `${TIMELAPSE_BASE_URL}${path}`;
+  return `${baseUrl}${path}`;
 }
 
-console.log("LVSM Timelapse JS remoto activo:", TIMELAPSE_INDEX_URL);
+console.log("LVSM Timelapse sources:", TIMELAPSE_SOURCES);
 
 let timelapseData = null;
 let activeTimelapseCameraId = null;
@@ -44,15 +48,60 @@ function formatTimelapseUpdated(value) {
 }
 
 async function loadTimelapseIndex() {
-  const response = await fetch(`${TIMELAPSE_INDEX_URL}?t=${Date.now()}`, {
-    cache: "no-store"
+  const results = await Promise.allSettled(
+    TIMELAPSE_SOURCES.map(async source => {
+      const url = `${source.baseUrl}/index.json?t=${Date.now()}`;
+
+      const response = await fetch(url, {
+        cache: "no-store"
+      });
+
+      if (!response.ok) {
+        throw new Error(`${source.id}: HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      return {
+        source,
+        data
+      };
+    })
+  );
+
+  const cameras = [];
+  const failures = [];
+
+  results.forEach(result => {
+    if (result.status === "rejected") {
+      failures.push(result.reason);
+      return;
+    }
+
+    const { source, data } = result.value;
+
+    (data.cameras || []).forEach(cam => {
+      cameras.push({
+        ...cam,
+        sourceId: source.id,
+        baseUrl: source.baseUrl,
+        indexUpdated: data.updated || ""
+      });
+    });
   });
 
-  if (!response.ok) {
-    throw new Error(`Erro ao carregar index.json: HTTP ${response.status}`);
+  if (!cameras.length) {
+    throw new Error("Nenhum nó de timelapse disponível");
   }
 
-  return await response.json();
+  if (failures.length) {
+    console.warn("Alguns nós de timelapse falharam:", failures);
+  }
+
+  return {
+    updated: new Date().toISOString(),
+    cameras
+  };
 }
 
 function renderTimelapseCameraSelector(cameras) {
@@ -64,7 +113,7 @@ function renderTimelapseCameraSelector(cameras) {
           data-timelapse-camera="${tlEscape(cam.id)}"
           type="button"
         >
-          <img src="${tlEscape(timelapseUrl(cam.currentThumb))}" alt="${tlEscape(cam.name)}">
+          <img src="${tlEscape(timelapseUrl(cam.currentThumb, cam.baseUrl))}" alt="${tlEscape(cam.name)}">
           <span>${tlEscape(cam.name)}</span>
         </button>
       `).join("")}
@@ -82,7 +131,7 @@ function renderTimelapseCamera(cam) {
 
   const previewDays = dailyItems.filter(item => item.date !== todayDailyDate);
 
-  const updatedLabel = formatTimelapseUpdated(timelapseData?.updated);
+  const updatedLabel = formatTimelapseUpdated(cam.indexUpdated);
 
   return `
     <article class="timelapse-dashboard-card">
@@ -95,7 +144,7 @@ function renderTimelapseCamera(cam) {
               Agora
               ${updatedLabel ? `<span class="timelapse-updated">Actualizado ${tlEscape(updatedLabel)}</span>` : ""}
             </h4>
-            <img src="${tlEscape(timelapseUrl(cam.currentThumb))}" alt="${tlEscape(cam.name)}">
+            <img src="${tlEscape(timelapseUrl(cam.currentThumb, cam.baseUrl))}" alt="${tlEscape(cam.name)}">
           </section>
 
           <section class="timelapse-strip-panel">
@@ -106,10 +155,10 @@ function renderTimelapseCamera(cam) {
                 <button
                   class="timelapse-thumb-item"
                   type="button"
-                  data-timelapse-image="${tlEscape(timelapseUrl(item.thumb))}"
+                  data-timelapse-image="${tlEscape(timelapseUrl(item.thumb, cam.baseUrl))}"
                   data-timelapse-title="${tlEscape(cam.name)} — ${tlEscape(item.hour)}"
                 >
-                  <img src="${tlEscape(timelapseUrl(item.thumb))}" alt="${tlEscape(item.hour)}">
+                  <img src="${tlEscape(timelapseUrl(item.thumb, cam.baseUrl))}" alt="${tlEscape(item.hour)}">
                   <span>${tlEscape(item.hour)}</span>
                 </button>
               `).join("")}
@@ -124,10 +173,10 @@ function renderTimelapseCamera(cam) {
             <button
               class="timelapse-play-card"
               type="button"
-              data-timelapse-video="${tlEscape(timelapseUrl(cam.latest?.dayVideo))}"
+              data-timelapse-video="${tlEscape(timelapseUrl(cam.latest?.dayVideo, cam.baseUrl))}"
               data-timelapse-title="${tlEscape(cam.name)} — Timelapse diário"
             >
-              <img src="${tlEscape(timelapseUrl(cam.latest?.dayThumb))}" alt="${tlEscape(cam.name)}">
+              <img src="${tlEscape(timelapseUrl(cam.latest?.dayThumb, cam.baseUrl))}" alt="${tlEscape(cam.name)}">
               <span class="timelapse-play-icon">▶</span>
             </button>
           </section>
@@ -140,10 +189,10 @@ function renderTimelapseCamera(cam) {
                 <button
                   class="timelapse-mini-day"
                   type="button"
-                  data-timelapse-video="${tlEscape(timelapseUrl(item.video))}"
+                  data-timelapse-video="${tlEscape(timelapseUrl(item.video, cam.baseUrl))}"
                   data-timelapse-title="${tlEscape(cam.name)} — ${tlEscape(formatTimelapseDate(item.date))}"
                 >
-                  <img src="${tlEscape(timelapseUrl(item.thumb))}" alt="${tlEscape(item.date)}">
+                  <img src="${tlEscape(timelapseUrl(item.thumb, cam.baseUrl))}" alt="${tlEscape(item.date)}">
                   <span>${tlEscape(formatTimelapseDate(item.date))}</span>
                 </button>
               `).join("")}
@@ -156,10 +205,10 @@ function renderTimelapseCamera(cam) {
             <button
               class="timelapse-play-card"
               type="button"
-              data-timelapse-video="${tlEscape(timelapseUrl(cam.weekly?.video))}"
+              data-timelapse-video="${tlEscape(timelapseUrl(cam.weekly?.video, cam.baseUrl))}"
               data-timelapse-title="${tlEscape(cam.name)} — Timelapse semanal"
             >
-              <img src="${tlEscape(timelapseUrl(cam.weekly?.thumb))}" alt="${tlEscape(cam.name)} semanal">
+              <img src="${tlEscape(timelapseUrl(cam.weekly?.thumb, cam.baseUrl))}" alt="${tlEscape(cam.name)} semanal">
               <span class="timelapse-play-icon">▶</span>
             </button>
           </section>
