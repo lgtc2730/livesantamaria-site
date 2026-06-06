@@ -1,0 +1,10 @@
+[Unit]
+Description=LVSM Boot Event Logger
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/lvsm-boot-log.sh
+
+[Install]
+WantedBy=multi-user.target

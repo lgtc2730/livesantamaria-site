@@ -1,0 +1,14 @@
+[Unit]
+Description=LVSM Timelapse HTTP Server
+After=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/var/lib/lvsm/timelapse
+ExecStart=/usr/bin/python3 /var/lib/lvsm/timelapse/scripts/timelapse-http.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

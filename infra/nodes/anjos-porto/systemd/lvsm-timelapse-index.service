@@ -1,0 +1,7 @@
+[Unit]
+Description=LVSM Timelapse - Build index and thumbnails
+
+[Service]
+Type=oneshot
+User=cam
+ExecStart=/var/lib/lvsm/timelapse/scripts/build-index.sh

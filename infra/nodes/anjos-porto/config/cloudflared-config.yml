@@ -1,0 +1,11 @@
+tunnel: tunnel-anjos-cam
+credentials-file: /etc/cloudflared/<TUNNEL-CREDENTIALS-FILE>.json
+
+ingress:
+  - hostname: anjos-cam.livesantamaria.org
+    service: http://127.0.0.1:8888
+
+  - hostname: anjos-timelapse.livesantamaria.org
+    service: http://127.0.0.1:8080
+
+  - service: http_status:404

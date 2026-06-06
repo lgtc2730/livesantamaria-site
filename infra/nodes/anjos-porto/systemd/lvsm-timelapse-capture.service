@@ -1,0 +1,6 @@
+[Unit]
+Description=LVSM Timelapse - Smart capture one frame
+
+[Service]
+Type=oneshot
+ExecStart=/var/lib/lvsm/timelapse/scripts/smart-capture.sh

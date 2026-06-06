@@ -1,0 +1,7 @@
+[Unit]
+Description=LVSM Timelapse Teste Anjos-Porto
+
+[Service]
+Type=simple
+ExecStart=/opt/lvsm/timelapse/timelapse-anjos-porto-test.sh
+Restart=no

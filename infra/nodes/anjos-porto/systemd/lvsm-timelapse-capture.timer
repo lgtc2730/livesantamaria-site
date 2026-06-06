@@ -1,0 +1,12 @@
+[Unit]
+Description=LVSM Timelapse - Smart capture scheduler
+
+[Timer]
+OnBootSec=1min
+OnCalendar=*:0/1
+AccuracySec=5s
+Persistent=true
+Unit=lvsm-timelapse-capture.service
+
+[Install]
+WantedBy=timers.target
