@@ -76,17 +76,14 @@ function renderTimelapseCamera(cam) {
   const dailyItems = cam.daily || [];
   const todayItems = cam.today || [];
 
+  const currentDay =
+    timelapseData?.updated
+      ? timelapseData.updated.slice(0, 10)
+      : "";
+
   const updatedLabel = formatTimelapseUpdated(timelapseData?.updated);
 
   const previewDays = [...dailyItems];
-
-  while (previewDays.length < 6) {
-    previewDays.push({
-      date: `2026-05-${String(30 - previewDays.length).padStart(2, "0")}`,
-      thumb: timelapseUrl(cam.currentThumb),
-      video: "#"
-    });
-  }
 
   return `
     <article class="timelapse-dashboard-card">
