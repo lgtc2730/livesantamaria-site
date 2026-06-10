@@ -3656,6 +3656,21 @@ function setSection(section) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function applyInitialUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  const cameraId = params.get("camera");
+  const section = params.get("section");
+
+  if (section) {
+    setSection(section);
+    return;
+  }
+
+  if (cameraId) {
+    setSection("timelapse");
+  }
+}
+
 function degreesToCompass(deg) {
   const value = Number(deg);
   if (!Number.isFinite(value)) return "—";
@@ -4259,6 +4274,9 @@ setInterval(updateCounts, 60 * 1000);
 setInterval(updateWeather, 10 * 60 * 1000);
 updateSeaState();
 setInterval(updateSeaState, 30 * 60 * 1000);
+
+applyInitialUrlParams();
+
 </script>
 
 <script src="./timelapse.js?v=20260606-3"></script>
