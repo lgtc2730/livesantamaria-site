@@ -17,8 +17,10 @@ function corsHeaders() {
   return {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Cache-Control": "public, max-age=300, s-maxage=300"
+    "Access-Control-Allow-Headers": "Content-Type, Accept",
+    "Access-Control-Max-Age": "86400",
+    "Cache-Control": "public, max-age=300, s-maxage=300",
+    "Vary": "Origin"
   };
 }
 
@@ -56,7 +58,10 @@ export async function onRequest(context) {
   const { request } = context;
 
   if (request.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders() });
+    return new Response(null, {
+      status: 204,
+      headers: corsHeaders()
+    });
   }
 
   if (request.method !== "GET") {
