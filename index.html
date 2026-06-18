@@ -1410,7 +1410,7 @@
 
     .metar-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 10px;
     }
 
@@ -1452,7 +1452,7 @@
 
     @media (max-width: 680px) {
       .metar-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
       }
     }
 
@@ -2621,8 +2621,18 @@
               </div>
 
               <div class="metar-item">
+                <span>Humidade</span>
+                <strong id="metarHumidity">—</strong>
+              </div>
+
+              <div class="metar-item">
                 <span>Ponto de orvalho</span>
                 <strong id="metarDewpoint">—</strong>
+              </div>
+
+              <div class="metar-item">
+                <span>Pressão</span>
+                <strong id="metarPressure">—</strong>
               </div>
 
               <div class="metar-item">
@@ -2636,13 +2646,13 @@
               </div>
 
               <div class="metar-item">
-                <span>Pressão</span>
-                <strong id="metarPressure">—</strong>
+                <span>Nuvens</span>
+                <strong id="metarClouds">—</strong>
               </div>
 
               <div class="metar-item">
-                <span>Nuvens</span>
-                <strong id="metarClouds">—</strong>
+                <span>Conforto</span>
+                <strong id="metarComfort">—</strong>
               </div>
 
               <div class="metar-item">
@@ -2659,29 +2669,63 @@
             <div class="metar-raw" id="metarRaw">METAR indisponível.</div>
           </div>
 
-          <div class="sea-card">
-            <h3>🌊 Estado do Mar</h3>
+          <div class="tides-card">
+            <h3>🌊 Marés</h3>
+            <p>Vila do Porto / Santa Maria. Dados a integrar na Previsão v2.</p>
 
-            <div class="sea-grid">
-              <div class="sea-row">
-                <span>Ondulação</span>
-                <strong id="seaWaveHeight">—</strong>
+            <div class="metar-grid">
+              <div class="metar-item">
+                <span>Próxima maré</span>
+                <strong id="nextTide">—</strong>
               </div>
 
-              <div class="sea-row">
-                <span>Período</span>
-                <strong id="seaWavePeriod">—</strong>
+              <div class="metar-item">
+                <span>Preia-mar</span>
+                <strong id="highTides">—</strong>
               </div>
 
-              <div class="sea-row">
-                <span>Direcção</span>
-                <strong id="seaWaveDirection">—</strong>
+              <div class="metar-item">
+                <span>Baixa-mar</span>
+                <strong id="lowTides">—</strong>
+              </div>
+
+              <div class="metar-item">
+                <span>Fonte</span>
+                <strong id="tidesSource">IH</strong>
               </div>
             </div>
           </div>
-         <h2>Previsão</h2>
-          <p>Dados meteorológicos actuais e previsão simples para consulta rápida.</p>
-          <div class="forecast-days" id="forecastDays"></div>                
+         <h2>Previsão IPMAS</h2>
+          <p>Previsão meteorológica para Santa Maria, com dados IPMA.</p>
+          <div class="forecast-days" id="forecastDays"></div> 
+          
+          <div class="sun-card">
+            <h3>🌅 Nascer / Pôr do sol</h3>
+            <p>Horários solares para Santa Maria.</p>
+
+            <div class="metar-grid">
+              <div class="metar-item">
+                <span>Nascer do sol</span>
+                <strong id="sunriseTime">—</strong>
+              </div>
+
+              <div class="metar-item">
+                <span>Pôr do sol</span>
+                <strong id="sunsetTime">—</strong>
+              </div>
+
+              <div class="metar-item">
+                <span>Duração do dia</span>
+                <strong id="dayLength">—</strong>
+              </div>
+
+              <div class="metar-item">
+                <span>Fonte</span>
+                <strong id="sunSource">Calculado</strong>
+              </div>
+            </div>
+          </div>          
+
         </div>
       </section>
 
@@ -2824,6 +2868,106 @@ function setHeroBackground() {
   if (hero && first) {
     hero.style.setProperty("--hero-image", `url("${getPreview(first)}")`);
   }
+}
+
+function pad2(value) {
+  return String(value).padStart(2, "0");
+}
+
+function formatMinutesAsTime(totalMinutes) {
+  const minutesInDay = 24 * 60;
+  const normalized = ((totalMinutes % minutesInDay) + minutesInDay) % minutesInDay;
+  const h = Math.floor(normalized / 60);
+  const m = Math.round(normalized % 60);
+
+  return `${pad2(h)}:${pad2(m)}`;
+}
+
+function dayOfYear(date) {
+  const start = new Date(date.getFullYear(), 0, 0);
+  const diff = date - start;
+  return Math.floor(diff / 86400000);
+}
+
+function calculateSunTimes(date, latitude, longitude, timezoneOffsetHours) {
+  const zenith = 90.833;
+  const n = dayOfYear(date);
+  const lngHour = longitude / 15;
+
+  function calc(isSunrise) {
+    const t = n + ((isSunrise ? 6 : 18) - lngHour) / 24;
+    const m = (0.9856 * t) - 3.289;
+
+    let l = m + (1.916 * Math.sin((Math.PI / 180) * m)) +
+      (0.020 * Math.sin((Math.PI / 180) * 2 * m)) + 282.634;
+    l = (l + 360) % 360;
+
+    let ra = (180 / Math.PI) * Math.atan(0.91764 * Math.tan((Math.PI / 180) * l));
+    ra = (ra + 360) % 360;
+
+    const lQuadrant = Math.floor(l / 90) * 90;
+    const raQuadrant = Math.floor(ra / 90) * 90;
+    ra = (ra + (lQuadrant - raQuadrant)) / 15;
+
+    const sinDec = 0.39782 * Math.sin((Math.PI / 180) * l);
+    const cosDec = Math.cos(Math.asin(sinDec));
+
+    const cosH =
+      (Math.cos((Math.PI / 180) * zenith) -
+        (sinDec * Math.sin((Math.PI / 180) * latitude))) /
+      (cosDec * Math.cos((Math.PI / 180) * latitude));
+
+    if (cosH > 1 || cosH < -1) return null;
+
+    let h = isSunrise
+      ? 360 - (180 / Math.PI) * Math.acos(cosH)
+      : (180 / Math.PI) * Math.acos(cosH);
+
+    h = h / 15;
+
+    const localMeanTime = h + ra - (0.06571 * t) - 6.622;
+    const utcTime = localMeanTime - lngHour;
+    const localTime = utcTime + timezoneOffsetHours;
+
+    return localTime * 60;
+  }
+
+  const sunrise = calc(true);
+  const sunset = calc(false);
+
+  if (sunrise == null || sunset == null) return null;
+
+  return { sunrise, sunset };
+}
+
+function formatDayLength(sunriseMinutes, sunsetMinutes) {
+  let diff = sunsetMinutes - sunriseMinutes;
+  if (diff < 0) diff += 24 * 60;
+
+  const h = Math.floor(diff / 60);
+  const m = Math.round(diff % 60);
+
+  return `${h}h ${pad2(m)}m`;
+}
+
+function updateSunCard() {
+  const latitude = 36.97639;
+  const longitude = -25.125;
+  const timezoneOffsetHours = 0; // Açores no verão: UTC+0
+
+  const times = calculateSunTimes(new Date(), latitude, longitude, timezoneOffsetHours);
+
+  if (!times) {
+    setText("sunriseTime", "—");
+    setText("sunsetTime", "—");
+    setText("dayLength", "—");
+    return;
+  }
+
+  setText("sunriseTime", formatMinutesAsTime(times.sunrise));
+  setText("sunsetTime", formatMinutesAsTime(times.sunset));
+  setText("dayLength", formatDayLength(times.sunrise, times.sunset));
+  setText("sunSource", "Calculado");
 }
 
 async function updateSeaState() {
@@ -3928,27 +4072,56 @@ function parseMetarTime(token) {
   }).format(date);
 }
 
+function calcRelativeHumidity(tempC, dewPointC) {
+  if (!Number.isFinite(tempC) || !Number.isFinite(dewPointC)) return null;
+
+  const es = 6.112 * Math.exp((17.67 * tempC) / (tempC + 243.5));
+  const e = 6.112 * Math.exp((17.67 * dewPointC) / (dewPointC + 243.5));
+
+  return Math.round((e / es) * 100);
+}
+
+function getAtmosphericComfort(tempC, dewPointC) {
+  if (!Number.isFinite(tempC) || !Number.isFinite(dewPointC)) return "—";
+
+  const spread = tempC - dewPointC;
+
+  if (spread <= 1) return "🌫️ Possibilidade de neblina";
+  if (spread <= 2) return "💧 Ar muito húmido";
+  if (spread <= 5) return "💦 Humidade elevada";
+
+  return "🌤️ Conforto normal";
+}
+
 function updateMetarCard(metar) {
+  const humidity = calcRelativeHumidity(metar.temp, metar.dewpoint);
+  const comfort = getAtmosphericComfort(metar.temp, metar.dewpoint);
+
   setText("metarCondition", `${metar.icon} ${metar.text}`);
   setText("metarTemp", Number.isFinite(metar.temp) ? `${metar.temp}°C` : "—");
+  setText("metarHumidity", Number.isFinite(humidity) ? `${humidity}%` : "—");
   setText("metarDewpoint", Number.isFinite(metar.dewpoint) ? `${metar.dewpoint}°C` : "—");
+  setText("metarPressure", Number.isFinite(metar.pressure) ? `${metar.pressure} hPa` : "—");
   setText("metarWind", metar.windText || "—");
   setText("metarVisibility", metar.visibilityText || "—");
-  setText("metarPressure", Number.isFinite(metar.pressure) ? `${metar.pressure} hPa` : "—");
   setText("metarClouds", metar.cloudsText || "—");
+  setText("metarComfort", comfort);
   setText("metarTime", metar.timeText || "—");
   setText("metarSource", metar.source || "METAR");
   setText("metarRaw", metar.raw || "METAR indisponível.");
+
 }
 
 function updateMetarCardUnavailable() {
   setText("metarCondition", "—");
   setText("metarTemp", "—");
+  setText("metarHumidity", "—");
   setText("metarDewpoint", "—");
+  setText("metarPressure", "—");
   setText("metarWind", "—");
   setText("metarVisibility", "—");
-  setText("metarPressure", "—");
   setText("metarClouds", "—");
+  setText("metarComfort", "—");
   setText("metarTime", "—");
   setText("metarSource", "—");
   setText("metarRaw", "METAR indisponível. A usar Open-Meteo como fallback no banner.");
@@ -4270,9 +4443,10 @@ renderPartners();
 renderPromos();
 
 updateWeather();
+updateSunCard();
 setInterval(updateCounts, 60 * 1000);
 setInterval(updateWeather, 10 * 60 * 1000);
-updateSeaState();
+// updateSeaState();
 setInterval(updateSeaState, 30 * 60 * 1000);
 
 applyInitialUrlParams();
