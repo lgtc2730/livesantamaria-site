@@ -2669,6 +2669,27 @@
             <div class="metar-raw" id="metarRaw">METAR indisponível.</div>
           </div>
 
+          <div class="sea-card">
+            <h3>🌊 Estado do Mar</h3>
+
+            <div class="sea-grid">
+              <div class="sea-row">
+                <span>Ondulação</span>
+                <strong id="seaWaveHeight">—</strong>
+              </div>
+
+              <div class="sea-row">
+                <span>Período</span>
+                <strong id="seaWavePeriod">—</strong>
+              </div>
+
+              <div class="sea-row">
+                <span>Direcção</span>
+                <strong id="seaWaveDirection">—</strong>
+              </div>
+            </div>
+          </div>
+
           <div class="tides-card">
             <h3>🌊 Marés</h3>
             <p>Vila do Porto / Santa Maria. Dados a integrar na Previsão v2.</p>
@@ -2695,7 +2716,7 @@
               </div>
             </div>
           </div>
-         <h2>Previsão IPMAS</h2>
+         <h2>Previsão IPMA</h2>
           <p>Previsão meteorológica para Santa Maria, com dados IPMA.</p>
           <div class="forecast-days" id="forecastDays"></div> 
           
@@ -4446,7 +4467,7 @@ updateWeather();
 updateSunCard();
 setInterval(updateCounts, 60 * 1000);
 setInterval(updateWeather, 10 * 60 * 1000);
-// updateSeaState();
+updateSeaState();
 setInterval(updateSeaState, 30 * 60 * 1000);
 
 applyInitialUrlParams();
