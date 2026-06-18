@@ -4198,15 +4198,8 @@ function updateMetarCardUnavailable() {
 }
 
 async function fetchOpenMeteoWeather() {
-  const url =
-    "https://api.open-meteo.com/v1/forecast" +
-    "?latitude=36.97639" +
-    "&longitude=-25.125" +
-    "&current=temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,wind_direction_10m,precipitation,weather_code" +
-    "&daily=weather_code,temperature_2m_max,temperature_2m_min" +
-    "&timezone=Atlantic%2FAzores";
-
-  const response = await fetch(url, { cache: "no-store" });
+  const response = await fetch("/api/ipma-forecast", { cache: "no-store" });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return await response.json();
 }
 
@@ -4251,7 +4244,7 @@ async function updateWeather() {
     setText("weatherSea", rain > 0 ? `${rain} mm` : "—");
     setText("lastUpdate", new Date().toLocaleTimeString("pt-PT"));
 
-    renderForecast(data.daily || {});
+    renderForecast(data);
   } catch (err) {
     console.warn("Erro meteo:", err);
     setText("weatherTemp", "—");
@@ -4262,23 +4255,55 @@ async function updateWeather() {
   }
 }
 
-function renderForecast(daily) {
+function ipmaWeatherTypeToIcon(id) {
+  const code = Number(id);
+
+  if ([1, 2].includes(code)) return "☀️";
+  if ([3, 4, 5].includes(code)) return "⛅";
+  if ([6, 7, 8, 9].includes(code)) return "🌧️";
+  if ([10, 11, 12, 13, 14, 15].includes(code)) return "🌦️";
+  if ([16, 17, 18, 19].includes(code)) return "⛈️";
+  return "🌤️";
+}
+
+function windClassToText(value) {
+  const code = Number(value);
+
+  if (code === 1) return "fraco";
+  if (code === 2) return "moderado";
+  if (code === 3) return "forte";
+  if (code === 4) return "muito forte";
+
+  return "—";
+}
+
+function renderForecast(payload) {
   const holder = document.getElementById("forecastDays");
-  if (!holder || !daily.time) return;
+  const days = Array.isArray(payload?.data) ? payload.data : [];
+
+  if (!holder || !days.length) {
+    if (holder) holder.innerHTML = "";
+    return;
+  }
 
   const formatter = new Intl.DateTimeFormat("pt-PT", { weekday: "long" });
 
-  holder.innerHTML = daily.time.slice(0, 5).map((day, index) => {
-    const date = new Date(`${day}T12:00:00`);
+  holder.innerHTML = days.slice(0, 5).map((day, index) => {
+    const date = new Date(`${day.forecastDate}T12:00:00`);
     const name = index === 0 ? "Hoje" : formatter.format(date);
-    const max = Math.round(daily.temperature_2m_max[index]);
-    const min = Math.round(daily.temperature_2m_min[index]);
-    const icon = weatherCodeToIcon(Number(daily.weather_code[index] ?? 1));
+
+    const max = Math.round(Number(day.tMax));
+    const min = Math.round(Number(day.tMin));
+    const rain = Math.round(Number(day.precipitaProb));
+    const icon = ipmaWeatherTypeToIcon(day.idWeatherType);
+    const wind = `${day.predWindDir || "—"} ${windClassToText(day.classWindSpeed)}`;
 
     return `
       <div class="forecast-row">
         <strong>${escapeHtml(name.charAt(0).toUpperCase() + name.slice(1))}</strong>
-        <span>${max}°C / ${min}°C</span>
+        <span>${Number.isFinite(max) && Number.isFinite(min) ? `${min}°C / ${max}°C` : "—"}</span>
+        <span>Chuva: ${Number.isFinite(rain) ? `${rain}%` : "—"}</span>
+        <span>Vento: ${escapeHtml(wind)}</span>
         <span style="font-size:1.35rem">${icon}</span>
       </div>
     `;
