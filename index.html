@@ -2991,6 +2991,47 @@ function updateSunCard() {
   setText("sunSource", "Calculado");
 }
 
+async function updateTidesCard() {
+  try {
+    const response = await fetch("/api/tides", { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const data = await response.json();
+    const tidesToday = Array.isArray(data.tides) ? data.tides : [];
+
+    const now = new Date();
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+    const tides = tidesToday.map(tide => {
+      const [h, m] = tide.time.split(":").map(Number);
+      return { ...tide, minutes: h * 60 + m };
+    });
+
+    const next = tides.find(tide => tide.minutes >= nowMinutes) || tides[0];
+
+    const high = tides
+      .filter(tide => tide.type === "Preia-mar")
+      .map(tide => `${tide.time} (${tide.height})`)
+      .join(" · ");
+
+    const low = tides
+      .filter(tide => tide.type === "Baixa-mar")
+      .map(tide => `${tide.time} (${tide.height})`)
+      .join(" · ");
+
+    setText("nextTide", next ? `${next.type} ${next.time} (${next.height})` : "—");
+    setText("highTides", high || "—");
+    setText("lowTides", low || "—");
+    setText("tidesSource", data.source || "—");
+  } catch (err) {
+    console.warn("Erro marés:", err);
+    setText("nextTide", "—");
+    setText("highTides", "—");
+    setText("lowTides", "—");
+    setText("tidesSource", "Indisponível");
+  }
+}
+
 async function updateSeaState() {
   try {
     const url =
@@ -4469,6 +4510,8 @@ setInterval(updateCounts, 60 * 1000);
 setInterval(updateWeather, 10 * 60 * 1000);
 updateSeaState();
 setInterval(updateSeaState, 30 * 60 * 1000);
+updateTidesCard();
+setInterval(updateTidesCard, 30 * 60 * 1000);
 
 applyInitialUrlParams();
 
