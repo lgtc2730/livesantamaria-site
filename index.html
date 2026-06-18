@@ -2701,12 +2701,12 @@
               </div>
 
               <div class="metar-item">
-                <span>Preia-mar</span>
+                <span>Preias-mares do dia</span>
                 <strong id="highTides">—</strong>
               </div>
 
               <div class="metar-item">
-                <span>Baixa-mar</span>
+                <span>Baixas-mares do dia</span>
                 <strong id="lowTides">—</strong>
               </div>
 
@@ -2783,7 +2783,7 @@
 
             <p>Algumas zonas da ilha de Santa Maria ainda não têm cobertura e estão assinaladas como “Procuramos patrocinador”.</p>
 
-            <p>Com um apoio estimado de <strong>120 €</strong>, é possível adquirir uma webcam e um webserver. Estes equipamentos serão sempre seus, podendo reavê-los a qualquer momento ou no final do projecto.</p>
+            <p>Com um apoio estimado de <strong>200 €</strong>, é possível adquirir uma webcam e um webserver. Estes equipamentos serão sempre seus, podendo reavê-los a qualquer momento ou no final do projecto.</p>
 
             <p>A equipa Live Santa Maria assegura a compra, configuração, programação e manutenção técnica do equipamento.</p>
 
@@ -3009,17 +3009,25 @@ async function updateTidesCard() {
 
     const next = tides.find(tide => tide.minutes >= nowMinutes) || tides[0];
 
+    const formatTide = tide =>
+      tide.height && tide.height !== "—"
+        ? `${tide.time} (${tide.height})`
+        : tide.time;
+
     const high = tides
       .filter(tide => tide.type === "Preia-mar")
-      .map(tide => `${tide.time} (${tide.height})`)
+      .map(formatTide)
       .join(" · ");
 
     const low = tides
       .filter(tide => tide.type === "Baixa-mar")
-      .map(tide => `${tide.time} (${tide.height})`)
+      .map(formatTide)
       .join(" · ");
 
-    setText("nextTide", next ? `${next.type} ${next.time} (${next.height})` : "—");
+    setText(
+      "nextTide",
+      next ? `${next.type} ${formatTide(next)}` : "—"
+    );
     setText("highTides", high || "—");
     setText("lowTides", low || "—");
     setText("tidesSource", data.source || "—");
