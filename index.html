@@ -1016,24 +1016,30 @@
 
     .forecast-row {
       display: grid;
-      gap: 6px;
+      gap: 4px;
       padding: 12px 14px;
       min-height: 150px;
     }
 
     .forecast-row strong {
-      font-size: .78rem;
+      font-size: .75rem;
       text-transform: uppercase;
-      letter-spacing: .06em;
+      letter-spacing: .05em;
     }
 
     .forecast-row span {
-      font-size: .9rem;
+      font-size: 82rem;
+      font-weight: 400;
     }
 
     .forecast-row span:first-of-type {
-      font-size: 1.05rem;
-      font-weight: 700;
+      font-size: 1.0rem;
+      font-weight: 600;
+    }
+
+    .forecast-row small {
+      font-size: .78rem;
+      opacity: .85;
     }
 
     .sea-row span,
@@ -1060,7 +1066,7 @@
 
     .forecast-icon {
       margin-top: auto;
-      font-size: 1.5rem !important;
+      font-size: 1.3rem !important;
     }
 
     .timelapse-grid {
@@ -4346,8 +4352,8 @@ function renderForecast(payload) {
       <div class="forecast-row">
         <strong>${escapeHtml(name.charAt(0).toUpperCase() + name.slice(1))}</strong>
         <span>${Number.isFinite(max) && Number.isFinite(min) ? `${min}°C / ${max}°C` : "—"}</span>
-        <span>Prob. chuva: ${Number.isFinite(rain) ? `${rain}%` : "—"}</span>
-        <span>Vento: ${escapeHtml(wind)}</span>
+        <small>🌧 ${Number.isFinite(rain) ? `${rain}%` : "—"}</small>
+        <small>🌬 ${escapeHtml(wind)}</small>
         <span class="forecast-icon">${icon}</span>
       </div>
     `;
