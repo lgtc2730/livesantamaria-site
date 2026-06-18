@@ -1004,14 +1004,36 @@
 
     .sea-row,
     .forecast-row {
-      display: block;
-
-      padding: 14px 16px;
-
       border-radius: 16px;
       border: 1px solid var(--line);
-
       background: rgba(255,255,255,.04);
+    }
+
+    .sea-row {
+      display: block;
+      padding: 14px 16px;
+    }
+
+    .forecast-row {
+      display: grid;
+      gap: 6px;
+      padding: 12px 14px;
+      min-height: 150px;
+    }
+
+    .forecast-row strong {
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .forecast-row span {
+      font-size: .9rem;
+    }
+
+    .forecast-row span:first-of-type {
+      font-size: 1.05rem;
+      font-weight: 700;
     }
 
     .sea-row span,
@@ -1034,6 +1056,11 @@
       color: var(--text);
       font-size: 1.25rem;
       font-weight: 950;
+    }
+
+    .forecast-icon {
+      margin-top: auto;
+      font-size: 1.5rem !important;
     }
 
     .timelapse-grid {
@@ -2692,7 +2719,7 @@
 
           <div class="tides-card">
             <h3>🌊 Marés</h3>
-            <p>Vila do Porto / Santa Maria. Dados a integrar na Previsão v2.</p>
+            <p>Marés previstas para Vila do Porto / Santa Maria.</p>
 
             <div class="metar-grid">
               <div class="metar-item">
@@ -2802,7 +2829,7 @@
     </main>
 
     <div class="footer">
-      © Live Santa Maria · Imagens em directo para apoio à observação meteorológica e marítima informal.
+      © Live Santa Maria · v1.0.0-dev · Imagens em directo para apoio à observação meteorológica e marítima informal.
     </div>
   </div>
 
@@ -4258,12 +4285,29 @@ async function updateWeather() {
 function ipmaWeatherTypeToIcon(id) {
   const code = Number(id);
 
-  if ([1, 2].includes(code)) return "☀️";
-  if ([3, 4, 5].includes(code)) return "⛅";
-  if ([6, 7, 8, 9].includes(code)) return "🌧️";
-  if ([10, 11, 12, 13, 14, 15].includes(code)) return "🌦️";
-  if ([16, 17, 18, 19].includes(code)) return "⛈️";
-  return "🌤️";
+  switch (code) {
+    case 1: return "☀️";
+    case 2: return "🌤️";
+    case 3: return "⛅";
+    case 4:
+    case 5: return "☁️";
+
+    case 6:
+    case 10: return "🌦️";
+
+    case 7:
+    case 8:
+    case 9:
+    case 12:
+    case 13: return "🌧️";
+
+    case 11: return "🌧️";
+
+    case 14:
+    case 15: return "⛈️";
+
+    default: return "🌤️";
+  }
 }
 
 function windClassToText(value) {
@@ -4302,9 +4346,9 @@ function renderForecast(payload) {
       <div class="forecast-row">
         <strong>${escapeHtml(name.charAt(0).toUpperCase() + name.slice(1))}</strong>
         <span>${Number.isFinite(max) && Number.isFinite(min) ? `${min}°C / ${max}°C` : "—"}</span>
-        <span>Chuva: ${Number.isFinite(rain) ? `${rain}%` : "—"}</span>
+        <span>Prob. chuva: ${Number.isFinite(rain) ? `${rain}%` : "—"}</span>
         <span>Vento: ${escapeHtml(wind)}</span>
-        <span style="font-size:1.35rem">${icon}</span>
+        <span class="forecast-icon">${icon}</span>
       </div>
     `;
   }).join("");
