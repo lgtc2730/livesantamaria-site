@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Live Santa Maria</title>
 
-  <script src="./cameras.public.js?v=20260627-125057"></script>
+  <script src="./cameras.public.js?v=20260526-v2"></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.16/dist/hls.min.js"></script>
 
   <style>
@@ -2366,7 +2366,7 @@
       }
     }
 
-    /* Mobile vertical â€” Timelapse */
+    /* Mobile vertical — Timelapse */
     @media (max-width: 820px) and (orientation: portrait) {
       .timelapse-section,
       .timelapse-dashboard-card {
@@ -2455,7 +2455,7 @@
       }
     }
 
-    /* Mobile vertical â€” Timelapse */
+    /* Mobile vertical — Timelapse */
     @media (max-width: 820px) and (orientation: portrait) {
       .timelapse-section,
       .timelapse-grid,
@@ -2549,50 +2549,50 @@
         </div>
       </a>
 
-      <nav class="nav" aria-label="NavegaÃ§Ã£o principal">
-        <button class="active" data-section="cameras">CÃ‚MARAS</button>
+      <nav class="nav" aria-label="Navegação principal">
+        <button class="active" data-section="cameras">CAMERAS</button>
         <button data-section="map">MAPA</button>
-        <button data-section="forecast">PREVISÃƒO</button>
+        <button data-section="forecast">PREVISÃO</button>
         <button data-section="timelapse">TIMELAPSE</button>
         <button data-section="about">SOBRE</button>
-        <button id="topTvButton" type="button">ðŸ“º SLIDE-SHOW</button>
+        <button id="topTvButton" type="button">📺 SLIDE-SHOW</button>
       </nav>
     </header>
 
-    <section class="hero" id="hero" aria-label="Live Santa Maria â€” a ilha, em tempo real">
+    <section class="hero" id="hero" aria-label="Live Santa Maria — a ilha, em tempo real">
       <div class="hero-live-overlay" aria-live="polite">
         <div class="hero-title-block">
           <div class="hero-live-subtitle">Uma janela para Santa Maria</div>
 
-          <div class="hero-live-tagline">Mar, cÃ©u e costa em tempo real.</div>
+          <div class="hero-live-tagline">Mar, céu e costa em tempo real.</div>
         </div>
 
         <div class="hero-live-stats">
           <div class="hero-stat">
             <div class="hero-stat-top">
               <span class="dot ok"></span>
-              <strong id="onlineCount">â€” cÃ¢maras</strong>
+              <strong id="onlineCount">— câmaras</strong>
             </div>
             <small>online</small>
           </div>
 
           <div class="hero-stat">
             <div class="hero-stat-top">
-              <span>ðŸ“</span>
-              <strong id="futureCount">â€” futuras</strong>
+              <span>📍</span>
+              <strong id="futureCount">— futuras</strong>
             </div>
-            <small>em preparaÃ§Ã£o</small>
+            <small>em preparação</small>
           </div>
         </div>
 
         <div class="hero-weather">
-          <span class="hero-weather-icon" id="weatherIcon">ðŸŒ¤ï¸</span>
+          <span class="hero-weather-icon" id="weatherIcon">🌤️</span>
           <div>
-            <strong id="weatherTemp">â€”</strong>
+            <strong id="weatherTemp">—</strong>
             <small id="weatherSummary">Meteorologia Santa Maria</small>
-            <span class="hero-accessibility" id="weatherWind">â€”</span>
-            <span class="hero-accessibility" id="weatherHum">â€”</span>
-            <span class="hero-accessibility" id="weatherSea">â€”</span>
+            <span class="hero-accessibility" id="weatherWind">—</span>
+            <span class="hero-accessibility" id="weatherHum">—</span>
+            <span class="hero-accessibility" id="weatherSea">—</span>
           </div>
         </div>
 
@@ -2616,7 +2616,7 @@
 
           <div class="section-head-right">
             <button id="supportShortcut" class="support-shortcut">
-              ðŸ“¢ Apoie o projecto
+              📢 Apoie o projecto
             </button>
           </div>
 
@@ -2627,8 +2627,8 @@
 
       <section class="map-section" id="mapSection">
         <div class="map-head">
-          <h2>Mapa das cÃ¢maras</h2>
-          <p>LocalizaÃ§Ã£o aproximada e orientaÃ§Ã£o visual das cÃ¢maras pÃºblicas e futuras.</p>
+          <h2>Mapa das câmaras</h2>
+          <p>Localização aproximada e orientação visual das câmaras públicas e futuras.</p>
         </div>
         <div class="island-map-wrap">
           <img src="./assets/santa-maria-map.png?v=2" alt="Mapa da ilha de Santa Maria" class="island-map-img">
@@ -2639,108 +2639,108 @@
       <section class="forecast-section" id="forecastSection">
         <div class="panel-pad">
           <div class="metar-card" id="metarCard">
-            <h3>ðŸ›« ObservaÃ§Ã£o actual â€” METAR LPAZ</h3>
+            <h3>🛫 Observação actual — METAR LPAZ</h3>
             <p>Dados observados no Aeroporto de Santa Maria. Usados para o estado actual no banner.</p>
 
             <div class="metar-grid">
               <div class="metar-item">
                 <span>Estado</span>
-                <strong id="metarCondition">â€”</strong>
+                <strong id="metarCondition">—</strong>
               </div>
 
               <div class="metar-item">
                 <span>Temperatura</span>
-                <strong id="metarTemp">â€”</strong>
+                <strong id="metarTemp">—</strong>
               </div>
 
               <div class="metar-item">
                 <span>Ponto de orvalho</span>
-                <strong id="metarDewpoint">â€”</strong>
+                <strong id="metarDewpoint">—</strong>
               </div>
 
               <div class="metar-item">
                 <span>Humidade</span>
-                <strong id="metarHumidity">â€”</strong>
+                <strong id="metarHumidity">—</strong>
               </div>
 
               <div class="metar-item">
                 <span>Conforto</span>
-                <strong id="metarComfort">â€”</strong>
+                <strong id="metarComfort">—</strong>
               </div>
 
               <div class="metar-item">
-                <span>PressÃ£o</span>
-                <strong id="metarPressure">â€”</strong>
+                <span>Pressão</span>
+                <strong id="metarPressure">—</strong>
               </div>
 
               <div class="metar-item">
                 <span>Visibilidade</span>
-                <strong id="metarVisibility">â€”</strong>
+                <strong id="metarVisibility">—</strong>
               </div>
 
               <div class="metar-item">
                 <span>Nuvens</span>
-                <strong id="metarClouds">â€”</strong>
+                <strong id="metarClouds">—</strong>
               </div>
 
               <div class="metar-item">
                 <span>Vento</span>
-                <strong id="metarWind">â€”</strong>
+                <strong id="metarWind">—</strong>
               </div>
 
               <div class="metar-item">
                 <span>Actualizado</span>
-                <strong id="metarTime">â€”</strong>
+                <strong id="metarTime">—</strong>
               </div>
 
               <div class="metar-item">
                 <span>Fonte</span>
-                <strong id="metarSource">â€”</strong>
+                <strong id="metarSource">—</strong>
               </div>
             </div>
 
-            <div class="metar-raw" id="metarRaw">METAR indisponÃ­vel.</div>
+            <div class="metar-raw" id="metarRaw">METAR indisponível.</div>
           </div>
 
           <div class="sea-card">
-            <h3>ðŸŒŠ Estado do Mar</h3>
+            <h3>🌊 Estado do Mar</h3>
 
             <div class="sea-grid">
               <div class="sea-row">
-                <span>OndulaÃ§Ã£o</span>
-                <strong id="seaWaveHeight">â€”</strong>
+                <span>Ondulação</span>
+                <strong id="seaWaveHeight">—</strong>
               </div>
 
               <div class="sea-row">
-                <span>PerÃ­odo</span>
-                <strong id="seaWavePeriod">â€”</strong>
+                <span>Período</span>
+                <strong id="seaWavePeriod">—</strong>
               </div>
 
               <div class="sea-row">
-                <span>DirecÃ§Ã£o</span>
-                <strong id="seaWaveDirection">â€”</strong>
+                <span>Direcção</span>
+                <strong id="seaWaveDirection">—</strong>
               </div>
             </div>
           </div>
 
           <div class="tides-card">
-            <h3>ðŸŒŠ MarÃ©s</h3>
-            <p>MarÃ©s previstas para Vila do Porto / Santa Maria.</p>
+            <h3>🌊 Marés</h3>
+            <p>Marés previstas para Vila do Porto / Santa Maria.</p>
 
             <div class="metar-grid">
               <div class="metar-item">
-                <span>PrÃ³xima marÃ©</span>
-                <strong id="nextTide">â€”</strong>
+                <span>Próxima maré</span>
+                <strong id="nextTide">—</strong>
               </div>
 
               <div class="metar-item">
                 <span>Preias-mares do dia</span>
-                <strong id="highTides">â€”</strong>
+                <strong id="highTides">—</strong>
               </div>
 
               <div class="metar-item">
                 <span>Baixas-mares do dia</span>
-                <strong id="lowTides">â€”</strong>
+                <strong id="lowTides">—</strong>
               </div>
 
               <div class="metar-item">
@@ -2749,28 +2749,28 @@
               </div>
             </div>
           </div>
-         <h2>PrevisÃ£o IPMA</h2>
-          <p>PrevisÃ£o meteorolÃ³gica para Santa Maria, com dados IPMA.</p>
+         <h2>Previsão IPMA</h2>
+          <p>Previsão meteorológica para Santa Maria, com dados IPMA.</p>
           <div class="forecast-days" id="forecastDays"></div> 
           
           <div class="sun-card">
-            <h3>ðŸŒ… Nascer / PÃ´r do sol</h3>
-            <p>HorÃ¡rios solares para Santa Maria.</p>
+            <h3>🌅 Nascer / Pôr do sol</h3>
+            <p>Horários solares para Santa Maria.</p>
 
             <div class="metar-grid">
               <div class="metar-item">
                 <span>Nascer do sol</span>
-                <strong id="sunriseTime">â€”</strong>
+                <strong id="sunriseTime">—</strong>
               </div>
 
               <div class="metar-item">
-                <span>PÃ´r do sol</span>
-                <strong id="sunsetTime">â€”</strong>
+                <span>Pôr do sol</span>
+                <strong id="sunsetTime">—</strong>
               </div>
 
               <div class="metar-item">
-                <span>DuraÃ§Ã£o do dia</span>
-                <strong id="dayLength">â€”</strong>
+                <span>Duração do dia</span>
+                <strong id="dayLength">—</strong>
               </div>
 
               <div class="metar-item">
@@ -2789,7 +2789,7 @@
       
       <section class="promo-section" id="promoSection">
         <div class="panel-pad">
-          <h2>VÃ­deos e PromoÃ§Ã£o</h2>
+          <h2>Vídeos e Promoção</h2>
           <p>Descubra Santa Maria e os parceiros do projecto.</p>
 
           <section class="camera-grid" id="promoContainer"></section>
@@ -2799,13 +2799,13 @@
       <section class="about-card" id="aboutSection">
         <div class="panel-pad">
           <h2>Live Santa Maria</h2>
-          <p>Uma janela simples e rÃ¡pida para observar Santa Maria: mar, cÃ©u, costa e lugares da ilha. As imagens servem de apoio informal Ã  observaÃ§Ã£o meteorolÃ³gica e marÃ­tima.</p>
+          <p>Uma janela simples e rápida para observar Santa Maria: mar, céu, costa e lugares da ilha. As imagens servem de apoio informal à observação meteorológica e marítima.</p>
 
           <div class="partners-section">
             <h3>Parceiros e Patrocinadores</h3>
 
             <p>
-              OrganizaÃ§Ãµes, empresas e particulares que ajudam a tornar possÃ­vel a rede Live Santa Maria.
+              Organizações, empresas e particulares que ajudam a tornar possível a rede Live Santa Maria.
             </p>
 
             <div id="partnersGrid" class="partners-grid"></div>
@@ -2814,13 +2814,13 @@
           <div class="support-card" id="supportCard">
             <h3>Quer apoiar este projecto?</h3>
 
-            <p>Algumas zonas da ilha de Santa Maria ainda nÃ£o tÃªm cobertura e estÃ£o assinaladas como â€œProcuramos patrocinadorâ€.</p>
+            <p>Algumas zonas da ilha de Santa Maria ainda não têm cobertura e estão assinaladas como “Procuramos patrocinador”.</p>
 
-            <p>Com um apoio estimado de <strong>200 â‚¬</strong>, Ã© possÃ­vel adquirir uma webcam e um webserver. Estes equipamentos serÃ£o sempre seus, podendo reavÃª-los a qualquer momento ou no final do projecto.</p>
+            <p>Com um apoio estimado de <strong>200 €</strong>, é possível adquirir uma webcam e um webserver. Estes equipamentos serão sempre seus, podendo reavê-los a qualquer momento ou no final do projecto.</p>
 
-            <p>A equipa Live Santa Maria assegura a compra, configuraÃ§Ã£o, programaÃ§Ã£o e manutenÃ§Ã£o tÃ©cnica do equipamento.</p>
+            <p>A equipa Live Santa Maria assegura a compra, configuração, programação e manutenção técnica do equipamento.</p>
 
-            <p>Em contrapartida, o seu nome, marca ou link poderÃ¡ ser apresentado junto da imagem transmitida na pÃ¡gina Live Santa Maria.</p>
+            <p>Em contrapartida, o seu nome, marca ou link poderá ser apresentado junto da imagem transmitida na página Live Santa Maria.</p>
 
             <a class="support-link" href="mailto:livesantamaria.project@gmail.com">
               Contactar o projecto
@@ -2835,27 +2835,27 @@
     </main>
 
     <div class="footer">
-      Â© Live Santa Maria Â· v1.0.0-dev Â· Imagens em directo para apoio Ã  observaÃ§Ã£o meteorolÃ³gica e marÃ­tima informal.
+      © Live Santa Maria · v1.0.0-dev · Imagens em directo para apoio à observação meteorológica e marítima informal.
     </div>
   </div>
 
-  <nav class="bottom-nav" aria-label="NavegaÃ§Ã£o inferior">
-    <button class="active" data-section="cameras"><span>ðŸ“·</span>CÃ¢maras</button>
-    <button data-section="map"><span>ðŸ—ºï¸</span>Mapa</button>
-    <button data-section="forecast"><span>â˜€ï¸</span>PrevisÃ£o</button>
-    <button data-section="timelapse"><span>ðŸŽ¬</span>Time</button>
-    <button data-section="about"><span>â„¹ï¸</span>Sobre</button>
+  <nav class="bottom-nav" aria-label="Navegação inferior">
+    <button class="active" data-section="cameras"><span>📷</span>Câmaras</button>
+    <button data-section="map"><span>🗺️</span>Mapa</button>
+    <button data-section="forecast"><span>☀️</span>Previsão</button>
+    <button data-section="timelapse"><span>🎬</span>Time</button>
+    <button data-section="about"><span>ℹ️</span>Sobre</button>
 
   </nav>
 
   <div class="tv-mode" id="tvMode">
     <div class="tv-stage" id="tvStage"></div>
-    <button class="close-button" id="tvCloseButton" aria-label="Fechar">Ã—</button>
+    <button class="close-button" id="tvCloseButton" aria-label="Fechar">×</button>
   </div>
 
   <div class="tv-mode" id="fullscreenMode">
     <div class="fullscreen-stage" id="fullscreenStage"></div>
-    <button class="close-button" id="fullscreenCloseButton" aria-label="Fechar">Ã—</button>
+    <button class="close-button" id="fullscreenCloseButton" aria-label="Fechar">×</button>
   </div>
 
 <script>
@@ -3012,14 +3012,14 @@ function formatDayLength(sunriseMinutes, sunsetMinutes) {
 function updateSunCard() {
   const latitude = 36.97639;
   const longitude = -25.125;
-  const timezoneOffsetHours = 0; // AÃ§ores no verÃ£o: UTC+0
+  const timezoneOffsetHours = 0; // Açores no verão: UTC+0
 
   const times = calculateSunTimes(new Date(), latitude, longitude, timezoneOffsetHours);
 
   if (!times) {
-    setText("sunriseTime", "â€”");
-    setText("sunsetTime", "â€”");
-    setText("dayLength", "â€”");
+    setText("sunriseTime", "—");
+    setText("sunsetTime", "—");
+    setText("dayLength", "—");
     return;
   }
 
@@ -3048,33 +3048,33 @@ async function updateTidesCard() {
     const next = tides.find(tide => tide.minutes >= nowMinutes) || tides[0];
 
     const formatTide = tide =>
-      tide.height && tide.height !== "â€”"
+      tide.height && tide.height !== "—"
         ? `${tide.time} (${tide.height})`
         : tide.time;
 
     const high = tides
       .filter(tide => tide.type === "Preia-mar")
       .map(formatTide)
-      .join(" Â· ");
+      .join(" · ");
 
     const low = tides
       .filter(tide => tide.type === "Baixa-mar")
       .map(formatTide)
-      .join(" Â· ");
+      .join(" · ");
 
     setText(
       "nextTide",
-      next ? `${next.type} ${formatTide(next)}` : "â€”"
+      next ? `${next.type} ${formatTide(next)}` : "—"
     );
-    setText("highTides", high || "â€”");
-    setText("lowTides", low || "â€”");
-    setText("tidesSource", data.source || "â€”");
+    setText("highTides", high || "—");
+    setText("lowTides", low || "—");
+    setText("tidesSource", data.source || "—");
   } catch (err) {
-    console.warn("Erro marÃ©s:", err);
-    setText("nextTide", "â€”");
-    setText("highTides", "â€”");
-    setText("lowTides", "â€”");
-    setText("tidesSource", "IndisponÃ­vel");
+    console.warn("Erro marés:", err);
+    setText("nextTide", "—");
+    setText("highTides", "—");
+    setText("lowTides", "—");
+    setText("tidesSource", "Indisponível");
   }
 }
 
@@ -3098,14 +3098,14 @@ async function updateSeaState() {
     const period = Number(hourly.wave_period?.[nowIndex]);
     const direction = Number(hourly.wave_direction?.[nowIndex]);
 
-    setText("seaWaveHeight", Number.isFinite(height) ? `${height.toFixed(1)} m` : "â€”");
-    setText("seaWavePeriod", Number.isFinite(period) ? `${Math.round(period)} s` : "â€”");
+    setText("seaWaveHeight", Number.isFinite(height) ? `${height.toFixed(1)} m` : "—");
+    setText("seaWavePeriod", Number.isFinite(period) ? `${Math.round(period)} s` : "—");
     setText("seaWaveDirection", degreesToCompass(direction));
   } catch (err) {
     console.warn("Erro estado do mar:", err);
-    setText("seaWaveHeight", "â€”");
-    setText("seaWavePeriod", "â€”");
-    setText("seaWaveDirection", "â€”");
+    setText("seaWaveHeight", "—");
+    setText("seaWavePeriod", "—");
+    setText("seaWaveDirection", "—");
   }
 }
 
@@ -3121,7 +3121,7 @@ function updateCounts() {
 
   setText(
     "onlineCount",
-    `${online} ${online === 1 ? "cÃ¢mara" : "cÃ¢maras"}`
+    `${online} ${online === 1 ? "câmara" : "câmaras"}`
   );
 
   setText(
@@ -3237,7 +3237,7 @@ function createCameraCard(cam, index) {
 
   const statusText =
     cam.type === "promo"
-      ? (cam.status ?? "Ver vÃ­deo")
+      ? (cam.status ?? "Ver vídeo")
       : cam.type === "future"
         ? (cam.status ?? "")
         : "A VERIFICAR";
@@ -3283,7 +3283,7 @@ function createCameraCard(cam, index) {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        ${escapeHtml(cam.sponsor.name)} â†—
+                        ${escapeHtml(cam.sponsor.name)} ↗
                       </a>
                     `
                     : `
@@ -3555,7 +3555,7 @@ function showMapPopup(cam, pos) {
 
   const status =
     cam.type === "future"
-      ? "Em preparaÃ§Ã£o"
+      ? "Em preparação"
       : isOffline(cam)
         ? "Offline"
         : "Em directo";
@@ -3565,7 +3565,7 @@ function showMapPopup(cam, pos) {
 
     <div class="map-popup-body">
       <div class="map-popup-title">${escapeHtml(cam.name)}</div>
-      <div class="map-popup-meta">${escapeHtml(getRegion(cam) || "Live Santa Maria")} Â· ${escapeHtml(status)}</div>
+      <div class="map-popup-meta">${escapeHtml(getRegion(cam) || "Live Santa Maria")} · ${escapeHtml(status)}</div>
 
       ${
         cam.sponsor?.name
@@ -3578,7 +3578,7 @@ function showMapPopup(cam, pos) {
       }
 
       <div class="map-popup-actions">
-        <button type="button" class="map-popup-open">Ver em ecrÃ£ inteiro</button>
+        <button type="button" class="map-popup-open">Ver em ecrã inteiro</button>
         <button type="button" class="map-popup-close secondary">Fechar</button>
       </div>
     </div>
@@ -3628,7 +3628,7 @@ function renderCameraMap() {
     item.dataset.cameraId = cam.id;
     item.type = "button";
     item.title = cam.name;
-    item.setAttribute("aria-label", `Ver cÃ¢mara ${cam.name}`);
+    item.setAttribute("aria-label", `Ver câmara ${cam.name}`);
 
     item.style.setProperty("--x", `${pos.x}%`);
     item.style.setProperty("--y", `${pos.y}%`);
@@ -3762,7 +3762,7 @@ function openCameraFullscreen(cam) {
   info.innerHTML = `
     <div>
       <div class="fs-name">${escapeHtml(cam.name)}</div>
-      <div>${escapeHtml(getRegion(cam))} Â· Live Santa Maria</div>
+      <div>${escapeHtml(getRegion(cam))} · Live Santa Maria</div>
     </div>
   `;
 
@@ -3925,23 +3925,23 @@ function applyInitialUrlParams() {
 
 function degreesToCompass(deg) {
   const value = Number(deg);
-  if (!Number.isFinite(value)) return "â€”";
+  if (!Number.isFinite(value)) return "—";
   const directions = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
   return directions[Math.round(value / 22.5) % 16];
 }
 
 function weatherCodeToIcon(code) {
-  if ([0].includes(code)) return "â˜€ï¸";
-  if ([1,2].includes(code)) return "ðŸŒ¤ï¸";
-  if ([3].includes(code)) return "â˜ï¸";
-  if ([45,48].includes(code)) return "ðŸŒ«ï¸";
-  if ([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) return "ðŸŒ§ï¸";
-  if ([95,96,99].includes(code)) return "â›ˆï¸";
-  return "ðŸŒ¤ï¸";
+  if ([0].includes(code)) return "☀️";
+  if ([1,2].includes(code)) return "🌤️";
+  if ([3].includes(code)) return "☁️";
+  if ([45,48].includes(code)) return "🌫️";
+  if ([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) return "🌧️";
+  if ([95,96,99].includes(code)) return "⛈️";
+  return "🌤️";
 }
 
 function weatherCodeToText(code) {
-  if (code === 0) return "CÃ©u limpo";
+  if (code === 0) return "Céu limpo";
   if ([1,2].includes(code)) return "Poucas nuvens";
   if (code === 3) return "Nublado";
   if ([45,48].includes(code)) return "Nevoeiro";
@@ -3980,7 +3980,7 @@ async function fetchLatestMetar() {
   const data = await fetchJsonWithTimeout("/api/metar");
 
   if (!data?.ok || !data.raw) {
-    throw new Error(data?.error || "METAR indisponÃ­vel");
+    throw new Error(data?.error || "METAR indisponível");
   }
 
   return parseMetar(
@@ -4037,31 +4037,31 @@ function isMetarWeatherToken(token) {
 function metarCondition(weatherTokens, cloudTokens, allTokens) {
   const weather = weatherTokens.join(" ");
 
-  if (/TS/.test(weather)) return { icon: "â›ˆï¸", text: "Trovoada" };
-  if (/FG/.test(weather)) return { icon: "ðŸŒ«ï¸", text: "Nevoeiro" };
-  if (/BR|HZ/.test(weather)) return { icon: "ðŸŒ«ï¸", text: "Neblina" };
-  if (/DZ/.test(weather)) return { icon: "ðŸŒ¦ï¸", text: "Chuvisco" };
-  if (/RA/.test(weather)) return { icon: "ðŸŒ§ï¸", text: "Chuva" };
-  if (/SN/.test(weather)) return { icon: "ðŸŒ¨ï¸", text: "Neve" };
-  if (/CAVOK|SKC|CLR|NSC|NCD/.test(allTokens.join(" "))) return { icon: "â˜€ï¸", text: "CÃ©u limpo" };
+  if (/TS/.test(weather)) return { icon: "⛈️", text: "Trovoada" };
+  if (/FG/.test(weather)) return { icon: "🌫️", text: "Nevoeiro" };
+  if (/BR|HZ/.test(weather)) return { icon: "🌫️", text: "Neblina" };
+  if (/DZ/.test(weather)) return { icon: "🌦️", text: "Chuvisco" };
+  if (/RA/.test(weather)) return { icon: "🌧️", text: "Chuva" };
+  if (/SN/.test(weather)) return { icon: "🌨️", text: "Neve" };
+  if (/CAVOK|SKC|CLR|NSC|NCD/.test(allTokens.join(" "))) return { icon: "☀️", text: "Céu limpo" };
 
   if (cloudTokens.some(token => token.startsWith("OVC") || token.startsWith("VV"))) {
-    return { icon: "â˜ï¸", text: "Encoberto" };
+    return { icon: "☁️", text: "Encoberto" };
   }
 
   if (cloudTokens.some(token => token.startsWith("BKN"))) {
-    return { icon: "â˜ï¸", text: "Muito nublado" };
+    return { icon: "☁️", text: "Muito nublado" };
   }
 
   if (cloudTokens.some(token => token.startsWith("SCT"))) {
-    return { icon: "â›…", text: "Parcialmente nublado" };
+    return { icon: "⛅", text: "Parcialmente nublado" };
   }
 
   if (cloudTokens.some(token => token.startsWith("FEW"))) {
-    return { icon: "ðŸŒ¤ï¸", text: "Pouco nublado" };
+    return { icon: "🌤️", text: "Pouco nublado" };
   }
 
-  return { icon: "ðŸŒ¤ï¸", text: "Tempo actual" };
+  return { icon: "🌤️", text: "Tempo actual" };
 }
 
 function parseSignedMetarTemp(value) {
@@ -4076,12 +4076,12 @@ function parseMetarTemperature(token) {
 }
 
 function parseMetarWind(token) {
-  if (!token) return { text: "â€”" };
+  if (!token) return { text: "—" };
 
   const match = token.match(/^(VRB|\d{3})(\d{2,3})(?:G(\d{2,3}))?KT$/);
-  if (!match) return { text: "â€”" };
+  if (!match) return { text: "—" };
 
-  const dir = match[1] === "VRB" ? "variÃ¡vel" : degreesToCompass(Number(match[1]));
+  const dir = match[1] === "VRB" ? "variável" : degreesToCompass(Number(match[1]));
   const speedKt = Number(match[2]);
   const gustKt = match[3] ? Number(match[3]) : null;
   const speedKmh = Math.round(speedKt * 1.852);
@@ -4104,7 +4104,7 @@ function parseMetarVisibility(token, allTokens) {
     metres = Number(token);
   }
 
-  if (!Number.isFinite(metres)) return "â€”";
+  if (!Number.isFinite(metres)) return "—";
 
   if (metres >= 10000) {
     return "Excelente (>10 km)";
@@ -4133,29 +4133,29 @@ function parseCloudHeight(token) {
 
 function parseMetarClouds(tokens, allTokens) {
   if (allTokens.includes("CAVOK")) return "Sem nuvens significativas";
-  if (!tokens.length) return "â€”";
+  if (!tokens.length) return "—";
 
   const labels = {
     FEW: "Poucas nuvens",
     SCT: "Nuvens dispersas",
     BKN: "Muito nublado",
     OVC: "Encoberto",
-    VV: "CÃ©u obscurecido",
+    VV: "Céu obscurecido",
     NSC: "Sem nuvens significativas",
     NCD: "Sem nuvens detectadas",
-    SKC: "CÃ©u limpo",
-    CLR: "CÃ©u limpo"
+    SKC: "Céu limpo",
+    CLR: "Céu limpo"
   };
 
   return tokens.map(token => {
     const prefix = token.slice(0, 3);
     const height = parseCloudHeight(token);
     return height ? `${labels[prefix] || prefix} a ${height} ft` : (labels[token] || token);
-  }).join(" Â· ");
+  }).join(" · ");
 }
 
 function parseMetarTime(token) {
-  if (!token) return "â€”";
+  if (!token) return "—";
 
   const day = Number(token.slice(0, 2));
   const hour = Number(token.slice(2, 4));
@@ -4190,15 +4190,15 @@ function calcRelativeHumidity(tempC, dewPointC) {
 }
 
 function getAtmosphericComfort(tempC, dewPointC) {
-  if (!Number.isFinite(tempC) || !Number.isFinite(dewPointC)) return "â€”";
+  if (!Number.isFinite(tempC) || !Number.isFinite(dewPointC)) return "—";
 
   const spread = tempC - dewPointC;
 
-  if (spread <= 1) return "ðŸŒ«ï¸ Possibilidade de neblina";
-  if (spread <= 2) return "ðŸ’§ Ar muito hÃºmido";
-  if (spread <= 5) return "ðŸ’¦ Humidade elevada";
+  if (spread <= 1) return "🌫️ Possibilidade de neblina";
+  if (spread <= 2) return "💧 Ar muito húmido";
+  if (spread <= 5) return "💦 Humidade elevada";
 
-  return "ðŸŒ¤ï¸ Conforto normal";
+  return "🌤️ Conforto normal";
 }
 
 function updateMetarCard(metar) {
@@ -4206,33 +4206,33 @@ function updateMetarCard(metar) {
   const comfort = getAtmosphericComfort(metar.temp, metar.dewpoint);
 
   setText("metarCondition", `${metar.icon} ${metar.text}`);
-  setText("metarTemp", Number.isFinite(metar.temp) ? `${metar.temp}Â°C` : "â€”");
-  setText("metarHumidity", Number.isFinite(humidity) ? `${humidity}%` : "â€”");
-  setText("metarDewpoint", Number.isFinite(metar.dewpoint) ? `${metar.dewpoint}Â°C` : "â€”");
-  setText("metarPressure", Number.isFinite(metar.pressure) ? `${metar.pressure} hPa` : "â€”");
-  setText("metarWind", metar.windText || "â€”");
-  setText("metarVisibility", metar.visibilityText || "â€”");
-  setText("metarClouds", metar.cloudsText || "â€”");
+  setText("metarTemp", Number.isFinite(metar.temp) ? `${metar.temp}°C` : "—");
+  setText("metarHumidity", Number.isFinite(humidity) ? `${humidity}%` : "—");
+  setText("metarDewpoint", Number.isFinite(metar.dewpoint) ? `${metar.dewpoint}°C` : "—");
+  setText("metarPressure", Number.isFinite(metar.pressure) ? `${metar.pressure} hPa` : "—");
+  setText("metarWind", metar.windText || "—");
+  setText("metarVisibility", metar.visibilityText || "—");
+  setText("metarClouds", metar.cloudsText || "—");
   setText("metarComfort", comfort);
-  setText("metarTime", metar.timeText || "â€”");
+  setText("metarTime", metar.timeText || "—");
   setText("metarSource", metar.source || "METAR");
-  setText("metarRaw", metar.raw || "METAR indisponÃ­vel.");
+  setText("metarRaw", metar.raw || "METAR indisponível.");
 
 }
 
 function updateMetarCardUnavailable() {
-  setText("metarCondition", "â€”");
-  setText("metarTemp", "â€”");
-  setText("metarHumidity", "â€”");
-  setText("metarDewpoint", "â€”");
-  setText("metarPressure", "â€”");
-  setText("metarWind", "â€”");
-  setText("metarVisibility", "â€”");
-  setText("metarClouds", "â€”");
-  setText("metarComfort", "â€”");
-  setText("metarTime", "â€”");
-  setText("metarSource", "â€”");
-  setText("metarRaw", "METAR indisponÃ­vel. A usar Open-Meteo como fallback no banner.");
+  setText("metarCondition", "—");
+  setText("metarTemp", "—");
+  setText("metarHumidity", "—");
+  setText("metarDewpoint", "—");
+  setText("metarPressure", "—");
+  setText("metarWind", "—");
+  setText("metarVisibility", "—");
+  setText("metarClouds", "—");
+  setText("metarComfort", "—");
+  setText("metarTime", "—");
+  setText("metarSource", "—");
+  setText("metarRaw", "METAR indisponível. A usar Open-Meteo como fallback no banner.");
 }
 
 async function fetchOpenMeteoWeather() {
@@ -4267,28 +4267,28 @@ async function updateWeather() {
         heroTemp = metar.temp;
       }
     } catch (metarErr) {
-      console.warn("METAR indisponÃ­vel, fallback Open-Meteo:", metarErr);
+      console.warn("METAR indisponível, fallback Open-Meteo:", metarErr);
       updateMetarCardUnavailable();
     }
 
     const miniTempEl = document.getElementById("miniTemp");
-    if (miniTempEl) miniTempEl.textContent = Number.isFinite(heroTemp) ? `${heroTemp}Â°C` : "â€”";
+    if (miniTempEl) miniTempEl.textContent = Number.isFinite(heroTemp) ? `${heroTemp}°C` : "—";
 
-    setText("weatherTemp", Number.isFinite(heroTemp) ? `${heroTemp}Â°C` : "â€”");
+    setText("weatherTemp", Number.isFinite(heroTemp) ? `${heroTemp}°C` : "—");
     setText("weatherIcon", heroIcon);
     setText("weatherSummary", heroText);
     setText("weatherWind", `${wind} km/h ${dir}`);
     setText("weatherHum", `${hum}%`);
-    setText("weatherSea", rain > 0 ? `${rain} mm` : "â€”");
+    setText("weatherSea", rain > 0 ? `${rain} mm` : "—");
     setText("lastUpdate", new Date().toLocaleTimeString("pt-PT"));
 
     renderForecast(data);
   } catch (err) {
     console.warn("Erro meteo:", err);
-    setText("weatherTemp", "â€”");
+    setText("weatherTemp", "—");
     const miniTempEl = document.getElementById("miniTemp");
-    if (miniTempEl) miniTempEl.textContent = "â€”";
-    setText("weatherSummary", "Meteorologia indisponÃ­vel");
+    if (miniTempEl) miniTempEl.textContent = "—";
+    setText("weatherSummary", "Meteorologia indisponível");
     updateMetarCardUnavailable();
   }
 }
@@ -4297,27 +4297,27 @@ function ipmaWeatherTypeToIcon(id) {
   const code = Number(id);
 
   switch (code) {
-    case 1: return "â˜€ï¸";
-    case 2: return "ðŸŒ¤ï¸";
-    case 3: return "â›…";
+    case 1: return "☀️";
+    case 2: return "🌤️";
+    case 3: return "⛅";
     case 4:
-    case 5: return "â˜ï¸";
+    case 5: return "☁️";
 
     case 6:
-    case 10: return "ðŸŒ¦ï¸";
+    case 10: return "🌦️";
 
     case 7:
     case 8:
     case 9:
     case 12:
-    case 13: return "ðŸŒ§ï¸";
+    case 13: return "🌧️";
 
-    case 11: return "ðŸŒ§ï¸";
+    case 11: return "🌧️";
 
     case 14:
-    case 15: return "â›ˆï¸";
+    case 15: return "⛈️";
 
-    default: return "ðŸŒ¤ï¸";
+    default: return "🌤️";
   }
 }
 
@@ -4329,7 +4329,7 @@ function windClassToText(value) {
   if (code === 3) return "forte";
   if (code === 4) return "muito forte";
 
-  return "â€”";
+  return "—";
 }
 
 function renderForecast(payload) {
@@ -4351,14 +4351,14 @@ function renderForecast(payload) {
     const min = Math.round(Number(day.tMin));
     const rain = Math.round(Number(day.precipitaProb));
     const icon = ipmaWeatherTypeToIcon(day.idWeatherType);
-    const wind = `${day.predWindDir || "â€”"} ${windClassToText(day.classWindSpeed)}`;
+    const wind = `${day.predWindDir || "—"} ${windClassToText(day.classWindSpeed)}`;
 
     return `
       <div class="forecast-row">
         <strong>${escapeHtml(name.charAt(0).toUpperCase() + name.slice(1))}</strong>
-        <span>${Number.isFinite(max) && Number.isFinite(min) ? `${min}Â°C / ${max}Â°C` : "â€”"}</span>
-        <small>ðŸŒ§ ${Number.isFinite(rain) ? `${rain}%` : "â€”"}</small>
-        <small>ðŸŒ¬ ${escapeHtml(wind)}</small>
+        <span>${Number.isFinite(max) && Number.isFinite(min) ? `${min}°C / ${max}°C` : "—"}</span>
+        <small>🌧 ${Number.isFinite(rain) ? `${rain}%` : "—"}</small>
+        <small>🌬 ${escapeHtml(wind)}</small>
         <span class="forecast-icon">${icon}</span>
       </div>
     `;
@@ -4388,7 +4388,7 @@ async function requestTvFullscreen() {
   try {
     await document.documentElement.requestFullscreen();
   } catch (err) {
-    console.warn("Fullscreen nÃ£o disponÃ­vel:", err);
+    console.warn("Fullscreen não disponível:", err);
   }
 }
 
@@ -4438,8 +4438,8 @@ let lastMobileMode = window.matchMedia("(max-width: 680px)").matches;
 window.addEventListener("resize", () => {
   const currentMobileMode = window.matchMedia("(max-width: 680px)").matches;
 
-  // No telemÃ³vel, o scroll pode disparar resize.
-  // SÃ³ redesenhamos se mudou mesmo entre mobile/desktop.
+  // No telemóvel, o scroll pode disparar resize.
+  // Só redesenhamos se mudou mesmo entre mobile/desktop.
   if (currentMobileMode === lastMobileMode) return;
 
   lastMobileMode = currentMobileMode;
@@ -4482,7 +4482,7 @@ function renderNetworkTimeline() {
   ])).sort();
 
   holder.innerHTML = `
-    <h3>HistÃ³ria da rede</h3>
+    <h3>História da rede</h3>
 
     ${dates.map(date => {
       const cams = active.filter(cam => cam.commissioned === date);
@@ -4495,14 +4495,14 @@ function renderNetworkTimeline() {
 
           ${items.map(item => `
             <div class="timeline-row milestone-row">
-              <strong>${escapeHtml(item.icon || "ðŸš€")} ${escapeHtml(item.title)}</strong>
+              <strong>${escapeHtml(item.icon || "🚀")} ${escapeHtml(item.title)}</strong>
               <span>${escapeHtml(item.text || "")}</span>
             </div>
           `).join("")}
 
           ${cams.map(cam => `
             <div class="timeline-row">
-              <strong>âœ“ ${escapeHtml(cam.name)}</strong>
+              <strong>✓ ${escapeHtml(cam.name)}</strong>
               <span>${escapeHtml(getRegion(cam))}</span>
             </div>
           `).join("")}
@@ -4514,11 +4514,11 @@ function renderNetworkTimeline() {
       future.length
         ? `
           <div class="timeline-group">
-            <div class="timeline-group-title">Em preparaÃ§Ã£o</div>
+            <div class="timeline-group-title">Em preparação</div>
 
             ${future.map(cam => `
               <div class="timeline-row">
-                <strong>â—‹ ${escapeHtml(cam.name)}</strong>
+                <strong>○ ${escapeHtml(cam.name)}</strong>
                 <span>${escapeHtml(getRegion(cam))}</span>
               </div>
             `).join("")}
@@ -4609,4 +4609,3 @@ applyInitialUrlParams();
 
 </body>
 </html>
-
