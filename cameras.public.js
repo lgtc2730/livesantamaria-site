@@ -398,7 +398,7 @@ window.LVSM_CAMERAS = [
     preview: null,
     message: null,
     status: null,
-    publicVisibility: "hidden", // public-aparece / staging-aparece com aviso / hidden-não aparece
+    publicVisibility: "public", // public-aparece / staging-aparece com aviso / hidden-não aparece
     commissioned: "2025-05",
     
     position: {
