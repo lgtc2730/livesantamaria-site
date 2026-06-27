@@ -15,8 +15,8 @@ window.LVSM_CAMERAS = [
 
     preview: "./assets/previews/marina-club-motard.jpeg",
     message: null,
-    status: "Em preparação",
-    publicVisibility: "staging", // public-aparece / staging-aparece com aviso / hidden-não aparece
+    status: "Em preparaÃ§Ã£o",
+    publicVisibility: "staging", // public-aparece / staging-aparece com aviso / hidden-nÃ£o aparece
     commissioned: null,
 
     position: {
@@ -48,7 +48,7 @@ window.LVSM_CAMERAS = [
     preview: null,
     message: null,
     status: null,
-    publicVisibility: "public", // public-aparece / staging-aparece com aviso / hidden-não aparece
+    publicVisibility: "public", // public-aparece / staging-aparece com aviso / hidden-nÃ£o aparece
     commissioned: "2024-05",
     position: {
       lat: 36.946593,
@@ -90,7 +90,7 @@ window.LVSM_CAMERAS = [
     },
 
     sponsor: {
-      name: "Ricardo Sebastião",
+      name: "Ricardo SebastiÃ£o",
       logo: null,
       url: null,
       label: "Sponsor"
@@ -110,7 +110,7 @@ window.LVSM_CAMERAS = [
 
     preview: "./assets/previews/anjos-blues.jpg",
     message: null,
-    status: "Em preparação",
+    status: "Em preparaÃ§Ã£o",
     publicVisibility: "staging",
     commissioned: null,
 
@@ -133,7 +133,7 @@ window.LVSM_CAMERAS = [
 
   {
     id: "ilheu-lagoinhas",
-    name: "Ilhéu das Lagoinhas",
+    name: "IlhÃ©u das Lagoinhas",
     region: "Norte",
     type: "future",
     url: null,
@@ -141,8 +141,8 @@ window.LVSM_CAMERAS = [
     fallbackImage: null,
 
     preview: "./assets/previews/ilheu-lagoinhas.jpg",
-    message: "Futura vista sobre o ilhéu e costa norte",
-    status: "Aguarda patrocínio",
+    message: "Futura vista sobre o ilhÃ©u e costa norte",
+    status: "Aguarda patrocÃ­nio",
     commissioned: null,
     publicVisibility: "staging",
 
@@ -165,7 +165,7 @@ window.LVSM_CAMERAS = [
 
   {
     id: "slourenco-norte",
-    name: "São Lourenço-Norte",
+    name: "SÃ£o LourenÃ§o-Norte",
     region: "Este",
     type: "snapshot",
     url: "https://www.spotazores.com/camaras/SMALOU01/QXGAcurrent.jpg",
@@ -197,7 +197,7 @@ window.LVSM_CAMERAS = [
 
   {
     id: "slourenco-sul",
-    name: "São Lourenço-Sul",
+    name: "SÃ£o LourenÃ§o-Sul",
     region: "Este",
     type: "hls",
     url: "https://slourenco-sul-cam.livesantamaria.org/cam1/index.m3u8",
@@ -270,7 +270,7 @@ window.LVSM_CAMERAS = [
 
     preview: null, //"http://anjos.olho.mariense.pt/maia/camera.m3u8",
     message: null,
-    status: "Em preparação",
+    status: "Em preparaÃ§Ã£o",
     commissioned: "2025-05",
     publicVisibility: "staging",
     position: {
@@ -302,7 +302,7 @@ window.LVSM_CAMERAS = [
     preview: "./assets/previews/farol-maia.jpeg",
     message: "Vista sobre a Maia",
     status: "Brevemente",
-    publicVisibility: "staging", // public-aparece / staging-aparece com aviso / hidden-não aparece
+    publicVisibility: "staging", // public-aparece / staging-aparece com aviso / hidden-nÃ£o aparece
     commissioned: null,
 
     position: {
@@ -313,7 +313,7 @@ window.LVSM_CAMERAS = [
     },
 
     sponsor: {
-      name: "Ricardo Sebastião",
+      name: "Ricardo SebastiÃ£o",
       logo: null,
       url: null,
       label: "Sponsor"
@@ -345,7 +345,7 @@ window.LVSM_CAMERAS = [
     },
 
     sponsor: {
-      name: "Ricardo Sebastião",
+      name: "Ricardo SebastiÃ£o",
       logo: null,
       url: null,
       label: "Sponsor"
@@ -366,7 +366,7 @@ window.LVSM_CAMERAS = [
     preview: null,
     message: null,
     status: null,
-    publicVisibility: "public", // public-aparece / staging-aparece com aviso / hidden-não aparece
+    publicVisibility: "public", // public-aparece / staging-aparece com aviso / hidden-nÃ£o aparece
     commissioned: "2023-05",
 
     position: {
@@ -398,7 +398,7 @@ window.LVSM_CAMERAS = [
     preview: null,
     message: null,
     status: null,
-    publicVisibility: "hidden", // public-aparece / staging-aparece com aviso / hidden-não aparece
+    publicVisibility: "hidden", // public-aparece / staging-aparece com aviso / hidden-nÃ£o aparece
     commissioned: "2025-05",
     
     position: {
@@ -429,7 +429,7 @@ window.LVSM_CAMERAS = [
 
     preview: "./assets/previews/pico-alto-nascente.jpeg",
     message: null,
-    status: "Aguarda patrocínio",
+    status: "Aguarda patrocÃ­nio",
     commissioned: null,
     publicVisibility: "staging",
 
@@ -461,7 +461,7 @@ window.LVSM_CAMERAS = [
 
     preview: "./assets/previews/pico-alto-poente.jpeg",
     message: null,
-    status: "Aguarda patrocínio",
+    status: "Aguarda patrocÃ­nio",
     commissioned: null,
     publicVisibility: "staging",
     position: {
@@ -492,7 +492,7 @@ window.LVSM_CAMERAS = [
 
     preview: "./assets/previews/aeroporto.jpeg",
     message: null,
-    status: "Aguarda patrocínio",
+    status: "Aguarda patrocÃ­nio",
     commissioned: null,
     publicVisibility: "staging",
 
@@ -515,7 +515,7 @@ window.LVSM_CAMERAS = [
 
   {
     id: "promo-cmvp",
-    name: "Santa Maria, Açores",
+    name: "Santa Maria, AÃ§ores",
     region: null,
     type: "promo",
     url: "https://www.youtube.com/watch?v=W9SgW4EWn30&t=9s",
@@ -523,16 +523,16 @@ window.LVSM_CAMERAS = [
     fallbackImage: null,
 
     preview: "./assets/previews/explore-sma.jpeg",
-    message: "Descubra a beleza autêntica da ilha do sol.",
-    status: "Ver vídeo",
+    message: "Descubra a beleza autÃªntica da ilha do sol.",
+    status: "Ver vÃ­deo",
 
     position: null,
 
     sponsor: {
-      name: "Câmara Municipal de Vila do Porto",
+      name: "CÃ¢mara Municipal de Vila do Porto",
       logo: "./assets/sponsors/cmvp.png",
       url: "https://www.cm-viladoporto.pt",
-      label: "Vídeo promocional"
+      label: "VÃ­deo promocional"
     },
 
     enabled: true
@@ -548,8 +548,8 @@ window.LVSM_CAMERAS = [
     fallbackImage: null,
 
     preview: "./assets/previews/villa-natura.jpg",
-    message: "Ecoturismo e experiências autênticas em Santa Maria.",
-    status: "Ver vídeo",
+    message: "Ecoturismo e experiÃªncias autÃªnticas em Santa Maria.",
+    status: "Ver vÃ­deo",
 
     position: null,
 
@@ -557,7 +557,7 @@ window.LVSM_CAMERAS = [
       name: "Villa Natura",
       logo: "./assets/sponsors/villa-natura.png",
       url: "https://villanaturaazores.com/pt/",
-      label: "Vídeo promocional"
+      label: "VÃ­deo promocional"
     },
 
     enabled: true
@@ -569,23 +569,23 @@ window.LVSM_CAMERAS = [
 window.LVSM_MILESTONES = [
   {
     date: "2026-05",
-    icon: "🚀",
-    title: "Arranque da rede pública LVSM",
-    text: "Primeira versão pública do Live Santa Maria com câmaras em directo, previsão meteorológica, estado do mar e mapa da rede."
+    icon: "ðŸš€",
+    title: "Arranque da rede pÃºblica LVSM",
+    text: "Primeira versÃ£o pÃºblica do Live Santa Maria com cÃ¢maras em directo, previsÃ£o meteorolÃ³gica, estado do mar e mapa da rede."
   },
 
   {
     date: "2026-05",
-    icon: "✨",
+    icon: "âœ¨",
     title: "Frontend V2.2",
-    text: "Introdução do estado do mar, milestones, sponsors, promo cards e identidade visual reforçada."
+    text: "IntroduÃ§Ã£o do estado do mar, milestones, sponsors, promo cards e identidade visual reforÃ§ada."
   }
 
 //  {
 //    date: "2026-07",
-//    icon: "🏔️",
+//    icon: "ðŸ”ï¸",
 //    title: "Cobertura do Pico Alto",
-//    text: "Entrada em serviço das câmaras do Pico Alto."
+//    text: "Entrada em serviÃ§o das cÃ¢maras do Pico Alto."
 //  }
 
 ];
