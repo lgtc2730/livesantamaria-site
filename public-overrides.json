@@ -1,0 +1,11 @@
+{
+  "overrides": {
+    "anjos-porto": { "visibility": "public" },
+    "cnsm": { "visibility": "public" },
+
+    "slourenco-norte": { "visibility": "staging" },
+    "praia-nascente": { "visibility": "public" },
+
+    "praia-poente": { "visibility": "hidden" }
+  }
+}

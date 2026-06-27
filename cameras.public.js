@@ -16,6 +16,7 @@ window.LVSM_CAMERAS = [
     preview: "./assets/previews/marina-club-motard.jpeg",
     message: null,
     status: "Em preparação",
+    publicVisibility: "staging", // public-aparece / staging-aparece com aviso / hidden-não aparece
     commissioned: null,
 
     position: {
@@ -47,6 +48,7 @@ window.LVSM_CAMERAS = [
     preview: null,
     message: null,
     status: null,
+    publicVisibility: "public", // public-aparece / staging-aparece com aviso / hidden-não aparece
     commissioned: "2024-05",
     position: {
       lat: 36.946593,
@@ -77,6 +79,7 @@ window.LVSM_CAMERAS = [
     preview: null,
     message: null,
     status: null,
+    publicVisibility: "public",
     commissioned: "2025-04",
 
     position: {
@@ -108,6 +111,7 @@ window.LVSM_CAMERAS = [
     preview: "./assets/previews/anjos-blues.jpg",
     message: null,
     status: "Em preparação",
+    publicVisibility: "staging",
     commissioned: null,
 
     position: {
@@ -140,6 +144,7 @@ window.LVSM_CAMERAS = [
     message: "Futura vista sobre o ilhéu e costa norte",
     status: "Aguarda patrocínio",
     commissioned: null,
+    publicVisibility: "staging",
 
     position: {
       lat: 37.005331,
@@ -162,14 +167,15 @@ window.LVSM_CAMERAS = [
     id: "slourenco-norte",
     name: "São Lourenço-Norte",
     region: "Este",
-    type: "future", // "snapshot",
-    url: null, // "https://www.spotazores.com/camaras/SMALOU01/QXGAcurrent.jpg"
+    type: "snapshot",
+    url: "https://www.spotazores.com/camaras/SMALOU01/QXGAcurrent.jpg",
     refresh: 15000,
     fallbackImage: "./assets/fallback/slourenco-norte.jpg",
 
     preview: null,
     message: null,
-    status: "OFFLINE",
+    status: null,
+    publicVisibility: "public",
     commissioned: "2023-01",
 
     position: {
@@ -201,6 +207,7 @@ window.LVSM_CAMERAS = [
     preview: null,
     message: null,
     status: null,
+    publicVisibility: "public",
     commissioned: "2024-05",
 
     position: {
@@ -233,6 +240,7 @@ window.LVSM_CAMERAS = [
     message: "Vista sobre a Baia e Farol da Maia",
     status: "Aguarda Patrocinio",
     commissioned: null,
+    publicVisibility: "staging",
 
     position: {
       lat: 36.938183,
@@ -264,7 +272,7 @@ window.LVSM_CAMERAS = [
     message: null,
     status: "Em preparação",
     commissioned: "2025-05",
-    
+    publicVisibility: "staging",
     position: {
       lat: 36.944280,
       lon: -25.016115,
@@ -294,6 +302,7 @@ window.LVSM_CAMERAS = [
     preview: "./assets/previews/farol-maia.jpeg",
     message: "Vista sobre a Maia",
     status: "Brevemente",
+    publicVisibility: "staging", // public-aparece / staging-aparece com aviso / hidden-não aparece
     commissioned: null,
 
     position: {
@@ -349,14 +358,15 @@ window.LVSM_CAMERAS = [
     id: "praia-nascente",
     name: "Praia-Nascente",
     region: "Sul",
-    type: "future", // "snapshot",
+    type: "snapshot",
     url: "https://www.spotazores.com/camaras/SMAFOR01/VGAcurrent.jpg",
     refresh: 15000,
     fallbackImage: "./assets/fallback/praia-nascente.jpg",
 
     preview: null,
     message: null,
-    status: "OFFLINE", // null,
+    status: null,
+    publicVisibility: "public", // public-aparece / staging-aparece com aviso / hidden-não aparece
     commissioned: "2023-05",
 
     position: {
@@ -388,6 +398,7 @@ window.LVSM_CAMERAS = [
     preview: null,
     message: null,
     status: null,
+    publicVisibility: "public", // public-aparece / staging-aparece com aviso / hidden-não aparece
     commissioned: "2025-05",
     
     position: {
@@ -420,6 +431,7 @@ window.LVSM_CAMERAS = [
     message: null,
     status: "Aguarda patrocínio",
     commissioned: null,
+    publicVisibility: "staging",
 
     position: {
       lat: 36.979503,
@@ -451,7 +463,7 @@ window.LVSM_CAMERAS = [
     message: null,
     status: "Aguarda patrocínio",
     commissioned: null,
-
+    publicVisibility: "staging",
     position: {
       lat: 36.979503,
       lon: -25.090873,
@@ -482,6 +494,7 @@ window.LVSM_CAMERAS = [
     message: null,
     status: "Aguarda patrocínio",
     commissioned: null,
+    publicVisibility: "staging",
 
     position: {
       lat: 36.975991,

@@ -2860,7 +2860,10 @@
 
 <script>
 const container = document.getElementById("cameraContainer");
-const PUBLIC_CAMERAS = (window.LVSM_CAMERAS || []).filter(cam => cam.enabled !== false);
+const PUBLIC_CAMERAS = (window.LVSM_CAMERAS || []).filter(cam =>
+  cam.enabled !== false &&
+  cam.publicVisibility !== "hidden"
+);
 const liveCameras = PUBLIC_CAMERAS.filter(cam =>
   ["hls", "snapshot"].includes(cam.type) && cam.url
 );
@@ -2892,8 +2895,10 @@ function escapeHtml(value) {
 }
 
 function addCacheBuster(url) {
-  const sep = url.includes("?") ? "&" : "?";
-  return `${url}${sep}t=${Date.now()}`;
+  if (!url) return null;
+  return url.includes("?")
+    ? `${url}&_=${Date.now()}`
+    : `${url}?_=${Date.now()}`;
 }
 
 function getRegion(cam) {
