@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Live Santa Maria</title>
 
-  <script src="./cameras.public.js?v=20260526-v2"></script>
+  <script src="./cameras.public.js?v=20260627-152330"></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.16/dist/hls.min.js"></script>
 
   <style>
@@ -2550,7 +2550,7 @@
       </a>
 
       <nav class="nav" aria-label="Navegação principal">
-        <button class="active" data-section="cameras">CAMERAS</button>
+        <button class="active" data-section="cameras">CÂMARAS</button>
         <button data-section="map">MAPA</button>
         <button data-section="forecast">PREVISÃO</button>
         <button data-section="timelapse">TIMELAPSE</button>
@@ -2860,10 +2860,7 @@
 
 <script>
 const container = document.getElementById("cameraContainer");
-const PUBLIC_CAMERAS = (window.LVSM_CAMERAS || []).filter(cam =>
-  cam.enabled !== false &&
-  cam.publicVisibility !== "hidden"
-);
+const PUBLIC_CAMERAS = (window.LVSM_CAMERAS || []).filter(cam => cam.enabled !== false);
 const liveCameras = PUBLIC_CAMERAS.filter(cam =>
   ["hls", "snapshot"].includes(cam.type) && cam.url
 );
@@ -2895,10 +2892,8 @@ function escapeHtml(value) {
 }
 
 function addCacheBuster(url) {
-  if (!url) return null;
-  return url.includes("?")
-    ? `${url}&_=${Date.now()}`
-    : `${url}?_=${Date.now()}`;
+  const sep = url.includes("?") ? "&" : "?";
+  return `${url}${sep}t=${Date.now()}`;
 }
 
 function getRegion(cam) {
