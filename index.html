@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Live Santa Maria</title>
 
-  <script src="./cameras.public.js?v=20260627-181440"></script>
+  <script src="./cameras.public.js?v=20260703-174346"></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.16/dist/hls.min.js"></script>
 
   <style>
@@ -2860,10 +2860,59 @@
 
 <script>
 const container = document.getElementById("cameraContainer");
+
+function getOperationalState(cam) {
+  return cam.operationalState || (
+    cam.publicVisibility === "hidden" ? "not-installed" :
+    cam.publicVisibility === "staging" ? "preparing" :
+    "public"
+  );
+}
+
+function getCameraPresentation(cam) {
+  const state = getOperationalState(cam);
+
+  if (state === "not-installed") {
+    return {
+      visible: false,
+      useFallback: true,
+      badge: "hidden",
+      label: "Não instalada"
+    };
+  }
+
+  if (state === "preparing") {
+    return {
+        visible: true,
+        useFallback: true,
+        badge: "future",
+        badgeDot: false,
+        label: "Em preparação"
+    };
+  }
+
+  if (state === "testing") {
+    return {
+      visible: true,
+      useFallback: false,
+      badge: "testing",
+      label: "Em testes"
+    };
+  }
+
+  return {
+    visible: true,
+    useFallback: false,
+    badge: "live",
+    label: "LIVE"
+  };
+}
+
 const PUBLIC_CAMERAS = (window.LVSM_CAMERAS || []).filter(cam =>
   cam.enabled !== false &&
-  cam.publicVisibility !== "hidden"
+  getOperationalState(cam) !== "not-installed"
 );
+
 const liveCameras = PUBLIC_CAMERAS.filter(cam =>
   ["hls", "snapshot"].includes(cam.type) && cam.url
 );
@@ -3199,6 +3248,8 @@ function isOffline(cam) {
 
 function createCameraCard(cam, index) {
   
+  const presentation = getCameraPresentation(cam);
+
   const card = document.createElement("article");
   card._cam = cam;
   card.className = `camera-card ${cam.type === "future" ? "future-card" : ""}`;
@@ -3224,8 +3275,8 @@ function createCameraCard(cam, index) {
       <img class="live-media" alt="${escapeHtml(cam.name)}">
       <img class="fallback-media" src="${escapeHtml(cam.fallbackImage || getPreview(cam))}" alt="${escapeHtml(cam.name)}">
     `;
-  } else if (cam.type === "future") {
-    mediaHtml = `<img class="live-media" src="${escapeHtml(getPreview(cam))}" alt="${escapeHtml(cam.name)}">`;
+  } else if (presentation.useFallback) {
+    mediaHtml = `<img class="live-media" src="${escapeHtml(cam.fallbackImage || getPreview(cam))}" alt="${escapeHtml(cam.name)}">`;
   } else {
     mediaHtml = `
       <video autoplay muted playsinline></video>
@@ -3233,17 +3284,40 @@ function createCameraCard(cam, index) {
     `;
   }
 
-  const statusText =
-    cam.type === "promo"
-      ? (cam.status ?? "Ver vídeo")
-      : cam.type === "future"
-        ? (cam.status ?? "")
-        : "A VERIFICAR";
+  let statusText;
 
+  if (cam.type === "promo") {
+    statusText = cam.status ?? "Ver vídeo";
+  } else {
+    switch (presentation.badge) {
+
+      case "future":
+        statusText = "EM PREPARAÇÃO";
+        break;
+
+      case "testing":
+        statusText = "EM TESTES";
+        break;
+
+      case "live":
+        statusText = "A VERIFICAR";
+        break;
+
+      default:
+        statusText = cam.status ?? "";
+    }
+  }
+        
   card.innerHTML = `
     ${mediaHtml}
-    <div class="status-badge ${cam.type === "future" ? "future" : isOffline(cam) ? "offline" : "live"}">
-      <span class="dot ${cam.type === "future" ? "" : "ok"}"></span>
+    <div class="status-badge ${
+      presentation.badge === "future"
+        ? "future"
+        : isOffline(cam)
+          ? "offline"
+          : "live"
+    }">
+      <span class="dot ${presentation.badgeDot ? "ok" : ""}"></span>
       <span>${escapeHtml(statusText).toUpperCase()}</span>
     </div>
 

@@ -17,6 +17,7 @@ window.LVSM_CAMERAS = [
     message: null,
     status: "Em preparação",
     publicVisibility: "staging", // public-aparece / staging-aparece com aviso / hidden-não aparece
+    operationalState: "preparing", //"not-installed" / "preparing" / "testing" / "public"
     commissioned: null,
 
     position: {
@@ -49,6 +50,7 @@ window.LVSM_CAMERAS = [
     message: null,
     status: null,
     publicVisibility: "public", // public-aparece / staging-aparece com aviso / hidden-não aparece
+    operationalState: "public",
     commissioned: "2024-05",
     position: {
       lat: 36.946593,
@@ -80,6 +82,7 @@ window.LVSM_CAMERAS = [
     message: null,
     status: null,
     publicVisibility: "public",
+    operationalState: "public",
     commissioned: "2025-04",
 
     position: {
@@ -112,6 +115,7 @@ window.LVSM_CAMERAS = [
     message: null,
     status: "Em preparação",
     publicVisibility: "staging",
+    operationalState: "testing",
     commissioned: null,
 
     position: {
@@ -145,6 +149,7 @@ window.LVSM_CAMERAS = [
     status: "Aguarda patrocínio",
     commissioned: null,
     publicVisibility: "staging",
+    operationalState: "not-installed", //"not-installed" / "preparing" / "testing" / "public"
 
     position: {
       lat: 37.005331,
@@ -176,6 +181,7 @@ window.LVSM_CAMERAS = [
     message: null,
     status: null,
     publicVisibility: "public",
+    operationalState: "public",
     commissioned: "2023-01",
 
     position: {
@@ -208,6 +214,7 @@ window.LVSM_CAMERAS = [
     message: null,
     status: null,
     publicVisibility: "public",
+    operationalState: "public",
     commissioned: "2024-05",
 
     position: {
@@ -241,6 +248,7 @@ window.LVSM_CAMERAS = [
     status: "Aguarda Patrocinio",
     commissioned: null,
     publicVisibility: "staging",
+    operationalState: "preparing",
 
     position: {
       lat: 36.938183,
@@ -273,6 +281,7 @@ window.LVSM_CAMERAS = [
     status: "operational",
     commissioned: "2026-06",
     publicVisibility: "public",
+    operationalState: "public",
     position: {
       lat: 36.944280,
       lon: -25.016115,
@@ -303,6 +312,7 @@ window.LVSM_CAMERAS = [
     message: "Vista sobre a Maia",
     status: "Brevemente",
     publicVisibility: "staging", // public-aparece / staging-aparece com aviso / hidden-não aparece
+    operationalState: "preparing", //"not-installed" / "preparing" / "testing" / "public"
     commissioned: null,
 
     position: {
@@ -336,7 +346,8 @@ window.LVSM_CAMERAS = [
     message: "Vista sobre o Porto do Castelo",
     status: "Brevemente",
     commissioned: null,
-
+    operationalState: "preparing",
+    publicVisibility: "staging", // public-aparece / staging-aparece com aviso / hidden-não aparece
     position: {
       lat: 36.929928,
       lon: -25.016833,
@@ -367,6 +378,7 @@ window.LVSM_CAMERAS = [
     message: null,
     status: null,
     publicVisibility: "public", // public-aparece / staging-aparece com aviso / hidden-não aparece
+    operationalState: "public", //"not-installed" / "preparing" / "testing" / "public"
     commissioned: "2023-05",
 
     position: {
@@ -399,6 +411,7 @@ window.LVSM_CAMERAS = [
     message: null,
     status: null,
     publicVisibility: "public", // public-aparece / staging-aparece com aviso / hidden-não aparece
+    operationalState: "public", //"not-installed" / "preparing" / "testing" / "public"
     commissioned: "2025-05",
     
     position: {
@@ -432,6 +445,7 @@ window.LVSM_CAMERAS = [
     status: "Aguarda patrocínio",
     commissioned: null,
     publicVisibility: "staging",
+    operationalState: "preparing",
 
     position: {
       lat: 36.979503,
@@ -464,6 +478,7 @@ window.LVSM_CAMERAS = [
     status: "Aguarda patrocínio",
     commissioned: null,
     publicVisibility: "staging",
+    operationalState: "preparing",
     position: {
       lat: 36.979503,
       lon: -25.090873,
@@ -495,6 +510,7 @@ window.LVSM_CAMERAS = [
     status: "Aguarda patrocínio",
     commissioned: null,
     publicVisibility: "staging",
+    operationalState: "preparing",
 
     position: {
       lat: 36.975991,
@@ -561,8 +577,32 @@ window.LVSM_CAMERAS = [
     },
 
     enabled: true
-  }
+  },
 
+  {
+    id: "promo-clinica-do-computador",
+    name: "Clínica do Computador",
+    region: null,
+    type: "promo",
+    url: null,
+    refresh: null,
+    fallbackImage: null,
+
+    preview: "./assets/previews/clinica-do-computador.jpg",
+    message: "Serviços de informática e consultoria em Santa Maria.",
+    status: null,
+
+    position: null,
+
+    sponsor: {
+      name: "Clínica do Computador",
+      logo: "./assets/sponsors/clinica-do-computador.png",
+      url: "https://clinica-do-computador.pt/",
+      label: null
+    },
+
+    enabled: true
+  }  
   
 ];
 
