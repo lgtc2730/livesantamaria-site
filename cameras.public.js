@@ -106,8 +106,8 @@ window.LVSM_CAMERAS = [
     id: "anjos-blues",
     name: "Anjos-Blues",
     region: "Norte",
-    type: "future",
-    url: null,
+    type: "hls",
+    url: "https://anjos-blues-cam.livesantamaria.org/cam1/index.m3u8",
     refresh: null,
     fallbackImage: null,
 
@@ -248,7 +248,7 @@ window.LVSM_CAMERAS = [
     status: "Aguarda Patrocinio",
     commissioned: null,
     publicVisibility: "staging",
-    operationalState: "preparing",
+    operationalState: "preparing", //"not-installed" / "preparing" / "testing" / "public"
 
     position: {
       lat: 36.938183,
@@ -282,6 +282,7 @@ window.LVSM_CAMERAS = [
     commissioned: "2026-06",
     publicVisibility: "public",
     operationalState: "public",
+
     position: {
       lat: 36.944280,
       lon: -25.016115,
@@ -312,7 +313,7 @@ window.LVSM_CAMERAS = [
     message: "Vista sobre a Maia",
     status: "Brevemente",
     publicVisibility: "staging", // public-aparece / staging-aparece com aviso / hidden-não aparece
-    operationalState: "preparing", //"not-installed" / "preparing" / "testing" / "public"
+    operationalState: "preparing",
     commissioned: null,
 
     position: {
@@ -345,9 +346,10 @@ window.LVSM_CAMERAS = [
     preview: "./assets/previews/porto-do-castelo.jpeg",
     message: "Vista sobre o Porto do Castelo",
     status: "Brevemente",
-    commissioned: null,
     operationalState: "preparing",
     publicVisibility: "staging", // public-aparece / staging-aparece com aviso / hidden-não aparece
+    commissioned: null,
+
     position: {
       lat: 36.929928,
       lon: -25.016833,
@@ -443,9 +445,9 @@ window.LVSM_CAMERAS = [
     preview: "./assets/previews/pico-alto-nascente.jpeg",
     message: null,
     status: "Aguarda patrocínio",
-    commissioned: null,
     publicVisibility: "staging",
-    operationalState: "preparing",
+    operationalState: "preparing", //"not-installed" / "preparing" / "testing" / "public"
+    commissioned: null,
 
     position: {
       lat: 36.979503,
@@ -476,9 +478,10 @@ window.LVSM_CAMERAS = [
     preview: "./assets/previews/pico-alto-poente.jpeg",
     message: null,
     status: "Aguarda patrocínio",
-    commissioned: null,
-    publicVisibility: "staging",
     operationalState: "preparing",
+    publicVisibility: "staging",
+    commissioned: null,
+
     position: {
       lat: 36.979503,
       lon: -25.090873,
@@ -508,9 +511,9 @@ window.LVSM_CAMERAS = [
     preview: "./assets/previews/aeroporto.jpeg",
     message: null,
     status: "Aguarda patrocínio",
-    commissioned: null,
     publicVisibility: "staging",
     operationalState: "preparing",
+    commissioned: null,
 
     position: {
       lat: 36.975991,
@@ -602,7 +605,7 @@ window.LVSM_CAMERAS = [
     },
 
     enabled: true
-  }  
+  }
   
 ];
 

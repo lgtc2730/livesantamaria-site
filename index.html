@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Live Santa Maria</title>
 
-  <script src="./cameras.public.js?v=20260703-174346"></script>
+  <script src="./cameras.public.js?v=20260704-142939"></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.16/dist/hls.min.js"></script>
 
   <style>
@@ -2962,9 +2962,12 @@ function viewerCount(cam, index) {
 }
 
 function cameraMatchesFilter(cam) {
+  const presentation = getCameraPresentation(cam);
+
   if (activeFilter === "all") return true;
-  if (activeFilter === "live") return cam.type !== "future";
-  if (activeFilter === "future") return cam.type === "future";
+  if (activeFilter === "live") return !presentation.useFallback;
+  if (activeFilter === "future") return presentation.useFallback;
+
   return getRegion(cam).toLowerCase() === activeFilter;
 }
 
@@ -3163,7 +3166,7 @@ function updateCounts() {
   ).length;
 
   const future = PUBLIC_CAMERAS.filter(
-    cam => cam.type === "future"
+    cam => getCameraPresentation(cam).useFallback
   ).length;
 
   setText(
@@ -3252,7 +3255,7 @@ function createCameraCard(cam, index) {
 
   const card = document.createElement("article");
   card._cam = cam;
-  card.className = `camera-card ${cam.type === "future" ? "future-card" : ""}`;
+  card.className = `camera-card ${presentation.useFallback ? "future-card" : ""}`;
 
   if (window.matchMedia("(max-width: 680px)").matches) {
     card.classList.add("compact-mobile");
@@ -3777,8 +3780,10 @@ function attachMediaToElement(media, cam, instanceName) {
     return;
   }
 
-  if (cam.type === "future") {
-    media.src = getPreview(cam);
+  const presentation = getCameraPresentation(cam);
+
+  if (presentation.useFallback) {
+    media.src = cam.fallbackImage || getPreview(cam);
     return;
   }
 
@@ -3814,7 +3819,9 @@ function openCameraFullscreen(cam) {
   destroyMediaInstance("fullscreen");
   fsStage.innerHTML = "";
 
-  const media = cam.type === "snapshot" || cam.type === "future"
+  const presentation = getCameraPresentation(cam);
+
+  const media = cam.type === "snapshot" || presentation.useFallback
     ? document.createElement("img")
     : document.createElement("video");
 
