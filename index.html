@@ -4652,9 +4652,15 @@ function renderPromos() {
 
   container.innerHTML = "";
 
-  (window.LVSM_CAMERAS || [])
+  PUBLIC_CAMERAS
     .filter(cam => cam.type === "promo")
-    .filter(cam => cam.enabled !== false)
+    .forEach((cam, index) => {
+
+      const card = createCameraCard(cam, index);
+
+      container.appendChild(card);
+
+    });
 }
 
 setHeroBackground();
