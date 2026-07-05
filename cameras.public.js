@@ -605,8 +605,35 @@ window.LVSM_CAMERAS = [
     },
 
     enabled: true
+  },
+
+  {
+    id: "praia-castelo",
+    name: "Praia do Castelo",
+    region: null,
+    type: "future",
+    url: null,
+    refresh: null,
+    fallbackImage: null,
+
+    preview: "./assets/previews/praia-castelo.jpg",
+    message: null,
+    status: "Aguarda patrocínio",
+    publicVisibility: "staging",
+    operationalState: "preparing",
+    commissioned: null,
+
+    position: {
+      lat: 36.979503,
+      lon: -25.091,
+      bearing: 180,
+      fov: 90
+    },
+
+    sponsor: null,
+
+    enabled: true
   }
-  
 ];
 
 window.LVSM_MILESTONES = [
