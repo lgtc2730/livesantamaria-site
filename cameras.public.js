@@ -591,7 +591,7 @@ window.LVSM_CAMERAS = [
     refresh: null,
     fallbackImage: null,
 
-    preview: "./assets/previews/clinica-do-computador.jpg",
+    preview: "./assets/previews/clinica-do-computador.png",
     message: "Serviços de informática e consultoria em Santa Maria.",
     status: null,
 
