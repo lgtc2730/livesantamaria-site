@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Live Santa Maria</title>
 
-  <script src="./cameras.public.js?v=20260705-140408"></script>
+  <script src="./cameras.public.js?v=20260705-144118"></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.16/dist/hls.min.js"></script>
 
   <style>
@@ -4652,15 +4652,9 @@ function renderPromos() {
 
   container.innerHTML = "";
 
-  PUBLIC_CAMERAS
+  (window.LVSM_CAMERAS || [])
     .filter(cam => cam.type === "promo")
-    .forEach((cam, index) => {
-
-      const card = createCameraCard(cam, index);
-
-      container.appendChild(card);
-
-    });
+    .filter(cam => cam.enabled !== false)
 }
 
 setHeroBackground();

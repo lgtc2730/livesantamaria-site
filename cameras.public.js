@@ -591,7 +591,7 @@ window.LVSM_CAMERAS = [
     refresh: null,
     fallbackImage: null,
 
-    preview: "./assets/previews/clinica-do-computador.png",
+    preview: "./assets/previews/clinica-computador.png",
     message: "Serviços de informática e consultoria em Santa Maria.",
     status: null,
 
@@ -599,7 +599,7 @@ window.LVSM_CAMERAS = [
 
     sponsor: {
       name: "Clínica do Computador",
-      logo: "./assets/sponsors/clinica-do-computador.png",
+      logo: "./assets/sponsors/clinica-computador.png",
       url: "https://clinica-do-computador.pt/",
       label: null
     },
