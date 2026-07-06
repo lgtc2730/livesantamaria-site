@@ -2607,11 +2607,6 @@
             <button class="chip active" data-filter="all">Todas</button>
             <button class="chip" data-filter="live">Live</button>
             <button class="chip" data-filter="future">Futuras</button>
-            <button class="chip" data-filter="norte">Norte</button>
-            <button class="chip" data-filter="sul">Sul</button>
-            <button class="chip" data-filter="este">Este</button>
-            <button class="chip" data-filter="oeste">Oeste</button>
-            <button class="chip" data-filter="centro">Centro</button>
           </div>
 
           <div class="section-head-right">
@@ -2968,7 +2963,7 @@ function cameraMatchesFilter(cam) {
   if (activeFilter === "live") return !presentation.useFallback;
   if (activeFilter === "future") return presentation.useFallback;
 
-  return getRegion(cam).toLowerCase() === activeFilter;
+  return true;
 }
 
 function setHeroBackground() {
@@ -3203,11 +3198,14 @@ function setMapStatus(cam, status) {
 
 function setCardLive(block) {
   const badge = block.querySelector(".status-badge");
+  const badgeDot = badge?.querySelector(".dot");
   const badgeText = badge?.querySelector("span:last-child");
   if (!badge || !badgeText) return;
 
   badge.className = "status-badge";
+  badgeDot?.classList.add("ok");
   badgeText.textContent = "LIVE";
+
   block.classList.remove("has-fallback-active");
   cameraRuntimeStatus.set(block._cam.id, "live");
   updateCounts();
@@ -3216,6 +3214,7 @@ function setCardLive(block) {
 
 function setCardOffline(block) {
   const badge = block.querySelector(".status-badge");
+  const badgeDot = badge?.querySelector(".dot");
   const badgeText = badge?.querySelector("span:last-child");
   const fallback = block.querySelector(".fallback-media");
   const cam = block._cam;
@@ -3223,12 +3222,14 @@ function setCardOffline(block) {
   if (!badge || !badgeText) return;
 
   badge.className = "status-badge offline";
+  badgeDot?.classList.remove("ok");
   badgeText.textContent = "OFFLINE";
 
   if (fallback && cam?.fallbackImage) {
     fallback.src = cam.fallbackImage;
     block.classList.add("has-fallback-active");
   }
+
   cameraRuntimeStatus.set(block._cam.id, "offline");
   updateCounts();
   setMapStatus(block._cam, "offline");
@@ -3236,11 +3237,13 @@ function setCardOffline(block) {
 
 function setCardChecking(block) {
   const badge = block.querySelector(".status-badge");
+  const badgeDot = badge?.querySelector(".dot");
   const badgeText = badge?.querySelector("span:last-child");
   if (!badge || !badgeText) return;
 
   if (!badge.classList.contains("offline")) {
     badge.className = "status-badge";
+    badgeDot?.classList.remove("ok");
     badgeText.textContent = "A VERIFICAR";
   }
 }
@@ -3474,6 +3477,9 @@ function loadHls(card, cam) {
   let offlineTimer = null;
   let retryCount = 0;
   let hls = null;
+  let lastProgressAt = Date.now();
+  let lastVideoTime = 0;
+  let watchdogTimer = null;  
   const maxRetries = 8;
 
   function clearOfflineTimer() {
@@ -3486,6 +3492,8 @@ function loadHls(card, cam) {
     retryCount = 0;
     clearOfflineTimer();
     setCardLive(card);
+    lastProgressAt = Date.now();
+    lastVideoTime = video.currentTime || 0;
   }
 
   function scheduleOffline(delay = 25000) {
@@ -3541,7 +3549,10 @@ function loadHls(card, cam) {
       video.play().catch(() => {});
     });
 
-    hls.on(Hls.Events.FRAG_LOADED, markLive);
+    hls.on(Hls.Events.FRAG_LOADED, () => {
+      lastProgressAt = Date.now();
+      markLive();
+    });
 
     hls.on(Hls.Events.ERROR, function (_event, data) {
       if (!data.fatal) {
@@ -3586,6 +3597,23 @@ function loadHls(card, cam) {
     video.play().catch(() => {});
     return;
   }
+
+  watchdogTimer = setInterval(() => {
+    const now = Date.now();
+    const currentVideoTime = video.currentTime || 0;
+    const videoAdvanced = currentVideoTime > lastVideoTime + 0.5;
+
+    if (videoAdvanced) {
+      lastVideoTime = currentVideoTime;
+      lastProgressAt = now;
+      return;
+    }
+
+    if (hasPlayedOnce && now - lastProgressAt > 20000) {
+      retryHls();
+      lastProgressAt = now;
+    }
+  }, 5000);
 
   startHls();
 }
