@@ -3472,6 +3472,9 @@ function loadHls(card, cam) {
   const video = card.querySelector("video");
   let hasPlayedOnce = false;
   let offlineTimer = null;
+  let retryCount = 0;
+  let hls = null;
+  const maxRetries = 8;
 
   function clearOfflineTimer() {
     if (offlineTimer) clearTimeout(offlineTimer);
@@ -3480,6 +3483,7 @@ function loadHls(card, cam) {
 
   function markLive() {
     hasPlayedOnce = true;
+    retryCount = 0;
     clearOfflineTimer();
     setCardLive(card);
   }
@@ -3491,48 +3495,56 @@ function loadHls(card, cam) {
     }, delay);
   }
 
-  setCardChecking(card);
-  scheduleOffline(cam.initialTimeout || 25000);
-
-  video.addEventListener("playing", markLive);
-  video.addEventListener("canplay", markLive);
-  video.addEventListener("loadeddata", markLive);
-  video.addEventListener("waiting", () => {
-    if (!hasPlayedOnce) {
-      setCardChecking(card);
-      scheduleOffline(25000);
+  function cleanupHls() {
+    if (hls) {
+      hls.destroy();
+      hls = null;
     }
-  });
-  video.addEventListener("stalled", () => {
-    if (!hasPlayedOnce) scheduleOffline(18000);
-  });
-  video.addEventListener("error", () => scheduleOffline(12000));
-
-  if (video.canPlayType("application/vnd.apple.mpegurl")) {
-    video.src = cam.url;
-    video.play().catch(() => {});
-    return;
   }
 
-  if (window.Hls && Hls.isSupported()) {
-    const hls = new Hls({
+  function retryHls() {
+    if (retryCount >= maxRetries) {
+      scheduleOffline(3000);
+      return;
+    }
+
+    retryCount += 1;
+    setCardChecking(card);
+
+    const delay = Math.min(2000 * retryCount, 10000);
+
+    setTimeout(() => {
+      cleanupHls();
+      startHls();
+    }, delay);
+  }
+
+  function startHls() {
+    if (!(window.Hls && Hls.isSupported())) {
+      setCardOffline(card);
+      return;
+    }
+
+    hls = new Hls({
       enableWorker: true,
       lowLatencyMode: false,
       liveSyncDuration: 4,
       liveMaxLatencyDuration: 12
     });
 
+    card.hlsInstance = hls;
+
     hls.loadSource(cam.url);
     hls.attachMedia(video);
 
-    hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => {}));
-    hls.on(Hls.Events.FRAG_LOADED, markLive);
-    hls.on(Hls.Events.ERROR, function (_event, data) {
-      if (!data.fatal) return;
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      video.play().catch(() => {});
+    });
 
-      if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-        hls.startLoad();
-        scheduleOffline(hasPlayedOnce ? 20000 : 12000);
+    hls.on(Hls.Events.FRAG_LOADED, markLive);
+
+    hls.on(Hls.Events.ERROR, function (_event, data) {
+      if (!data.fatal) {
         return;
       }
 
@@ -3542,13 +3554,40 @@ function loadHls(card, cam) {
         return;
       }
 
-      scheduleOffline(8000);
+      retryHls();
     });
-
-    card.hlsInstance = hls;
-  } else {
-    setCardOffline(card);
   }
+
+  setCardChecking(card);
+  scheduleOffline(cam.initialTimeout || 25000);
+
+  video.addEventListener("playing", markLive);
+  video.addEventListener("canplay", markLive);
+  video.addEventListener("loadeddata", markLive);
+
+  video.addEventListener("waiting", () => {
+    if (!hasPlayedOnce) {
+      setCardChecking(card);
+      scheduleOffline(25000);
+    }
+  });
+
+  video.addEventListener("stalled", () => {
+    if (!hasPlayedOnce) scheduleOffline(18000);
+  });
+
+  video.addEventListener("error", () => {
+    if (!hasPlayedOnce) retryHls();
+    scheduleOffline(12000);
+  });
+
+  if (video.canPlayType("application/vnd.apple.mpegurl")) {
+    video.src = cam.url;
+    video.play().catch(() => {});
+    return;
+  }
+
+  startHls();
 }
 
 function renderCameras() {
