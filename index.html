@@ -3147,10 +3147,12 @@ async function updateSeaState() {
     const height = Number(hourly.wave_height?.[nowIndex]);
     const period = Number(hourly.wave_period?.[nowIndex]);
     const direction = Number(hourly.wave_direction?.[nowIndex]);
+    const seaTemp = Number(hourly.sea_surface_temperature?.[nowIndex]);
 
     setText("seaWaveHeight", Number.isFinite(height) ? `${height.toFixed(1)} m` : "—");
     setText("seaWavePeriod", Number.isFinite(period) ? `${Math.round(period)} s` : "—");
     setText("seaWaveDirection", degreesToCompass(direction));
+    setText("seaTemperature", Number.isFinite(seaTemp) ? `${seaTemp.toFixed(1)} °C` : "—");
   } catch (err) {
     console.warn("Erro estado do mar:", err);
     setText("seaWaveHeight", "—");
