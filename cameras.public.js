@@ -624,9 +624,9 @@ window.LVSM_CAMERAS = [
     commissioned: null,
 
     position: {
-      lat: 36.979503,
-      lon: -25.091,
-      bearing: 180,
+      lat: 36.97952296,
+      lon: -25.102622,
+      bearing: 140,
       fov: 90
     },
 
