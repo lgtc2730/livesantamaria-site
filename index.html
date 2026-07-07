@@ -3512,10 +3512,17 @@ function loadHls(card, cam) {
   }
 
   function cleanupHls() {
+    if (watchdogTimer) {
+      clearInterval(watchdogTimer);
+      watchdogTimer = null;
+    }
+
     if (hls) {
       hls.destroy();
       hls = null;
     }
+
+    card.hlsInstance = null;
   }
 
   function retryHls() {
@@ -3626,6 +3633,49 @@ function loadHls(card, cam) {
   startHls();
 }
 
+const LazyHlsManager = {
+  observer: null,
+
+  init() {
+    if (this.observer || !("IntersectionObserver" in window)) return;
+
+    this.observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+
+        const card = entry.target;
+        const cam = card._cam;
+
+        if (!cam || card.dataset.hlsStarted === "true") return;
+
+        card.dataset.hlsStarted = "true";
+        console.log("[LVSM lazy] arrancar HLS:", cam.id, cam.name);
+        loadHls(card, cam);
+      });
+    }, {
+      root: null,
+      rootMargin: "250px 0px",
+      threshold: 0.01
+    });
+  },
+
+  observe(card) {
+    this.init();
+
+    if (!this.observer) {
+      const cam = card._cam;
+      if (cam && card.dataset.hlsStarted !== "true") {
+        card.dataset.hlsStarted = "true";
+        console.log("[LVSM lazy] arrancar HLS:", cam.id, cam.name);
+        loadHls(card, cam);
+      }
+      return;
+    }
+
+    this.observer.observe(card);
+  }
+};
+
 function renderCameras() {
   container.innerHTML = "";
 
@@ -3650,7 +3700,7 @@ function renderCameras() {
     container.appendChild(card);
 
     if (cam.type === "snapshot") loadSnapshot(card, cam);
-    else if (cam.type === "hls") loadHls(card, cam);
+    else if (cam.type === "hls") LazyHlsManager.observe(card);
   });
 }
 
