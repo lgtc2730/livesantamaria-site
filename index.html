@@ -4788,6 +4788,45 @@ function renderPromos() {
     });
 }
 
+let visibilityShutdownTimer = null;
+
+function stopGridHlsPlayers() {
+  document.querySelectorAll(".camera-card[data-hls-started='true']").forEach(card => {
+    if (card.hlsInstance) {
+      card.hlsInstance.destroy();
+      card.hlsInstance = null;
+    }
+
+    const video = card.querySelector("video");
+    if (video) {
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+    }
+
+    card.dataset.hlsStarted = "false";
+  });
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    clearTimeout(visibilityShutdownTimer);
+
+    visibilityShutdownTimer = setTimeout(() => {
+      if (document.hidden) {
+        stopGridHlsPlayers();
+      }
+    }, 60000);
+
+    return;
+  }
+
+  clearTimeout(visibilityShutdownTimer);
+  visibilityShutdownTimer = null;
+
+  window.location.reload();
+});
+
 setHeroBackground();
 updateCounts();
 renderCameras();
