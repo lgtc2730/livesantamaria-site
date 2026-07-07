@@ -2714,6 +2714,12 @@
                 <span>Direcção</span>
                 <strong id="seaWaveDirection">—</strong>
               </div>
+
+              <div class="sea-row">
+                <span>Temperatura do mar</span>
+                <strong id="seaTemperature">—</strong>
+              </div>
+
             </div>
           </div>
 
@@ -3128,7 +3134,7 @@ async function updateSeaState() {
       "https://marine-api.open-meteo.com/v1/marine" +
       "?latitude=36.97639" +
       "&longitude=-25.125" +
-      "&hourly=wave_height,wave_period,wave_direction" +
+      "&hourly=wave_height,wave_period,wave_direction,sea_surface_temperature" +
       "&timezone=Atlantic%2FAzores" +
       "&forecast_days=1";
 
@@ -3150,6 +3156,7 @@ async function updateSeaState() {
     setText("seaWaveHeight", "—");
     setText("seaWavePeriod", "—");
     setText("seaWaveDirection", "—");
+    setText("seaTemperature", "—");
   }
 }
 
