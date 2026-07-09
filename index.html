@@ -3489,6 +3489,7 @@ function loadHls(card, cam) {
   let lastVideoTime = 0;
   let watchdogTimer = null;  
   const maxRetries = 8;
+  const streamUrl = cam.previewStreamUrl || cam.streamUrl || cam.url;
 
   function clearOfflineTimer() {
     if (offlineTimer) clearTimeout(offlineTimer);
@@ -3557,7 +3558,7 @@ function loadHls(card, cam) {
 
     card.hlsInstance = hls;
 
-    hls.loadSource(cam.url);
+    hls.loadSource(streamUrl);
     hls.attachMedia(video);
 
     hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -3608,7 +3609,7 @@ function loadHls(card, cam) {
   });
 
   if (video.canPlayType("application/vnd.apple.mpegurl")) {
-    video.src = cam.url;
+    video.src = streamUrl;
     video.play().catch(() => {});
     return;
   }
@@ -3906,6 +3907,10 @@ function attachMediaToElement(media, cam, instanceName) {
   }
 
   const presentation = getCameraPresentation(cam);
+  const streamUrl =
+    instanceName === "fullscreen" || instanceName === "tv"
+      ? (cam.streamUrl || cam.url)
+      : (cam.previewStreamUrl || cam.streamUrl || cam.url);  
 
   if (presentation.useFallback) {
     media.src = cam.fallbackImage || getPreview(cam);
@@ -3918,7 +3923,7 @@ function attachMediaToElement(media, cam, instanceName) {
   media.controls = true;
 
   if (media.canPlayType("application/vnd.apple.mpegurl")) {
-    media.src = cam.url;
+    media.src = streamUrl;
     media.play().catch(() => {});
   } else if (window.Hls && Hls.isSupported()) {
     const hls = new Hls({
@@ -3928,7 +3933,7 @@ function attachMediaToElement(media, cam, instanceName) {
       liveMaxLatencyDuration: 12
     });
 
-    hls.loadSource(cam.url);
+    hls.loadSource(streamUrl);
     hls.attachMedia(media);
     hls.on(Hls.Events.MANIFEST_PARSED, () => media.play().catch(() => {}));
 

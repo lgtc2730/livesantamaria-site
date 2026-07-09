@@ -273,6 +273,8 @@ window.LVSM_CAMERAS = [
     region: "Este",
     type: "hls",
     url: "https://maia-norte-cam.livesantamaria.org/cam1/index.m3u8",
+    streamUrl: "https://maia-norte-cam.livesantamaria.org/cam1hq/index.m3u8",
+    previewStreamUrl: "https://maia-norte-cam.livesantamaria.org/cam1/index.m3u8",
     refresh: null,
     fallbackImage: "./assets/fallback/maia-norte.jpeg",
 
