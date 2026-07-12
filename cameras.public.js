@@ -7,9 +7,11 @@ window.LVSM_CAMERAS = [
   {
     id: "marina-club-motard",
     name: "Marina-Club Motard",
-    region: "Sul",
+    region: null,
     type: "future",
     url: null,
+    streamUrl: null,
+    previewStreamUrl: null,
     refresh: null,
     fallbackImage: null,
 
@@ -17,7 +19,7 @@ window.LVSM_CAMERAS = [
     message: null,
     status: "Em preparação",
     publicVisibility: "staging", // public-aparece / staging-aparece com aviso / hidden-não aparece
-    operationalState: "preparing", //"not-installed" / "preparing" / "testing" / "public"
+    operationalState: "future", //"not-installed" / "future" / "testing" / "public"
     commissioned: null,
 
     position: {
@@ -40,7 +42,7 @@ window.LVSM_CAMERAS = [
   {
     id: "cnsm",
     name: "Marina-Clube Naval",
-    region: "Sul",
+    region: null,
     type: "hls",
     url: "https://cnsm.olho.mariense.pt/cam/camera.m3u8",
     refresh: null,
@@ -72,9 +74,11 @@ window.LVSM_CAMERAS = [
   {
     id: "anjos-porto",
     name: "Anjos-Porto",
-    region: "Norte",
+    region: null,
     type: "hls",
     url: "https://anjos-cam.livesantamaria.org/cam1/index.m3u8",
+    streamUrl: "https://anjos-cam.livesantamaria.org/cam1hq/index.m3u8",
+    previewStreamUrl: "https://anjos-cam.livesantamaria.org/cam1/index.m3u8",
     refresh: null,
     fallbackImage: "./assets/fallback/anjos-porto.jpg",
 
@@ -105,18 +109,19 @@ window.LVSM_CAMERAS = [
   {
     id: "anjos-blues",
     name: "Anjos-Blues",
-    region: "Norte",
     type: "hls",
     url: "https://anjos-blues-cam.livesantamaria.org/cam1/index.m3u8",
+    streamUrl: "https://anjos-blues-cam.livesantamaria.org/cam1hq/index.m3u8",
+    previewStreamUrl: "https://anjos-blues-cam.livesantamaria.org/cam1/index.m3u8",
     refresh: null,
-    fallbackImage: null,
-
+    fallbackImage: "./assets/fallback/anjos-blues.jpg",
+    
     preview: "./assets/previews/anjos-blues.jpg",
     message: null,
-    status: "Em preparação",
-    publicVisibility: "staging",
-    operationalState: "testing",
-    commissioned: null,
+    status: null,
+    publicVisibility: "public", // public-aparece / staging-aparece com aviso / hidden-não aparece
+    operationalState: "public", //"not-installed" / "future" / "testing" / "public"
+    commissioned: "2026-07",
 
     position: {
       lat: 37.00799592,
@@ -138,9 +143,11 @@ window.LVSM_CAMERAS = [
   {
     id: "ilheu-lagoinhas",
     name: "Ilhéu das Lagoinhas",
-    region: "Norte",
+    region: null,
     type: "future",
     url: null,
+    streamUrl: null,
+    previewStreamUrl: null,
     refresh: null,
     fallbackImage: null,
 
@@ -149,7 +156,7 @@ window.LVSM_CAMERAS = [
     status: "Aguarda patrocínio",
     commissioned: null,
     publicVisibility: "staging",
-    operationalState: "not-installed", //"not-installed" / "preparing" / "testing" / "public"
+    operationalState: "future", //"not-installed" / "future" / "testing" / "public"
 
     position: {
       lat: 37.005331,
@@ -171,7 +178,7 @@ window.LVSM_CAMERAS = [
   {
     id: "slourenco-norte",
     name: "São Lourenço-Norte",
-    region: "Este",
+    region: null,
     type: "snapshot",
     url: "https://www.spotazores.com/camaras/SMALOU01/QXGAcurrent.jpg",
     refresh: 15000,
@@ -204,9 +211,11 @@ window.LVSM_CAMERAS = [
   {
     id: "slourenco-sul",
     name: "São Lourenço-Sul",
-    region: "Este",
+    region: null,
     type: "hls",
     url: "https://slourenco-sul-cam.livesantamaria.org/cam1/index.m3u8",
+    streamUrl: "https://slourenco-sul-cam.livesantamaria.org/cam1hq/index.m3u8",
+    previewStreamUrl: "https://slourenco-sul-cam.livesantamaria.org/cam1/index.m3u8",
     refresh: null,
     fallbackImage: "./assets/fallback/slourenco-sul.jpg",
 
@@ -237,9 +246,11 @@ window.LVSM_CAMERAS = [
   {
     id: "maia-sul",
     name: "Maia-Sul",
-    region: "Este",
+    region: null,
     type: "future",
     url: null,
+    streamUrl: null,
+    previewStreamUrl: null,
     refresh: null,
     fallbackImage: null,
 
@@ -248,7 +259,7 @@ window.LVSM_CAMERAS = [
     status: "Aguarda Patrocinio",
     commissioned: null,
     publicVisibility: "staging",
-    operationalState: "preparing", //"not-installed" / "preparing" / "testing" / "public"
+    operationalState: "future", //"not-installed" / "future" / "testing" / "public"
 
     position: {
       lat: 36.938183,
@@ -270,8 +281,9 @@ window.LVSM_CAMERAS = [
   {
     id: "maia-norte",
     name: "Maia-Norte",
-    region: "Este",
+    region: null,
     type: "hls",
+    // Compatibilidade (temporário)
     url: "https://maia-norte-cam.livesantamaria.org/cam1/index.m3u8",
     streamUrl: "https://maia-norte-cam.livesantamaria.org/cam1hq/index.m3u8",
     previewStreamUrl: "https://maia-norte-cam.livesantamaria.org/cam1/index.m3u8",
@@ -305,9 +317,11 @@ window.LVSM_CAMERAS = [
   {
     id: "farol-maia",
     name: "Maia-Farol",
-    region: "Este",
+    region: null,
     type: "future",
     url: null,
+    streamUrl: null,
+    previewStreamUrl: null,
     refresh: null,
     fallbackImage: null,
 
@@ -315,7 +329,7 @@ window.LVSM_CAMERAS = [
     message: "Vista sobre a Maia",
     status: "Brevemente",
     publicVisibility: "staging", // public-aparece / staging-aparece com aviso / hidden-não aparece
-    operationalState: "preparing",
+    operationalState: "future", //"not-installed" / "future" / "testing" / "public"
     commissioned: null,
 
     position: {
@@ -339,31 +353,33 @@ window.LVSM_CAMERAS = [
   {
     id: "porto-do-castelo",
     name: "Porto Castelo",
-    region: "Sul",
+    region: null,
     type: "future",
     url: null,
+    streamUrl: null,
+    previewStreamUrl: null,
     refresh: null,
     fallbackImage: null,
 
     preview: "./assets/previews/porto-do-castelo.jpeg",
     message: "Vista sobre o Porto do Castelo",
     status: "Brevemente",
-    operationalState: "preparing",
+    operationalState: "future", //"not-installed" / "future" / "testing" / "public"
     publicVisibility: "staging", // public-aparece / staging-aparece com aviso / hidden-não aparece
     commissioned: null,
 
     position: {
-      lat: 36.929928,
-      lon: -25.016833,
-      bearing: 180,
-      fov: 65
+      lat: 36.97952296,
+      lon: -25.102622,
+      bearing: 140,
+      fov: 90
     },
 
     sponsor: {
-      name: "Ricardo Sebastião",
+      name: null,
       logo: null,
       url: null,
-      label: "Sponsor"
+      label: null
     },
 
     enabled: true
@@ -372,9 +388,11 @@ window.LVSM_CAMERAS = [
   {
     id: "praia-nascente",
     name: "Praia-Nascente",
-    region: "Sul",
+    region: null,
     type: "snapshot",
     url: "https://www.spotazores.com/camaras/SMAFOR01/VGAcurrent.jpg",
+    streamUrl: null,
+    previewStreamUrl: null,
     refresh: 15000,
     fallbackImage: "./assets/fallback/praia-nascente.jpg",
 
@@ -382,7 +400,7 @@ window.LVSM_CAMERAS = [
     message: null,
     status: null,
     publicVisibility: "public", // public-aparece / staging-aparece com aviso / hidden-não aparece
-    operationalState: "public", //"not-installed" / "preparing" / "testing" / "public"
+    operationalState: "public", //"not-installed" / "future" / "testing" / "public"
     commissioned: "2023-05",
 
     position: {
@@ -405,17 +423,19 @@ window.LVSM_CAMERAS = [
   {
     id: "praia-poente",
     name: "Praia-Poente",
-    region: "Sul",
+    region: null,
     type: "hls",
     url: "https://praia-poente-cam.livesantamaria.org/cam1/index.m3u8",
+    streamUrl: "https://praia-poente-cam.livesantamaria.org/cam1hq/index.m3u8",
+    previewStreamUrl: "https://praia-poente-cam.livesantamaria.org/cam1/index.m3u8",
     refresh: null,
     fallbackImage: "./assets/fallback/praia-poente.jpg",
 
     preview: null,
     message: null,
     status: null,
-    publicVisibility: "public", // public-aparece / staging-aparece com aviso / hidden-não aparece
-    operationalState: "public", //"not-installed" / "preparing" / "testing" / "public"
+    publicVisibility: "staging", // public-aparece / staging-aparece com aviso / hidden-não aparece
+    operationalState: "testing", //"not-installed" / "future" / "testing" / "public"
     commissioned: "2025-05",
     
     position: {
@@ -438,9 +458,11 @@ window.LVSM_CAMERAS = [
   {
     id: "pico-alto-nascente",
     name: "Pico Alto-Nascente",
-    region: "Centro",
+    region: null,
     type: "future",
     url: null,
+    streamUrl: null,
+    previewStreamUrl: null,
     refresh: null,
     fallbackImage: null,
 
@@ -448,7 +470,7 @@ window.LVSM_CAMERAS = [
     message: null,
     status: "Aguarda patrocínio",
     publicVisibility: "staging",
-    operationalState: "preparing", //"not-installed" / "preparing" / "testing" / "public"
+    operationalState: "future", //"not-installed" / "future" / "testing" / "public"
     commissioned: null,
 
     position: {
@@ -471,16 +493,18 @@ window.LVSM_CAMERAS = [
   {
     id: "pico-alto-poente",
     name: "Pico Alto-Poente",
-    region: "Centro",
+    region: null,
     type: "future",
     url: null,
+    streamUrl: null,
+    previewStreamUrl: null,
     refresh: null,
     fallbackImage: null,
 
     preview: "./assets/previews/pico-alto-poente.jpeg",
     message: null,
     status: "Aguarda patrocínio",
-    operationalState: "preparing",
+    operationalState: "future", //"not-installed" / "future" / "testing" / "public"
     publicVisibility: "staging",
     commissioned: null,
 
@@ -504,9 +528,11 @@ window.LVSM_CAMERAS = [
   {
     id: "aeroporto",
     name: "Aeroporto",
-    region: "Centro",
+    region: null,
     type: "future",
     url: null,
+    streamUrl: null,
+    previewStreamUrl: null,
     refresh: null,
     fallbackImage: null,
 
@@ -514,7 +540,7 @@ window.LVSM_CAMERAS = [
     message: null,
     status: "Aguarda patrocínio",
     publicVisibility: "staging",
-    operationalState: "preparing",
+    operationalState: "future", //"not-installed" / "future" / "testing" / "public"
     commissioned: null,
 
     position: {
@@ -602,7 +628,7 @@ window.LVSM_CAMERAS = [
     sponsor: {
       name: "Clínica do Computador",
       logo: "./assets/sponsors/clinica-computador.png",
-      url: "https://clinica-do-computador.pt/",
+      url: null,
       label: null
     },
 
@@ -622,11 +648,11 @@ window.LVSM_CAMERAS = [
     message: null,
     status: "Aguarda patrocínio",
     publicVisibility: "staging",
-    operationalState: "preparing",
+    operationalState: "future",
     commissioned: null,
 
     position: {
-      lat: 36.97952296,
+      lat: 36.952276,
       lon: -25.102622,
       bearing: 140,
       fov: 90
@@ -636,6 +662,7 @@ window.LVSM_CAMERAS = [
 
     enabled: true
   }
+
 ];
 
 window.LVSM_MILESTONES = [
