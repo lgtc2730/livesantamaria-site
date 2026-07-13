@@ -53,7 +53,7 @@ window.LVSM_CAMERAS = [
     status: null,
     publicVisibility: "public", // public-aparece / staging-aparece com aviso / hidden-não aparece
     operationalState: "public",
-    commissioned: "2024-05",
+    commissioned: "2020",
     position: {
       lat: 36.946593,
       lon: -25.147747,
@@ -87,7 +87,7 @@ window.LVSM_CAMERAS = [
     status: null,
     publicVisibility: "public",
     operationalState: "public",
-    commissioned: "2025-04",
+    commissioned: "2021",
 
     position: {
       lat: 37.0039,
@@ -189,7 +189,7 @@ window.LVSM_CAMERAS = [
     status: null,
     publicVisibility: "public",
     operationalState: "public",
-    commissioned: "2023-01",
+    commissioned: "2023",
 
     position: {
       lat: 36.9843,
@@ -224,7 +224,7 @@ window.LVSM_CAMERAS = [
     status: null,
     publicVisibility: "public",
     operationalState: "public",
-    commissioned: "2024-05",
+    commissioned: "2012",
 
     position: {
       lat: 36.9952,
@@ -237,7 +237,7 @@ window.LVSM_CAMERAS = [
       name: "Deolinda Melo",
       logo: null,
       url: null,
-      label: "Apoio de"
+      label: "Sponsor"
     },
 
     enabled: true
@@ -293,7 +293,7 @@ window.LVSM_CAMERAS = [
     preview: null,
     message: null,
     status: "operational",
-    commissioned: "2026-06",
+    commissioned: "2023",
     publicVisibility: "public",
     operationalState: "public",
 
@@ -369,8 +369,8 @@ window.LVSM_CAMERAS = [
     commissioned: null,
 
     position: {
-      lat: 36.97952296,
-      lon: -25.102622,
+      lat: 36.929656,
+      lon: -25.016711,
       bearing: 140,
       fov: 90
     },
@@ -401,7 +401,7 @@ window.LVSM_CAMERAS = [
     status: null,
     publicVisibility: "public", // public-aparece / staging-aparece com aviso / hidden-não aparece
     operationalState: "public", //"not-installed" / "future" / "testing" / "public"
-    commissioned: "2023-05",
+    commissioned: "2023",
 
     position: {
       lat: 36.952592,
@@ -436,7 +436,7 @@ window.LVSM_CAMERAS = [
     status: null,
     publicVisibility: "staging", // public-aparece / staging-aparece com aviso / hidden-não aparece
     operationalState: "testing", //"not-installed" / "future" / "testing" / "public"
-    commissioned: "2025-05",
+    commissioned: "2013",
     
     position: {
       lat: 36.950908,
@@ -449,7 +449,7 @@ window.LVSM_CAMERAS = [
       name: "Apartamentos Mar e Sol",
       logo: "./assets/sponsors/apartamentos-maresol.jpeg",
       url: "https://www.apartamentosmaresol.com/",
-      label: "Apoio de"
+      label: "Sponsor"
     },
 
     enabled: true
@@ -615,7 +615,7 @@ window.LVSM_CAMERAS = [
     name: "Clínica do Computador",
     region: null,
     type: "promo",
-    url: null,
+    url: "https://youtu.be/zb3SD088mHU",
     refresh: null,
     fallbackImage: null,
 
@@ -652,8 +652,8 @@ window.LVSM_CAMERAS = [
     commissioned: null,
 
     position: {
-      lat: 36.952276,
-      lon: -25.102622,
+      lat: 36.952287,
+      lon: -25.102611,
       bearing: 140,
       fov: 90
     },
@@ -666,6 +666,28 @@ window.LVSM_CAMERAS = [
 ];
 
 window.LVSM_MILESTONES = [
+
+  {
+    date: "2012",
+    icon: "🚀",
+    title: "Primeira câmara que esteve na origem deste projeto",
+    text: "Foi instalada em São Lourenço, primeiramente na casa do Henrique Nunes e posteriormente na casa da Elisa Sousa e finalmente na casa de Deolinda Melo."
+  },
+
+  {
+    date: "2021",
+    icon: "🚀",
+    title: "Aparecimento do Olho Mariense",
+    text: "Foi criado o domínio \"Olho Mariense\" e plataforma correspondente, pelo Rui Chaves."
+  },
+   
+  {
+    date: "2023",
+    icon: "✨",
+    title: "Orçamento Participativo da CMVP",
+    text: "O embrião deste Projeto foi levado a concurso para o Orçamento Participativo da CMVP."
+  },
+
   {
     date: "2026-05",
     icon: "🚀",
@@ -678,8 +700,14 @@ window.LVSM_MILESTONES = [
     icon: "✨",
     title: "Frontend V2.2",
     text: "Introdução do estado do mar, milestones, sponsors, promo cards e identidade visual reforçada."
-  }
+  },
 
+  {
+    date: "2026-07-15",
+    icon: "🚀",
+    title: "Lançamento da v1.0 do Projeto Live Santa Maria",
+    text: "Versão pública atualizada do LVSM v1.0."
+  }  
 //  {
 //    date: "2026-07",
 //    icon: "🏔️",
