@@ -8,18 +8,18 @@ window.LVSM_CAMERAS = [
     id: "marina-club-motard",
     name: "Marina-Club Motard",
     region: null,
-    type: "future",
-    url: null,
-    streamUrl: null,
-    previewStreamUrl: null,
+    type: "hls",
+    url: "https://marina-club-motard-cam.livesantamaria.org/cam1/index.m3u8",
+    streamUrl: "https://marina-club-motard-cam.livesantamaria.org/cam1hq/index.m3u8",
+    previewStreamUrl: "https://marina-club-motard-cam.livesantamaria.org/cam1/index.m3u8",
     refresh: null,
-    fallbackImage: null,
+    fallbackImage: "./assets/fallback/marina-club-motard.jpg",
 
     preview: "./assets/previews/marina-club-motard.jpeg",
     message: null,
-    status: "Em preparação",
+    status: null,
     publicVisibility: "staging", // public-aparece / staging-aparece com aviso / hidden-não aparece
-    operationalState: "future", //"not-installed" / "future" / "testing" / "public"
+    operationalState: "testing", //"not-installed" / "future" / "testing" / "public"
     commissioned: null,
 
     position: {
@@ -371,7 +371,7 @@ window.LVSM_CAMERAS = [
     position: {
       lat: 36.929656,
       lon: -25.016711,
-      bearing: 140,
+      bearing: 200,
       fov: 90
     },
 

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Live Santa Maria</title>
 
-  <script src="./cameras.public.js?v=20260713-105956"></script>
+  <script src="./cameras.public.js?v=20260713-170954"></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.16/dist/hls.min.js"></script>
 
   <style>
@@ -4663,15 +4663,57 @@ window.addEventListener("resize", () => {
 });
 
 function formatCommissioned(value) {
-  if (!value) return "";
+  if (!value) return "Data desconhecida";
 
-  const [year, month] = String(value).split("-");
-  const date = new Date(Number(year), Number(month) - 1, 1);
+  const text = String(value).trim();
 
-  return new Intl.DateTimeFormat("pt-PT", {
-    month: "long",
-    year: "numeric"
-  }).format(date);
+  // Apenas ano: "2020"
+  if (/^\d{4}$/.test(text)) {
+    return text;
+  }
+
+  // Ano e mês: "2026-07"
+  let match = text.match(/^(\d{4})-(\d{2})$/);
+
+  if (match) {
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+
+    if (month >= 1 && month <= 12) {
+      const date = new Date(year, month - 1, 1);
+
+      return new Intl.DateTimeFormat("pt-PT", {
+        month: "long",
+        year: "numeric"
+      }).format(date);
+    }
+  }
+
+  // Data completa: "2026-07-15"
+  match = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+  if (match) {
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+
+    const date = new Date(year, month - 1, day);
+
+    if (
+      date.getFullYear() === year &&
+      date.getMonth() === month - 1 &&
+      date.getDate() === day
+    ) {
+      return new Intl.DateTimeFormat("pt-PT", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      }).format(date);
+    }
+  }
+
+  console.warn("commissioned inválido:", value);
+  return text;
 }
 
 function renderNetworkTimeline() {
