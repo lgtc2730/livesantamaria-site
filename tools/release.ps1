@@ -10,13 +10,18 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
+# Keep Git commit subjects readable on Windows terminals.
+[Console]::InputEncoding = [System.Text.UTF8Encoding]::new($false)
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+$OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+
 $Config = [ordered]@{
-    Version       = '1.0'
+    Version       = '1.1'
     ExpectedRepo  = 'lgtc2730/livesantamaria-site'
     SourceBranch  = 'lab'
     TargetBranch  = 'main'
     ReleaseBranch = 'release/launch-2026-07-15'
-    PreLaunchTag  = 'pre-launch-2026-07-15'
+    PreLaunchTag  = 'pre-launch-holding-2026-07-15'
     LaunchTag     = 'launch-2026-07-15'
 }
 
@@ -32,23 +37,23 @@ function Show-Help {
     Show-Header
     Write-Host 'Usage'
     Write-Host ''
-    Write-Host '  .\tools\release.ps1 create'
-    Write-Host '  .\tools\release.ps1 check'
-    Write-Host '  .\tools\release.ps1 publish -DryRun'
-    Write-Host '  .\tools\release.ps1 publish'
-    Write-Host '  .\tools\release.ps1 rollback -DryRun'
-    Write-Host '  .\tools\release.ps1 rollback'
+    Write-Host '  .\lvsm-release.cmd create'
+    Write-Host '  .\lvsm-release.cmd check'
+    Write-Host '  .\lvsm-release.cmd publish -DryRun'
+    Write-Host '  .\lvsm-release.cmd publish'
+    Write-Host '  .\lvsm-release.cmd rollback -DryRun'
+    Write-Host '  .\lvsm-release.cmd rollback'
     Write-Host ''
     Write-Host 'Commands'
     Write-Host ''
     Write-Host '  create    Cria e publica o branch de release a partir de lab.'
-    Write-Host '  check     Valida o estado do repositorio e da release.'
-    Write-Host '  publish   Coloca a release em main.'
-    Write-Host '  rollback  Reposiciona main na tag pre-launch.'
+    Write-Host '  check     Valida o repositorio, a release e as tags de seguranca.'
+    Write-Host '  publish   Faz origin/main apontar exatamente para a release.'
+    Write-Host '  rollback  Reposiciona origin/main na pagina pre-launch.'
     Write-Host ''
     Write-Host 'Options'
     Write-Host ''
-    Write-Host '  -DryRun   Valida e mostra o plano sem alterar refs ou tags.'
+    Write-Host '  -DryRun   Valida e mostra o plano sem alterar branches ou tags.'
     Write-Host ''
 }
 
@@ -69,7 +74,7 @@ function Write-InfoLine {
         [Parameter(Mandatory)][string]$Value
     )
 
-    Write-Host ("{0,-18} {1}" -f ($Label + ':'), $Value)
+    Write-Host ("{0,-20} {1}" -f ($Label + ':'), $Value)
 }
 
 function Invoke-Git {
@@ -78,23 +83,40 @@ function Invoke-Git {
         [switch]$AllowFailure
     )
 
-    $output = & git @Arguments 2>&1
-    $exitCode = $LASTEXITCODE
+    # Windows PowerShell 5.1 may expose normal Git stderr progress as a
+    # terminating NativeCommandError when ErrorActionPreference is Stop.
+    $previousErrorPreference = $ErrorActionPreference
+    $hasNativePreference = Test-Path variable:PSNativeCommandUseErrorActionPreference
+    if ($hasNativePreference) {
+        $previousNativePreference = $PSNativeCommandUseErrorActionPreference
+        $PSNativeCommandUseErrorActionPreference = $false
+    }
+
+    try {
+        $ErrorActionPreference = 'Continue'
+        $output = @(& git -c i18n.logOutputEncoding=utf-8 @Arguments 2>&1 | ForEach-Object { $_.ToString() })
+        $exitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorPreference
+        if ($hasNativePreference) {
+            $PSNativeCommandUseErrorActionPreference = $previousNativePreference
+        }
+    }
 
     if ($exitCode -ne 0 -and -not $AllowFailure) {
-        $message = ($output | ForEach-Object { $_.ToString() }) -join [Environment]::NewLine
+        $message = $output -join [Environment]::NewLine
         throw "git $($Arguments -join ' ') falhou:`n$message"
     }
 
     return [pscustomobject]@{
         ExitCode = $exitCode
-        Output   = @($output | ForEach-Object { $_.ToString() })
+        Output   = $output
     }
 }
 
 function Assert-GitAvailable {
-    $commandInfo = Get-Command git -ErrorAction SilentlyContinue
-    if (-not $commandInfo) {
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
         throw 'Git nao foi encontrado no PATH.'
     }
 }
@@ -215,26 +237,38 @@ function Assert-ReleaseReady {
     if (-not $State.SourceRemote.Exists) {
         throw "Nao existe origin/$($Config.SourceBranch)."
     }
-
     if (-not $State.ReleaseLocal.Exists) {
         throw "Nao existe o branch local $($Config.ReleaseBranch). Execute create."
     }
-
     if (-not $State.ReleaseRemote.Exists) {
         throw "Nao existe origin/$($Config.ReleaseBranch). Execute create."
     }
-
     if ($State.ReleaseLocal.Commit -ne $State.ReleaseRemote.Commit) {
         throw 'O branch release local e remoto apontam para commits diferentes.'
     }
-
     if (-not $State.MainRemote.Exists) {
         throw "Nao existe origin/$($Config.TargetBranch)."
     }
-
     if (-not $State.PreLaunchTag.Exists) {
-        throw "Nao existe a tag $($Config.PreLaunchTag)."
+        throw "Nao existe a tag $($Config.PreLaunchTag). Crie-a no commit atual de origin/main."
     }
+}
+
+function Assert-PublishBaseline {
+    param([Parameter(Mandatory)]$State)
+
+    if ($State.MainRemote.Commit -eq $State.ReleaseRemote.Commit) {
+        if ($State.LaunchTag.Exists -and $State.LaunchTag.Commit -eq $State.ReleaseRemote.Commit) {
+            return 'already-published'
+        }
+        throw 'origin/main ja aponta para a release, mas a tag de lancamento nao coincide.'
+    }
+
+    if ($State.MainRemote.Commit -ne $State.PreLaunchTag.Commit) {
+        throw "origin/main mudou depois da preparacao. Esperado $($State.PreLaunchTag.Short), atual $($State.MainRemote.Short)."
+    }
+
+    return 'ready'
 }
 
 function Show-State {
@@ -269,16 +303,12 @@ function Invoke-Check {
 
     Assert-GitAvailable
     Write-StepOk 1 $total 'Git'
-
     Assert-GitRepository
     Write-StepOk 2 $total 'Repository'
-
     Assert-CleanWorkingTree
     Write-StepOk 3 $total 'Working Tree'
-
     Assert-ExpectedRemote
     Write-StepOk 4 $total 'Remote'
-
     Update-Origin
     Write-StepOk 5 $total 'Fetch'
 
@@ -287,7 +317,13 @@ function Invoke-Check {
     Write-StepOk 6 $total 'Release State'
 
     Show-State -State $state
-    Write-Host 'READY' -ForegroundColor Green
+    $baseline = Assert-PublishBaseline -State $state
+    if ($baseline -eq 'already-published') {
+        Write-Host 'ALREADY PUBLISHED' -ForegroundColor Green
+    }
+    else {
+        Write-Host 'READY' -ForegroundColor Green
+    }
 }
 
 function Invoke-Create {
@@ -305,7 +341,6 @@ function Invoke-Create {
     if (-not $state.SourceRemote.Exists) {
         throw "Nao existe origin/$($Config.SourceBranch)."
     }
-
     if ($state.SourceLocal.Commit -ne $state.SourceRemote.Commit) {
         throw "$($Config.SourceBranch) local nao coincide com origin/$($Config.SourceBranch)."
     }
@@ -315,7 +350,6 @@ function Invoke-Create {
     if ($state.ReleaseLocal.Exists -and $state.ReleaseLocal.Commit -ne $sourceCommit) {
         throw "O branch local $($Config.ReleaseBranch) ja existe noutro commit."
     }
-
     if ($state.ReleaseRemote.Exists -and $state.ReleaseRemote.Commit -ne $sourceCommit) {
         throw "O branch remoto origin/$($Config.ReleaseBranch) ja existe noutro commit."
     }
@@ -356,9 +390,7 @@ function Show-PublishPlan {
     Write-InfoLine -Label 'Tag' -Value $Config.LaunchTag
     Write-Host ''
     Write-Host 'Comandos previstos:'
-    Write-Host "  git switch $($Config.TargetBranch)"
-    Write-Host "  git reset --hard $($State.ReleaseRemote.Commit)"
-    Write-Host "  git push --force-with-lease=refs/heads/$($Config.TargetBranch):$($State.MainRemote.Commit) origin $($Config.TargetBranch)"
+    Write-Host "  git push --force-with-lease=refs/heads/$($Config.TargetBranch):$($State.MainRemote.Commit) origin $($State.ReleaseRemote.Commit):refs/heads/$($Config.TargetBranch)"
     Write-Host "  git tag $($Config.LaunchTag) $($State.ReleaseRemote.Commit)"
     Write-Host "  git push origin $($Config.LaunchTag)"
     Write-Host ''
@@ -376,7 +408,14 @@ function Invoke-Publish {
         throw "A tag $($Config.LaunchTag) ja existe noutro commit."
     }
 
+    $baseline = Assert-PublishBaseline -State $state
     Show-State -State $state
+
+    if ($baseline -eq 'already-published') {
+        Write-Host 'A release ja esta publicada e etiquetada.' -ForegroundColor Green
+        return
+    }
+
     Show-PublishPlan -State $state
 
     if ($DryRun) {
@@ -387,13 +426,13 @@ function Invoke-Publish {
 
     Confirm-Action -ExpectedText 'PUBLICAR' -Prompt 'Escreva PUBLICAR para colocar esta release em producao'
 
-    Invoke-Git -Arguments @('switch', $Config.TargetBranch) | Out-Null
-    Invoke-Git -Arguments @('reset', '--hard', $state.ReleaseRemote.Commit) | Out-Null
+    $targetRef = "refs/heads/$($Config.TargetBranch)"
+    $releaseRefSpec = "$($state.ReleaseRemote.Commit):$targetRef"
     Invoke-Git -Arguments @(
         'push',
-        "--force-with-lease=refs/heads/$($Config.TargetBranch):$($state.MainRemote.Commit)",
+        "--force-with-lease=${targetRef}:$($state.MainRemote.Commit)",
         'origin',
-        $Config.TargetBranch
+        $releaseRefSpec
     ) | Out-Null
     Write-StepOk 1 2 'Main publicado'
 
@@ -419,10 +458,8 @@ function Show-RollbackPlan {
     Write-InfoLine -Label 'Main atual' -Value $State.MainRemote.Short
     Write-InfoLine -Label 'Destino' -Value "$($Config.PreLaunchTag) ($($State.PreLaunchTag.Short))"
     Write-Host ''
-    Write-Host 'Comandos previstos:'
-    Write-Host "  git switch $($Config.TargetBranch)"
-    Write-Host "  git reset --hard $($Config.PreLaunchTag)"
-    Write-Host "  git push --force-with-lease=refs/heads/$($Config.TargetBranch):$($State.MainRemote.Commit) origin $($Config.TargetBranch)"
+    Write-Host 'Comando previsto:'
+    Write-Host "  git push --force-with-lease=refs/heads/$($Config.TargetBranch):$($State.MainRemote.Commit) origin $($State.PreLaunchTag.Commit):refs/heads/$($Config.TargetBranch)"
     Write-Host ''
 }
 
@@ -432,11 +469,9 @@ function Invoke-Rollback {
     Update-Origin
 
     $state = Get-ReleaseState
-
     if (-not $state.MainRemote.Exists) {
         throw "Nao existe origin/$($Config.TargetBranch)."
     }
-
     if (-not $state.PreLaunchTag.Exists) {
         throw "Nao existe a tag $($Config.PreLaunchTag)."
     }
@@ -449,15 +484,15 @@ function Invoke-Rollback {
         return
     }
 
-    Confirm-Action -ExpectedText 'REVERTER' -Prompt 'Escreva REVERTER para repor a versao pre-launch'
+    Confirm-Action -ExpectedText 'REVERTER' -Prompt 'Escreva REVERTER para repor a pagina pre-launch'
 
-    Invoke-Git -Arguments @('switch', $Config.TargetBranch) | Out-Null
-    Invoke-Git -Arguments @('reset', '--hard', $Config.PreLaunchTag) | Out-Null
+    $targetRef = "refs/heads/$($Config.TargetBranch)"
+    $rollbackRefSpec = "$($state.PreLaunchTag.Commit):$targetRef"
     Invoke-Git -Arguments @(
         'push',
-        "--force-with-lease=refs/heads/$($Config.TargetBranch):$($state.MainRemote.Commit)",
+        "--force-with-lease=${targetRef}:$($state.MainRemote.Commit)",
         'origin',
-        $Config.TargetBranch
+        $rollbackRefSpec
     ) | Out-Null
 
     Write-Host ''
