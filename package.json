@@ -1,0 +1,27 @@
+{
+  "name": "livesantamaria-site",
+  "version": "1.0.0",
+  "description": "Repositório do **site público Live Santa Maria**.",
+  "main": "cameras.public.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lgtc2730/livesantamaria-site.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/lgtc2730/livesantamaria-site/issues"
+  },
+  "homepage": "https://github.com/lgtc2730/livesantamaria-site#readme",
+  "devDependencies": {
+    "wrangler": "^4.111.0"
+  }
+}
