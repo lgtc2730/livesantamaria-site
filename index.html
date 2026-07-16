@@ -3945,6 +3945,8 @@ function attachMediaToElement(media, cam, instanceName) {
 }
 
 function openCameraFullscreen(cam) {
+  trackCameraView(cam.id);
+  
   const fsMode = document.getElementById("fullscreenMode");
   const fsStage = document.getElementById("fullscreenStage");
 
@@ -4857,6 +4859,116 @@ function stopGridHlsPlayers() {
   });
 }
 
+const AUDIENCE_SESSION_KEY = "lvsm-audience-session";
+const AUDIENCE_SESSION_MS = 30 * 60 * 1000;
+
+function getAudienceSession() {
+  const now = Date.now();
+
+  try {
+    const stored = JSON.parse(
+      localStorage.getItem(AUDIENCE_SESSION_KEY) || "null"
+    );
+
+    if (
+      stored?.id &&
+      stored?.lastActivity &&
+      now - stored.lastActivity < AUDIENCE_SESSION_MS
+    ) {
+      stored.lastActivity = now;
+      localStorage.setItem(
+        AUDIENCE_SESSION_KEY,
+        JSON.stringify(stored)
+      );
+
+      return stored;
+    }
+  } catch (error) {
+    console.warn("Audience session inválida:", error);
+  }
+
+  const session = {
+    id: crypto.randomUUID(),
+    lastActivity: now,
+    cameras: []
+  };
+
+  localStorage.setItem(
+    AUDIENCE_SESSION_KEY,
+    JSON.stringify(session)
+  );
+
+  return session;
+}
+
+async function sendAudienceEvent(event, camera = null) {
+  if (location.hostname !== "www.livesantamaria.org") {
+    return;
+  }
+
+  const session = getAudienceSession();
+
+  try {
+    await fetch("/api/audience/event", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      keepalive: true,
+      body: JSON.stringify({
+        event,
+        camera,
+        session: session.id
+      })
+    });
+  } catch (error) {
+    console.warn("Audience indisponível:", error);
+  }
+}
+
+function trackVisit() {
+  const session = getAudienceSession();
+
+  if (session.visitSent) {
+    return;
+  }
+
+  session.visitSent = true;
+  session.lastActivity = Date.now();
+
+  localStorage.setItem(
+    AUDIENCE_SESSION_KEY,
+    JSON.stringify(session)
+  );
+
+  sendAudienceEvent("visit");
+}
+
+function trackCameraView(cameraId) {
+  if (!cameraId) {
+    return;
+  }
+
+  const session = getAudienceSession();
+  const viewedCameras = new Set(session.cameras || []);
+
+  if (viewedCameras.has(cameraId)) {
+    return;
+  }
+
+  viewedCameras.add(cameraId);
+
+  session.cameras = [...viewedCameras];
+  session.lastActivity = Date.now();
+
+  localStorage.setItem(
+    AUDIENCE_SESSION_KEY,
+    JSON.stringify(session)
+  );
+
+  sendAudienceEvent("camera_view", cameraId);
+}
+
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     clearTimeout(visibilityShutdownTimer);
@@ -4894,6 +5006,8 @@ updateTidesCard();
 setInterval(updateTidesCard, 30 * 60 * 1000);
 
 applyInitialUrlParams();
+
+trackVisit();
 
 </script>
 
