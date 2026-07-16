@@ -4,9 +4,10 @@ export async function onRequestPost(context) {
 
   const host = context.request.headers.get("host");
 
-  // Apenas contamos o site público
   if (host !== "www.livesantamaria.org") {
-    return new Response(null, { status: 204 });
+    return new Response(null, {
+      status: 204
+    });
   }
 
   const body = await context.request.json();
@@ -18,13 +19,27 @@ export async function onRequestPost(context) {
     );
   }
 
-  await insertEvent(context.env.LVSM_AUDIENCE, {
-    type: body.event,
+  console.log("[Audience]", {
+    event: body.event,
     camera: body.camera,
     session: body.session,
     host
   });
 
-  return Response.json({ ok: true });
+  const result = await insertEvent(
+    context.env.LVSM_AUDIENCE,
+    {
+      type: body.event,
+      camera: body.camera,
+      session: body.session,
+      host
+    }
+  );
+
+  console.log("[Audience] DB", result);
+
+  return Response.json({
+    ok: true
+  });
 
 }
