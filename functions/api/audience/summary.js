@@ -191,16 +191,13 @@ export async function onRequestGet(context) {
   ]);
 
   return Response.json({
-
     apiVersion: 1,
-
     generatedAt: new Date().toISOString(),
 
     activatedAt:
       firstResult.results[0]?.activatedAt ?? null,
 
     visits: {
-
       today:
         todayResult.results[0]?.count ?? 0,
 
@@ -212,7 +209,6 @@ export async function onRequestGet(context) {
 
       total:
         totalResult.results[0]?.count ?? 0
-
     },
 
     top:
@@ -222,11 +218,10 @@ export async function onRequestGet(context) {
       }))
 
   }, {
-
     headers: {
-      "Cache-Control": "no-store"
+      "Cache-Control": "no-store",
+      "Access-Control-Allow-Origin": "*"
     }
-
   });
 
 }
