@@ -166,7 +166,7 @@ window.LVSM_CAMERAS = [
         "refresh":  null,
         "fallbackImage":  "./assets/fallback/maia-norte.jpeg",
         "preview":  null,
-        "message":  null,
+        "message":  "Apoio de Carlos Andrade",
         "status":  "operational",
         "commissioned":  "2023",
         "publicVisibility":  "public",
@@ -178,7 +178,7 @@ window.LVSM_CAMERAS = [
                          "fov":  65
                      },
         "sponsor":  {
-                        "name":  "Carlos Andrade e Rui Chaves",
+                        "name":  "Rui Chaves",
                         "logo":  null,
                         "url":  null,
                         "label":  "Sponsor"
@@ -225,7 +225,7 @@ window.LVSM_CAMERAS = [
         "previewStreamUrl":  "https://praia-poente-cam.livesantamaria.org/cam1/index.m3u8",
         "refresh":  null,
         "fallbackImage":  "./assets/fallback/praia-poente.jpg",
-        "preview":  null,
+        "preview":  "./assets/previews/praia-poente.jpg",
         "message":  null,
         "status":  null,
         "publicVisibility":  "staging",
@@ -304,7 +304,7 @@ window.LVSM_CAMERAS = [
         "type":  "future",
         "preview":  "./assets/previews/ilheu-lagoinhas.jpg",
         "message":  "Futura vista sobre o ilhéu e costa norte",
-        "status":  "Aguarda patrocínio",
+        "status":  "Em preparação",
         "commissioned":  null,
         "publicVisibility":  "staging",
         "position":  {
@@ -314,10 +314,10 @@ window.LVSM_CAMERAS = [
                          "fov":  65
                      },
         "sponsor":  {
-                        "name":  null,
+                        "name":  "Helder Cunha",
                         "logo":  null,
                         "url":  null,
-                        "label":  null
+                        "label":  "Sponsor"
                     },
         "enabled":  true
     },
@@ -328,7 +328,7 @@ window.LVSM_CAMERAS = [
         "type":  "future",
         "preview":  "./assets/previews/maia-sul.jpeg",
         "message":  "Vista sobre a Baia e Farol da Maia",
-        "status":  "Aguarda Patrocinio",
+        "status":  "Em preparação",
         "commissioned":  null,
         "publicVisibility":  "staging",
         "position":  {
@@ -338,10 +338,10 @@ window.LVSM_CAMERAS = [
                          "fov":  65
                      },
         "sponsor":  {
-                        "name":  null,
+                        "name":  "Ricardo Botelho",
                         "logo":  null,
                         "url":  null,
-                        "label":  null
+                        "label":  "Sponsor"
                     },
         "enabled":  true
     },
@@ -400,7 +400,7 @@ window.LVSM_CAMERAS = [
         "type":  "future",
         "preview":  "./assets/previews/pico-alto-nascente.jpeg",
         "message":  null,
-        "status":  "Aguarda patrocínio",
+        "status":  "Brevemente",
         "publicVisibility":  "staging",
         "commissioned":  null,
         "position":  {
@@ -424,7 +424,7 @@ window.LVSM_CAMERAS = [
         "type":  "future",
         "preview":  "./assets/previews/pico-alto-poente.jpeg",
         "message":  null,
-        "status":  "Aguarda patrocínio",
+        "status":  "Brevemente",
         "publicVisibility":  "staging",
         "commissioned":  null,
         "position":  {
@@ -448,7 +448,7 @@ window.LVSM_CAMERAS = [
         "type":  "future",
         "preview":  "./assets/previews/aeroporto.jpeg",
         "message":  null,
-        "status":  "Aguarda patrocínio",
+        "status":  "Brevemente",
         "publicVisibility":  "staging",
         "commissioned":  null,
         "position":  {
@@ -490,7 +490,7 @@ window.LVSM_CAMERAS = [
         "region":  null,
         "type":  "future",
         "preview":  "./assets/previews/malbusca-sunset.jpeg",
-        "message":  "Pastelaria Corália",
+        "message":  "Apoio de Maria Leonardo",
         "status":  "Em preparação",
         "operationalState":  "future",
         "publicVisibility":  "staging",
@@ -502,7 +502,7 @@ window.LVSM_CAMERAS = [
                          "fov":  100
                      },
         "sponsor":  {
-                        "name":  "Maria Leonardo",
+                        "name":  "Pastelaria Corália",
                         "logo":  null,
                         "url":  null,
                         "label":  "Sponsor"
@@ -517,7 +517,7 @@ window.LVSM_CAMERAS = [
         "url":  "https://www.youtube.com/watch?v=W9SgW4EWn30\u0026t=9s",
         "refresh":  null,
         "fallbackImage":  null,
-        "preview":  "./assets/previews/explore-sma.jpeg",
+        "preview":  null,
         "message":  "Descubra a beleza autêntica da ilha do sol.",
         "status":  "Ver vídeo",
         "position":  null,
@@ -537,7 +537,7 @@ window.LVSM_CAMERAS = [
         "url":  "https://www.youtube.com/watch?v=T9Ok5fD-4Aw",
         "refresh":  null,
         "fallbackImage":  null,
-        "preview":  "./assets/previews/villa-natura.jpg",
+        "preview":  null,
         "message":  "Ecoturismo e experiências autênticas em Santa Maria.",
         "status":  "Ver vídeo",
         "position":  null,
@@ -557,7 +557,7 @@ window.LVSM_CAMERAS = [
         "url":  "https://youtu.be/zb3SD088mHU",
         "refresh":  null,
         "fallbackImage":  null,
-        "preview":  "./assets/previews/clinica-computador.png",
+        "preview":  null,
         "message":  "Serviços de informática e consultoria em Santa Maria.",
         "status":  null,
         "position":  null,
