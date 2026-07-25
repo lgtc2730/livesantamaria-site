@@ -485,6 +485,31 @@ window.LVSM_CAMERAS = [
         "enabled":  true
     },
     {
+        "id":  "malbusca-sunset",
+        "name":  "Malbusca Sunset",
+        "region":  null,
+        "type":  "future",
+        "preview":  "./assets/previews/malbusca-sunset.jpeg",
+        "message":  "Pastelaria Corália",
+        "status":  "Em preparação",
+        "operationalState":  "future",
+        "publicVisibility":  "staging",
+        "commissioned":  null,
+        "position":  {
+                         "lat":  36.94324,
+                         "lon":  -25.078278,
+                         "bearing":  280,
+                         "fov":  100
+                     },
+        "sponsor":  {
+                        "name":  "Maria Leonardo",
+                        "logo":  null,
+                        "url":  null,
+                        "label":  "Sponsor"
+                    },
+        "enabled":  true
+    },
+    {
         "id":  "promo-cmvp",
         "name":  "Santa Maria, Açores",
         "region":  null,
