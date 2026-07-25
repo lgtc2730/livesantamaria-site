@@ -246,6 +246,34 @@ window.LVSM_CAMERAS = [
         "enabled":  true
     },
     {
+        "id":  "maia-piscina",
+        "name":  "Baixa da Maia",
+        "region":  null,
+        "type":  "hls",
+        "preview":  "./assets/previews/baixa-maia.jpeg",
+        "message":  null,
+        "status":  "Em preparação",
+        "operationalState":  "future",
+        "publicVisibility":  "staging",
+        "commissioned":  null,
+        "position":  {
+                         "lat":  36.939774,
+                         "lon":  -25.014035,
+                         "bearing":  45,
+                         "fov":  90
+                     },
+        "sponsor":  {
+                        "name":  "Assoc. Amigos da Maia",
+                        "logo":  null,
+                        "url":  null,
+                        "label":  "Sponsor"
+                    },
+        "enabled":  true,
+        "url":  "https://maia-piscina-cam.livesantamaria.org/cam1/index.m3u8",
+        "streamUrl":  "https://maia-piscina-cam.livesantamaria.org/cam1hq/index.m3u8",
+        "previewStreamUrl":  "https://maia-piscina-cam.livesantamaria.org/cam1/index.m3u8"
+    },
+    {
         "id":  "marina-club-motard",
         "name":  "Marina-Club Motard",
         "region":  null,
