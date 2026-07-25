@@ -249,7 +249,7 @@ window.LVSM_CAMERAS = [
         "id":  "maia-piscina",
         "name":  "Baixa da Maia",
         "region":  null,
-        "type":  "hls",
+        "type":  "future",
         "preview":  "./assets/previews/baixa-maia.jpeg",
         "message":  null,
         "status":  "Em preparação",
