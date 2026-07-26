@@ -274,6 +274,34 @@ window.LVSM_CAMERAS = [
         "previewStreamUrl":  "https://maia-piscina-cam.livesantamaria.org/cam1/index.m3u8"
     },
     {
+        "id":  "maia-sul",
+        "name":  "Maia-Sul",
+        "region":  null,
+        "type":  "hls",
+        "preview":  "./assets/previews/maia-sul.jpeg",
+        "message":  "Vista sobre a Baia e Farol da Maia",
+        "status":  "Em preparação",
+        "commissioned":  null,
+        "publicVisibility":  "public",
+        "operationalState":  "testing",
+        "position":  {
+                         "lat":  36.938183,
+                         "lon":  -25.015193,
+                         "bearing":  180,
+                         "fov":  65
+                     },
+        "sponsor":  {
+                        "name":  "Ricardo Botelho",
+                        "logo":  null,
+                        "url":  null,
+                        "label":  "Sponsor"
+                    },
+        "enabled":  true,
+        "url":  "https://maia-sul-cam.livesantamaria.org/cam1/index.m3u8",
+        "streamUrl":  "https://maia-sul-cam.livesantamaria.org/cam1hq/index.m3u8",
+        "previewStreamUrl":  "https://maia-sul-cam.livesantamaria.org/cam1/index.m3u8"
+    },
+    {
         "id":  "marina-club-motard",
         "name":  "Marina-Club Motard",
         "region":  null,
@@ -315,30 +343,6 @@ window.LVSM_CAMERAS = [
                      },
         "sponsor":  {
                         "name":  "Helder Cunha",
-                        "logo":  null,
-                        "url":  null,
-                        "label":  "Sponsor"
-                    },
-        "enabled":  true
-    },
-    {
-        "id":  "maia-sul",
-        "name":  "Maia-Sul",
-        "region":  null,
-        "type":  "future",
-        "preview":  "./assets/previews/maia-sul.jpeg",
-        "message":  "Vista sobre a Baia e Farol da Maia",
-        "status":  "Em preparação",
-        "commissioned":  null,
-        "publicVisibility":  "staging",
-        "position":  {
-                         "lat":  36.938183,
-                         "lon":  -25.015193,
-                         "bearing":  180,
-                         "fov":  65
-                     },
-        "sponsor":  {
-                        "name":  "Ricardo Botelho",
                         "logo":  null,
                         "url":  null,
                         "label":  "Sponsor"
@@ -517,7 +521,7 @@ window.LVSM_CAMERAS = [
         "url":  "https://www.youtube.com/watch?v=W9SgW4EWn30\u0026t=9s",
         "refresh":  null,
         "fallbackImage":  null,
-        "preview":  null,
+        "preview":  "./assets/previews/explore-sma.jpeg",
         "message":  "Descubra a beleza autêntica da ilha do sol.",
         "status":  "Ver vídeo",
         "position":  null,
@@ -537,7 +541,7 @@ window.LVSM_CAMERAS = [
         "url":  "https://www.youtube.com/watch?v=T9Ok5fD-4Aw",
         "refresh":  null,
         "fallbackImage":  null,
-        "preview":  null,
+        "preview":  "./assets/previews/villa-natura.jpg",
         "message":  "Ecoturismo e experiências autênticas em Santa Maria.",
         "status":  "Ver vídeo",
         "position":  null,
@@ -557,7 +561,7 @@ window.LVSM_CAMERAS = [
         "url":  "https://youtu.be/zb3SD088mHU",
         "refresh":  null,
         "fallbackImage":  null,
-        "preview":  null,
+        "preview":  "./assets/previews/clinica-computador.png",
         "message":  "Serviços de informática e consultoria em Santa Maria.",
         "status":  null,
         "position":  null,
