@@ -228,8 +228,8 @@ window.LVSM_CAMERAS = [
         "preview":  "./assets/previews/praia-poente.jpg",
         "message":  null,
         "status":  null,
-        "publicVisibility":  "staging",
-        "operationalState":  "testing",
+        "publicVisibility":  "public",
+        "operationalState":  "public",
         "commissioned":  "2013",
         "position":  {
                          "lat":  36.950908,
@@ -250,6 +250,7 @@ window.LVSM_CAMERAS = [
         "name":  "Baixa da Maia",
         "region":  null,
         "type":  "future",
+        "fallbackImage":  null,
         "preview":  "./assets/previews/baixa-maia.jpeg",
         "message":  null,
         "status":  "Em preparação",
@@ -274,10 +275,40 @@ window.LVSM_CAMERAS = [
         "previewStreamUrl":  "https://maia-piscina-cam.livesantamaria.org/cam1/index.m3u8"
     },
     {
+        "id":  "marina-club-motard",
+        "name":  "Marina-Club Motard",
+        "region":  null,
+        "type":  "hls",
+        "fallbackImage":  null,
+        "preview":  "./assets/previews/marina-club-motard.jpeg",
+        "message":  null,
+        "status":  "Em preparação",
+        "publicVisibility":  "public",
+        "operationalState":  "testing",
+        "commissioned":  null,
+        "position":  {
+                         "lat":  36.946241,
+                         "lon":  -25.146948,
+                         "bearing":  160,
+                         "fov":  90
+                     },
+        "sponsor":  {
+                        "name":  "Clube Motard Santa Maria",
+                        "logo":  "./assets/sponsors/clube-motard.jpeg",
+                        "url":  null,
+                        "label":  "Sponsor"
+                    },
+        "enabled":  true,
+        "url":  "https://marina-club-motard-cam.livesantamaria.org/cam1/index.m3u8",
+        "streamUrl":  "https://marina-club-motard-cam.livesantamaria.org/cam1hq/index.m3u8",
+        "previewStreamUrl":  "https://marina-club-motard-cam.livesantamaria.org/cam1/index.m3u8"
+    },
+    {
         "id":  "maia-sul",
         "name":  "Maia-Sul",
         "region":  null,
         "type":  "hls",
+        "fallbackImage":  null,
         "preview":  "./assets/previews/maia-sul.jpeg",
         "message":  "Vista sobre a Baia e Farol da Maia",
         "status":  "Em preparação",
@@ -300,30 +331,6 @@ window.LVSM_CAMERAS = [
         "url":  "https://maia-sul-cam.livesantamaria.org/cam1/index.m3u8",
         "streamUrl":  "https://maia-sul-cam.livesantamaria.org/cam1hq/index.m3u8",
         "previewStreamUrl":  "https://maia-sul-cam.livesantamaria.org/cam1/index.m3u8"
-    },
-    {
-        "id":  "marina-club-motard",
-        "name":  "Marina-Club Motard",
-        "region":  null,
-        "type":  "future",
-        "preview":  "./assets/previews/marina-club-motard.jpeg",
-        "message":  null,
-        "status":  "Em preparação",
-        "publicVisibility":  "staging",
-        "commissioned":  null,
-        "position":  {
-                         "lat":  36.946241,
-                         "lon":  -25.146948,
-                         "bearing":  160,
-                         "fov":  90
-                     },
-        "sponsor":  {
-                        "name":  "Clube Motard Santa Maria",
-                        "logo":  "./assets/sponsors/clube-motard.jpeg",
-                        "url":  null,
-                        "label":  "Sponsor"
-                    },
-        "enabled":  true
     },
     {
         "id":  "ilheu-lagoinhas",
