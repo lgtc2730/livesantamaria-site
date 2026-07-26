@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Live Santa Maria</title>
 
-  <script src="./cameras.public.js?v=20260726-121055"></script>
+  <script src="./cameras.public.js?v=20260726-122542"></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.16/dist/hls.min.js"></script>
 
   <style>
@@ -2972,6 +2972,40 @@ function getOfflineImage(cam) {
   return cam?.fallbackImage || getPreview(cam);
 }
 
+function getRuntimeBadge(cam, runtimeState) {
+  const testing = getOperationalState(cam) === "testing";
+
+  if (testing) {
+    return {
+      className: "status-badge",
+      text: "EM TESTE",
+      dotOk: runtimeState === "live"
+    };
+  }
+
+  if (runtimeState === "offline") {
+    return {
+      className: "status-badge offline",
+      text: "OFFLINE",
+      dotOk: false
+    };
+  }
+
+  if (runtimeState === "live") {
+    return {
+      className: "status-badge",
+      text: "LIVE",
+      dotOk: true
+    };
+  }
+
+  return {
+    className: "status-badge",
+    text: "A VERIFICAR",
+    dotOk: false
+  };
+}
+
 function viewerCount(cam, index) {
   const seed = Array.from(cam.id).reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
   return 11 + ((seed + index * 7) % 23);
@@ -3227,11 +3261,12 @@ function setCardLive(block) {
   const badge = block.querySelector(".status-badge");
   const badgeDot = badge?.querySelector(".dot");
   const badgeText = badge?.querySelector("span:last-child");
+  const badgeModel = getRuntimeBadge(block._cam, "live");
   if (!badge || !badgeText) return;
 
-  badge.className = "status-badge";
-  badgeDot?.classList.add("ok");
-  badgeText.textContent = "LIVE";
+  badge.className = badgeModel.className;
+  badgeDot?.classList.toggle("ok", badgeModel.dotOk);
+  badgeText.textContent = badgeModel.text;
 
   block.classList.remove("has-fallback-active");
   cameraRuntimeStatus.set(block._cam.id, "live");
@@ -3246,12 +3281,13 @@ function setCardOffline(block) {
   const fallback = block.querySelector(".fallback-media");
   const cam = block._cam;
   const offlineImage = getOfflineImage(cam);
+  const badgeModel = getRuntimeBadge(cam, "offline");
 
   if (!badge || !badgeText) return;
 
-  badge.className = "status-badge offline";
-  badgeDot?.classList.remove("ok");
-  badgeText.textContent = "OFFLINE";
+  badge.className = badgeModel.className;
+  badgeDot?.classList.toggle("ok", badgeModel.dotOk);
+  badgeText.textContent = badgeModel.text;
 
   if (fallback && offlineImage) {
     fallback.src = offlineImage;
@@ -3267,13 +3303,12 @@ function setCardChecking(block) {
   const badge = block.querySelector(".status-badge");
   const badgeDot = badge?.querySelector(".dot");
   const badgeText = badge?.querySelector("span:last-child");
+  const badgeModel = getRuntimeBadge(block._cam, "checking");
   if (!badge || !badgeText) return;
 
-  if (!badge.classList.contains("offline")) {
-    badge.className = "status-badge";
-    badgeDot?.classList.remove("ok");
-    badgeText.textContent = "A VERIFICAR";
-  }
+  badge.className = badgeModel.className;
+  badgeDot?.classList.toggle("ok", badgeModel.dotOk);
+  badgeText.textContent = badgeModel.text;
 }
 
 function isOffline(cam) {
@@ -3330,7 +3365,7 @@ function createCameraCard(cam, index) {
         break;
 
       case "testing":
-        statusText = "EM TESTES";
+        statusText = "EM TESTE";
         break;
 
       case "live":
@@ -3347,6 +3382,8 @@ function createCameraCard(cam, index) {
     <div class="status-badge ${
       presentation.badge === "future"
         ? "future"
+        : presentation.badge === "testing"
+          ? ""
         : isOffline(cam)
           ? "offline"
           : "live"
