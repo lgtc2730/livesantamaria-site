@@ -62,7 +62,7 @@ window.LVSM_CAMERAS = [
     },
     "sponsor": {
       "name": "Ricardo Sebastião",
-      "logo": "./assets/sponsors/amigos-maia.jpeg",
+      "logo": null,
       "url": null,
       "label": "Sponsor"
     },
@@ -265,7 +265,7 @@ window.LVSM_CAMERAS = [
     },
     "sponsor": {
       "name": "Assoc. Amigos da Maia",
-      "logo": null,
+      "logo": "./assets/sponsors/amigos-maia.jpeg",
       "url": null,
       "label": "Sponsor"
     },
