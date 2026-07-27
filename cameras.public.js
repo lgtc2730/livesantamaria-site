@@ -170,7 +170,7 @@ window.LVSM_CAMERAS = [
     "status": "operational",
     "commissioned": "2023",
     "publicVisibility": "public",
-    "operationalState": "public",
+    "operationalState": "maintenance",
     "position": {
       "lat": 36.94428,
       "lon": -25.016115,
