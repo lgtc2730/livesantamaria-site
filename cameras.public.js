@@ -333,6 +333,35 @@ window.LVSM_CAMERAS = [
     "previewStreamUrl": "https://maia-sul-cam.livesantamaria.org/cam1/index.m3u8"
   },
   {
+    "id": "malbusca-sunset",
+    "name": "Malbusca Sunset",
+    "region": null,
+    "type": "hls",
+    "preview": "./assets/previews/malbusca-sunset.jpeg",
+    "fallbackImage": null,
+    "message": "Apoio de Maria Leonardo",
+    "status": "Em preparação",
+    "operationalState": "testing",
+    "publicVisibility": "public",
+    "commissioned": null,
+    "position": {
+      "lat": 36.94324,
+      "lon": -25.078278,
+      "bearing": 280,
+      "fov": 100
+    },
+    "sponsor": {
+      "name": "Pastelaria Corália",
+      "logo": null,
+      "url": null,
+      "label": "Sponsor"
+    },
+    "enabled": true,
+    "url": "https://malbusca-sunset-cam.livesantamaria.org/cam1/index.m3u8",
+    "streamUrl": "https://malbusca-sunset-cam.livesantamaria.org/cam1hq/index.m3u8",
+    "previewStreamUrl": "https://malbusca-sunset-cam.livesantamaria.org/cam1/index.m3u8"
+  },
+  {
     "id": "ilheu-lagoinhas",
     "name": "Ilhéu das Lagoinhas",
     "region": null,
@@ -493,31 +522,6 @@ window.LVSM_CAMERAS = [
       "fov": 90
     },
     "sponsor": null,
-    "enabled": true
-  },
-  {
-    "id": "malbusca-sunset",
-    "name": "Malbusca Sunset",
-    "region": null,
-    "type": "future",
-    "preview": "./assets/previews/malbusca-sunset.jpeg",
-    "message": "Apoio de Maria Leonardo",
-    "status": "Em preparação",
-    "operationalState": "future",
-    "publicVisibility": "staging",
-    "commissioned": null,
-    "position": {
-      "lat": 36.94324,
-      "lon": -25.078278,
-      "bearing": 280,
-      "fov": 100
-    },
-    "sponsor": {
-      "name": "Pastelaria Corália",
-      "logo": null,
-      "url": null,
-      "label": "Sponsor"
-    },
     "enabled": true
   },
   {
