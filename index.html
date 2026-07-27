@@ -638,6 +638,12 @@
       border-color: rgba(255,107,130,.32);
     }
 
+    .status-badge.maintenance {
+      background: rgba(74, 48, 8, .88);
+      border-color: rgba(251,191,36,.42);
+      color: #fff4d6;
+    }
+
     .camera-info {
       position: absolute;
       z-index: 3;
@@ -968,6 +974,12 @@
     .map-camera.offline .map-dot {
       background: #e11d48;
     }
+
+    .map-camera.maintenance .map-dot {
+      background: #fbbf24;
+      box-shadow: 0 0 14px rgba(251,191,36,.7);
+    }
+
     .map-label {
       position: absolute;
       left: var(--label-x, 16px);
@@ -2912,6 +2924,16 @@ function getCameraPresentation(cam) {
     };
   }
 
+  if (state === "maintenance") {
+    return {
+      visible: true,
+      useFallback: true,
+      badge: "maintenance",
+      badgeDot: false,
+      label: "Em manutenção"
+    };
+  }
+
   return {
     visible: true,
     useFallback: false,
@@ -2926,7 +2948,9 @@ const PUBLIC_CAMERAS = (window.LVSM_CAMERAS || []).filter(cam =>
 );
 
 const liveCameras = PUBLIC_CAMERAS.filter(cam =>
-  ["hls", "snapshot"].includes(cam.type) && cam.url
+  ["hls", "snapshot"].includes(cam.type) &&
+  cam.url &&
+  getOperationalState(cam) !== "maintenance"
 );
 const expandedMobileCards = new Set();
 const cameraRuntimeStatus = new Map();
@@ -2973,6 +2997,14 @@ function getOfflineImage(cam) {
 }
 
 function getRuntimeBadge(cam, runtimeState) {
+  if (getOperationalState(cam) === "maintenance") {
+    return {
+      className: "status-badge maintenance",
+      text: "EM MANUTENÇÃO",
+      dotOk: false
+    };
+  }
+
   const testing = getOperationalState(cam) === "testing";
 
   if (testing) {
@@ -3013,12 +3045,26 @@ function viewerCount(cam, index) {
 
 function cameraMatchesFilter(cam) {
   const presentation = getCameraPresentation(cam);
+  const state = getOperationalState(cam);
 
   if (activeFilter === "all") return true;
-  if (activeFilter === "live") return !presentation.useFallback;
-  if (activeFilter === "future") return presentation.useFallback;
+  if (activeFilter === "live") return state !== "maintenance" && !presentation.useFallback;
+  if (activeFilter === "future") return state === "preparing";
 
   return true;
+}
+
+function getMapPopupStatus(cam) {
+  if (getOperationalState(cam) === "maintenance") return "Em manutenção";
+  if (cam.type === "future") return "Em preparação";
+  return isOffline(cam) ? "Offline" : "Em directo";
+}
+
+function getMapStatus(cam, runtimeStatus) {
+  if (getOperationalState(cam) === "maintenance") return "maintenance";
+  if (cam.type === "future") return "future";
+  if (runtimeStatus === "offline" || isOffline(cam)) return "offline";
+  return "live";
 }
 
 function setHeroBackground() {
@@ -3368,6 +3414,10 @@ function createCameraCard(cam, index) {
         statusText = "EM TESTE";
         break;
 
+      case "maintenance":
+        statusText = "EM MANUTENÇÃO";
+        break;
+
       case "live":
         statusText = "A VERIFICAR";
         break;
@@ -3384,6 +3434,8 @@ function createCameraCard(cam, index) {
         ? "future"
         : presentation.badge === "testing"
           ? ""
+        : presentation.badge === "maintenance"
+          ? "maintenance"
         : isOffline(cam)
           ? "offline"
           : "live"
@@ -3757,8 +3809,12 @@ function renderCameras() {
     const card = createCameraCard(cam, index);
     container.appendChild(card);
 
+    if (getOperationalState(cam) === "maintenance") return;
     if (cam.type === "snapshot") loadSnapshot(card, cam);
-    else if (cam.type === "hls") LazyHlsManager.observe(card);
+    else if (cam.type === "hls") {
+      LazyHlsManager.observe(card);
+    }
+
   });
 }
 
@@ -3811,12 +3867,7 @@ function showMapPopup(cam, pos) {
   popup.style.setProperty("--popup-tx", tx);
   popup.style.setProperty("--popup-ty", ty);  
 
-  const status =
-    cam.type === "future"
-      ? "Em preparação"
-      : isOffline(cam)
-        ? "Offline"
-        : "Em directo";
+  const status = getMapPopupStatus(cam);
 
   popup.innerHTML = `
     <img src="${escapeHtml(getPreview(cam))}" alt="${escapeHtml(cam.name)}">
@@ -3871,16 +3922,7 @@ function renderCameraMap() {
 
     const runtimeStatus = cameraRuntimeStatus.get(cam.id);
 
-    const mapStatus =
-      cam.type === "future"
-        ? "future"
-        : runtimeStatus === "offline"
-          ? "offline"
-          : isOffline(cam)
-            ? "offline"
-            : runtimeStatus === "live"
-              ? "live"
-              : "live";
+    const mapStatus = getMapStatus(cam, runtimeStatus);
 
     item.className = `map-camera ${mapStatus}`;
     item.dataset.cameraId = cam.id;
@@ -3958,6 +4000,11 @@ function destroyMediaInstance(instanceName) {
 }
 
 function attachMediaToElement(media, cam, instanceName) {
+  if (getOperationalState(cam) === "maintenance") {
+    media.src = getOfflineImage(cam);
+    return;
+  }
+
   if (cam.type === "snapshot") {
     media.src = addCacheBuster(cam.url);
     return;
@@ -4000,6 +4047,7 @@ function attachMediaToElement(media, cam, instanceName) {
 }
 
 function openCameraFullscreen(cam) {
+  if (getOperationalState(cam) === "maintenance") return;
   trackCameraView(cam.id);
   
   const fsMode = document.getElementById("fullscreenMode");
