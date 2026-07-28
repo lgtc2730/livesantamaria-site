@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Live Santa Maria</title>
 
-  <script src="./cameras.public.js?v=d8b5751db06a"></script>
+  <script src="./cameras.public.js?v=camera-support-v1"></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.16/dist/hls.min.js"></script>
 
   <style>
@@ -845,7 +845,39 @@
       color: rgba(255,255,255,.88);
 
       font-weight: 650;
-        }
+    }
+
+    .camera-support {
+      margin-top: 8px;
+      padding-left: 9px;
+      border-left: 2px solid rgba(66,183,255,.34);
+      display: grid;
+      gap: 2px;
+    }
+
+    .camera-support span {
+      color: rgba(126,215,255,.72);
+      font-size: .5rem;
+      font-weight: 850;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .camera-support strong,
+    .camera-support a {
+      color: rgba(255,255,255,.78);
+      font-size: .72rem;
+      font-weight: 650;
+    }
+
+    .camera-support-logo {
+      display: block;
+      max-width: 110px;
+      max-height: 24px;
+      margin-top: 4px;
+      object-fit: contain;
+      opacity: .72;
+    }
 
     .camera-sponsor-logo {
       position: absolute;
@@ -867,7 +899,7 @@
       pointer-events: none;
     }
 
-    .camera-sponsor-logo img {
+    .camera-sponsor-logo {
       display: block;
       max-width: 100%;
       max-height: 28px;
@@ -2979,6 +3011,55 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function safeHttpsUrl(value) {
+  const candidate = String(value ?? "").trim();
+  if (!candidate) return "";
+
+  try {
+    const parsed = new URL(candidate);
+    return parsed.protocol === "https:" ? parsed.href : "";
+  } catch {
+    return "";
+  }
+}
+
+function safeAttributionLogoUrl(value) {
+  const candidate = String(value ?? "").trim();
+  if (/^(?:\.\/|\/)assets\/[a-z0-9_./-]+$/i.test(candidate)) {
+    return candidate;
+  }
+  return safeHttpsUrl(candidate);
+}
+
+function renderCameraAttribution(
+  entity,
+  { defaultLabel, className }
+) {
+  if (!entity?.name) return "";
+
+  const safeClass = /^[a-z][a-z0-9_-]*$/i.test(className)
+    ? className
+    : "camera-attribution";
+  const label = entity.label || defaultLabel;
+  const url = safeHttpsUrl(entity.url);
+  const logo = safeAttributionLogoUrl(entity.logo);
+  const name = escapeHtml(entity.name);
+  const identity = url
+    ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${name} ↗</a>`
+    : `<strong>${name}</strong>`;
+  const logoMarkup = logo
+    ? `<img class="${safeClass}-logo" src="${escapeHtml(logo)}" alt="${name}">`
+    : "";
+
+  return `
+    <div class="${safeClass}">
+      <span>${escapeHtml(label)}</span>
+      ${identity}
+      ${logoMarkup}
+    </div>
+  `;
+}
+
 function addCacheBuster(url) {
   const sep = url.includes("?") ? "&" : "?";
   return `${url}${sep}t=${Date.now()}`;
@@ -3464,44 +3545,14 @@ function createCameraCard(cam, index) {
               : ""
         }
 
-        ${
-          cam.sponsor?.name
-            ? `
-              <div class="camera-sponsor">
-                <span>${escapeHtml(cam.sponsor.label || "Sponsor")}</span>
-
-                ${
-                  cam.sponsor.url
-                    ? `
-                      <a
-                        href="${escapeHtml(cam.sponsor.url)}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        ${escapeHtml(cam.sponsor.name)} ↗
-                      </a>
-                    `
-                    : `
-                      <strong>${escapeHtml(cam.sponsor.name)}</strong>
-                    `
-                }
-              </div>
-            `
-            : ""
-        }
-
-        ${
-          cam.sponsor?.logo
-            ? `
-              <div class="camera-sponsor-logo">
-                <img
-                  src="${escapeHtml(cam.sponsor.logo)}"
-                  alt="${escapeHtml(cam.sponsor.name || "Sponsor")}"
-                >
-              </div>
-            `
-            : ""
-        }        
+        ${renderCameraAttribution(
+          cam.sponsor,
+          { defaultLabel: "Sponsor", className: "camera-sponsor" }
+        )}
+        ${renderCameraAttribution(
+          cam.support,
+          { defaultLabel: "Apoio", className: "camera-support" }
+        )}
       </div>
     </div>
   `;
