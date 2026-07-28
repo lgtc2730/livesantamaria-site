@@ -362,6 +362,35 @@ window.LVSM_CAMERAS = [
     "previewStreamUrl": "https://malbusca-sunset-cam.livesantamaria.org/cam1/index.m3u8"
   },
   {
+    "id": "praia-malbusca",
+    "name": "Praia Malbusca",
+    "region": null,
+    "type": "hls",
+    "preview": "./assets/previews/praia-malbusca.png",
+    "message": null,
+    "status": "Em preparação",
+    "operationalState": "testing",
+    "publicVisibility": "public",
+    "commissioned": null,
+    "position": {
+      "lat": 36.950578,
+      "lon": -25.094441,
+      "bearing": 140,
+      "fov": 120
+    },
+    "sponsor": {
+      "name": "Fernando Freitas",
+      "logo": null,
+      "url": null,
+      "label": "Sponsor"
+    },
+    "enabled": true,
+    "fallbackImage": null,
+    "url": "https://praia-malbusca-cam.livesantamaria.org/cam1/index.m3u8",
+    "streamUrl": "https://praia-malbusca-cam.livesantamaria.org/cam1hq/index.m3u8",
+    "previewStreamUrl": "https://praia-malbusca-cam.livesantamaria.org/cam1/index.m3u8"
+  },
+  {
     "id": "ilheu-lagoinhas",
     "name": "Ilhéu das Lagoinhas",
     "region": null,
