@@ -3026,7 +3026,11 @@ function safeHttpsUrl(value) {
 function safeAttributionLogoUrl(value) {
   const candidate = String(value ?? "").trim();
   if (/^(?:\.\/|\/)assets\/[a-z0-9_./-]+$/i.test(candidate)) {
-    return candidate;
+    const relativePath = candidate.replace(/^(?:\.\/|\/)/, "");
+    const pathSegments = relativePath.split("/");
+    if (!pathSegments.includes(".") && !pathSegments.includes("..")) {
+      return candidate;
+    }
   }
   return safeHttpsUrl(candidate);
 }

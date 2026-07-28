@@ -70,6 +70,15 @@ test("camera attribution is optional and safely rendered", () => {
   assert.doesNotMatch(hostile, /<script>|<img src=x|javascript:|data:image/);
   assert.match(hostile, /&lt;img/);
   assert.doesNotMatch(hostile, /camera-support bad/);
+
+  const traversal = render(
+    {
+      name: "Traversal",
+      logo: "./assets/../../index.html"
+    },
+    { defaultLabel: "Apoio", className: "camera-support" }
+  );
+  assert.doesNotMatch(traversal, /<img/);
 });
 
 test("public data contains only the approved Support migration", () => {
