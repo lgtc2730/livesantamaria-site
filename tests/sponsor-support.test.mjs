@@ -106,16 +106,51 @@ test("public data contains only the approved Support migration", () => {
   assert.equal(byId["praia-nascente"].sponsor.name, "SpotAzores");
 });
 
-test("camera card attribution logos use the compact shared image rule", () => {
-  const sharedRule = source.match(
-    /\.camera-sponsor-logo,\s*\.camera-support-logo\s*\{([^}]*)\}/
-  );
+test("Sponsor logo uses the restored card container while Apoio stays inline", () => {
+  const factory = new Function(`
+    ${extractFunction("escapeHtml")}
+    ${extractFunction("safeHttpsUrl")}
+    ${extractFunction("safeAttributionLogoUrl")}
+    ${extractFunction("renderCameraSponsorLogo")}
+    return renderCameraSponsorLogo;
+  `);
+  const renderSponsorLogo = factory();
 
-  assert.ok(sharedRule, "shared Sponsor/Apoio logo rule missing");
-  assert.match(sharedRule[1], /max-width:\s*110px/);
-  assert.match(sharedRule[1], /max-height:\s*24px/);
-  assert.match(sharedRule[1], /width:\s*auto/);
-  assert.match(sharedRule[1], /height:\s*auto/);
-  assert.match(sharedRule[1], /object-fit:\s*contain/);
-  assert.doesNotMatch(sharedRule[1], /position:\s*absolute/);
+  assert.equal(renderSponsorLogo(null), "");
+  assert.equal(renderSponsorLogo({ name: "Sem logo" }), "");
+
+  const valid = renderSponsorLogo({
+    name: "Sponsor",
+    logo: "./assets/sponsors/sponsor.png"
+  });
+  assert.match(valid, /class="camera-sponsor-logo"/);
+  assert.match(valid, /<img/);
+  assert.match(valid, /src="\.\/assets\/sponsors\/sponsor\.png"/);
+  assert.match(valid, /alt="Sponsor"/);
+
+  const hostile = renderSponsorLogo({
+    name: "<img src=x onerror=alert(1)>",
+    logo: "javascript:alert(1)"
+  });
+  assert.equal(hostile, "");
+
+  assert.match(source, /className:\s*"camera-sponsor",\s*showLogo:\s*false/);
+  assert.match(source, /renderCameraSponsorLogo\(cam\.sponsor\)/);
+
+  const containerRule = source.match(/\.camera-sponsor-logo\s*\{([^}]*)\}/);
+  assert.ok(containerRule, "Sponsor logo container rule missing");
+  assert.match(containerRule[1], /position:\s*absolute/);
+  assert.match(containerRule[1], /max-width:\s*150px/);
+  assert.match(containerRule[1], /max-height:\s*55px/);
+
+  const imageRule = source.match(/\.camera-sponsor-logo img\s*\{([^}]*)\}/);
+  assert.ok(imageRule, "Sponsor logo image rule missing");
+  assert.match(imageRule[1], /max-height:\s*28px/);
+  assert.match(imageRule[1], /object-fit:\s*contain/);
+
+  const supportRule = source.match(/\.camera-support-logo\s*\{([^}]*)\}/);
+  assert.ok(supportRule, "Apoio logo rule missing");
+  assert.match(supportRule[1], /max-width:\s*110px/);
+  assert.match(supportRule[1], /max-height:\s*24px/);
+  assert.doesNotMatch(supportRule[1], /position:\s*absolute/);
 });
