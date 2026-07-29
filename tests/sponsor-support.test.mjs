@@ -105,3 +105,17 @@ test("public data contains only the approved Support migration", () => {
   assert.equal(byId["slourenco-norte"].sponsor.name, "SpotAzores");
   assert.equal(byId["praia-nascente"].sponsor.name, "SpotAzores");
 });
+
+test("camera card attribution logos use the compact shared image rule", () => {
+  const sharedRule = source.match(
+    /\.camera-sponsor-logo,\s*\.camera-support-logo\s*\{([^}]*)\}/
+  );
+
+  assert.ok(sharedRule, "shared Sponsor/Apoio logo rule missing");
+  assert.match(sharedRule[1], /max-width:\s*110px/);
+  assert.match(sharedRule[1], /max-height:\s*24px/);
+  assert.match(sharedRule[1], /width:\s*auto/);
+  assert.match(sharedRule[1], /height:\s*auto/);
+  assert.match(sharedRule[1], /object-fit:\s*contain/);
+  assert.doesNotMatch(sharedRule[1], /position:\s*absolute/);
+});
