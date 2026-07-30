@@ -359,9 +359,9 @@ window.LVSM_CAMERAS = [
     "region": null,
     "type": "hls",
     "preview": "./assets/previews/malbusca-sunset.jpeg",
-    "fallbackImage": null,
+    "fallbackImage": "./assets/previews/malbusca-sunset.jpeg",
     "message": null,
-    "status": "Em preparação",
+    "status": null,
     "operationalState": "public",
     "publicVisibility": "public",
     "commissioned": "2026-07",
@@ -372,8 +372,8 @@ window.LVSM_CAMERAS = [
       "fov": 100
     },
     "sponsor": {
-      "name": "Pastelaria Corália",
-      "logo": null,
+      "name": "Donna-Corália Pastelaria",
+      "logo": "./assets/sponsors/donna-coralia.jpeg",
       "url": null,
       "label": "Sponsor"
     },
@@ -575,7 +575,7 @@ window.LVSM_CAMERAS = [
     "type": "future",
     "preview": "./assets/previews/praia-castelo.jpg",
     "message": null,
-    "status": "Aguarda patrocínio",
+    "status": "Brevemente",
     "publicVisibility": "staging",
     "commissioned": null,
     "position": {
@@ -584,7 +584,12 @@ window.LVSM_CAMERAS = [
       "bearing": 140,
       "fov": 90
     },
-    "sponsor": null,
+    "sponsor": {
+      "name": "PcClick Informática",
+      "logo": "./assets/sponsors/PcClick.png",
+      "url": "https://pcclick.pt/",
+      "label": "Sponsor"
+    },
     "support": null,
     "enabled": true
   },
