@@ -484,12 +484,7 @@ window.LVSM_CAMERAS = [
       "bearing": 200,
       "fov": 90
     },
-    "sponsor": {
-      "name": null,
-      "logo": null,
-      "url": null,
-      "label": null
-    },
+    "sponsor": null,
     "support": null,
     "enabled": true
   },
