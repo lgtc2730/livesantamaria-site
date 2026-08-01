@@ -246,7 +246,7 @@ window.LVSM_CAMERAS = [
     "message": null,
     "status": null,
     "publicVisibility": "public",
-    "operationalState": "maintenance",
+    "operationalState": "public",
     "commissioned": "2013",
     "position": {
       "lat": 36.950908,
