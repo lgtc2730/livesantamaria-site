@@ -84,7 +84,20 @@ test("camera card keeps partner text left and renders only the selected logo rig
   ]) {
     assert.match(logoRule[1], expected);
   }
-  assert.doesNotMatch(logoRule[1], /background|padding/);
+  assert.doesNotMatch(logoRule[1], /padding/);
+
+  assert.doesNotMatch(source, /\.camera-card img\s*\{/);
+  assert.match(
+    source,
+    /\.camera-card img:not\(\.camera-partner-logo\)\s*\{/
+  );
+  assert.doesNotMatch(source, /compact-mobile[^\{]*\simg\s*\{/g);
+  assert.match(
+    source,
+    /compact-mobile[^\{]*\simg:not\(\.camera-partner-logo\)\s*\{/
+  );
+  assert.match(logoRule[1], /transform:\s*none/);
+  assert.match(logoRule[1], /background:\s*transparent/);
 });
 
 test("camera attribution is optional and safely rendered", () => {
