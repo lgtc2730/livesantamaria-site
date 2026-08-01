@@ -28,8 +28,9 @@ test("a imagem offline prefere fallback e usa preview quando ainda não existe s
   vm.runInNewContext(
     [
       extractFunction(html, "getPreview"),
+      extractFunction(html, "getEditorialPreview"),
       extractFunction(html, "getOfflineImage"),
-      "result = { getPreview, getOfflineImage };"
+      "result = { getPreview, getEditorialPreview, getOfflineImage };"
     ].join("\n"),
     context
   );
@@ -48,6 +49,13 @@ test("a imagem offline prefere fallback e usa preview quando ainda não existe s
       preview: "./assets/previews/maia-sul.jpeg"
     }),
     "./assets/fallback/maia-sul.jpeg"
+  );
+
+  assert.equal(
+    context.result.getEditorialPreview({
+      fallbackImage: "./assets/fallback/operational-only.jpeg"
+    }),
+    "./assets/previews/lvsm-love-sma.jpg"
   );
 });
 
@@ -70,6 +78,8 @@ test("câmaras testing mantêm EM TESTE em qualquer estado do player", async () 
   vm.runInNewContext(
     [
       extractFunction(html, "getOperationalState"),
+      extractFunction(html, "getPublicMedia"),
+      extractFunction(html, "getCameraPresentation"),
       extractFunction(html, "getRuntimeBadge"),
       "result = { getRuntimeBadge };"
     ].join("\n"),
@@ -95,4 +105,16 @@ test("câmaras testing mantêm EM TESTE em qualquer estado do player", async () 
   assert.equal(publicOffline.text, "OFFLINE");
   assert.equal(publicOffline.className, "status-badge offline");
   assert.equal(publicOffline.dotOk, false);
+
+  for (const runtimeState of ["checking", "live", "offline"]) {
+    const badge = context.result.getRuntimeBadge(
+      { operationalState: "testing", publicMedia: "preview" },
+      runtimeState
+    );
+
+    assert.notEqual(badge.text, "EM TESTE");
+    assert.equal(badge.text, "EM PREPARA\u00c7\u00c3O");
+    assert.equal(badge.className, "status-badge future");
+    assert.equal(badge.dotOk, false);
+  }
 });

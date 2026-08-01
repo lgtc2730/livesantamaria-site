@@ -1006,6 +1006,10 @@
       background: #f59e0b;
     }
 
+    .map-camera.testing .map-dot {
+      background: #42b7ff;
+    }
+
     .map-camera.offline .map-dot {
       background: #e11d48;
     }
@@ -2928,13 +2932,26 @@ function getOperationalState(cam) {
   return state === "future" ? "preparing" : state;
 }
 
+function getPublicMedia(cam) {
+  if (cam?.publicMedia === "preview" || cam?.publicMedia === "stream") {
+    return cam.publicMedia;
+  }
+  if (cam?.publicMedia !== undefined) return "preview";
+  return getOperationalState(cam) === "preparing" ? "preview" : "stream";
+}
+
 function getCameraPresentation(cam) {
   const state = getOperationalState(cam);
 
-  if (state === "not-installed") {
+  if (
+    state === "not-installed" ||
+    cam?.publicVisibility === "hidden" ||
+    cam?.publicVisibility === "staging"
+  ) {
     return {
       visible: false,
       useFallback: true,
+      allowStream: false,
       badge: "hidden",
       label: "Não instalada"
     };
@@ -2944,9 +2961,21 @@ function getCameraPresentation(cam) {
     return {
         visible: true,
         useFallback: true,
+        allowStream: false,
         badge: "future",
         badgeDot: false,
         label: "Em preparação"
+    };
+  }
+
+  if (getPublicMedia(cam) === "preview" && state !== "maintenance") {
+    return {
+      visible: true,
+      useFallback: true,
+      allowStream: false,
+      badge: "future",
+      badgeDot: false,
+      label: "Em prepara\u00e7\u00e3o"
     };
   }
 
@@ -2954,8 +2983,9 @@ function getCameraPresentation(cam) {
     return {
       visible: true,
       useFallback: false,
+      allowStream: true,
       badge: "testing",
-      label: "Em testes"
+      label: "Em teste"
     };
   }
 
@@ -2963,6 +2993,7 @@ function getCameraPresentation(cam) {
     return {
       visible: true,
       useFallback: true,
+      allowStream: false,
       badge: "maintenance",
       badgeDot: false,
       label: "Em manutenção"
@@ -2972,6 +3003,7 @@ function getCameraPresentation(cam) {
   return {
     visible: true,
     useFallback: false,
+    allowStream: true,
     badge: "live",
     label: "LIVE"
   };
@@ -2979,21 +3011,23 @@ function getCameraPresentation(cam) {
 
 const PUBLIC_CAMERAS = (window.LVSM_CAMERAS || []).filter(cam =>
   cam.enabled !== false &&
-  getOperationalState(cam) !== "not-installed"
+  (cam.type === "promo" || cam.publicVisibility === "public") &&
+  getCameraPresentation(cam).visible
 );
 
 const liveCameras = PUBLIC_CAMERAS.filter(cam =>
   ["hls", "snapshot"].includes(cam.type) &&
   cam.url &&
-  getOperationalState(cam) !== "maintenance"
+  getCameraPresentation(cam).allowStream
 );
 const expandedMobileCards = new Set();
 const cameraRuntimeStatus = new Map();
 
 PUBLIC_CAMERAS.forEach(cam => {
+  const presentation = getCameraPresentation(cam);
   cameraRuntimeStatus.set(
     cam.id,
-    cam.type === "future" ? "future" : "checking"
+    presentation.badge === "future" ? "future" : "checking"
   );
 });
 
@@ -3093,6 +3127,16 @@ function getPreview(cam) {
   return cam.preview || cam.fallbackImage || "./assets/previews/lvsm-love-sma.jpg";
 }
 
+function getEditorialPreview(cam) {
+  return cam.preview || "./assets/previews/lvsm-love-sma.jpg";
+}
+
+function getHeroImage(cam) {
+  return getCameraPresentation(cam).allowStream
+    ? getPreview(cam)
+    : getEditorialPreview(cam);
+}
+
 function getOfflineImage(cam) {
   return cam?.fallbackImage || getPreview(cam);
 }
@@ -3106,7 +3150,17 @@ function getRuntimeBadge(cam, runtimeState) {
     };
   }
 
-  const testing = getOperationalState(cam) === "testing";
+  if (!getCameraPresentation(cam).allowStream) {
+    return {
+      className: "status-badge future",
+      text: "EM PREPARA\u00c7\u00c3O",
+      dotOk: false
+    };
+  }
+
+  const testing =
+    getOperationalState(cam) === "testing" &&
+    getCameraPresentation(cam).allowStream;
 
   if (testing) {
     return {
@@ -3148,31 +3202,40 @@ function cameraMatchesFilter(cam) {
   const presentation = getCameraPresentation(cam);
   const state = getOperationalState(cam);
 
+  if (!presentation.visible) return false;
   if (activeFilter === "all") return true;
-  if (activeFilter === "live") return state !== "maintenance" && !presentation.useFallback;
-  if (activeFilter === "future") return state === "preparing";
+  if (activeFilter === "live") return state !== "maintenance" && presentation.allowStream;
+  if (activeFilter === "future") return presentation.badge === "future";
 
   return true;
 }
 
 function getMapPopupStatus(cam) {
-  if (getOperationalState(cam) === "maintenance") return "Em manutenção";
-  if (cam.type === "future") return "Em preparação";
+  const presentation = getCameraPresentation(cam);
+  if (
+    presentation.badge === "maintenance" ||
+    presentation.badge === "future" ||
+    presentation.badge === "testing"
+  ) {
+    return presentation.label;
+  }
   return isOffline(cam) ? "Offline" : "Em directo";
 }
 
 function getMapStatus(cam, runtimeStatus) {
-  if (getOperationalState(cam) === "maintenance") return "maintenance";
-  if (cam.type === "future") return "future";
+  const presentation = getCameraPresentation(cam);
+  if (presentation.badge === "maintenance") return "maintenance";
+  if (presentation.badge === "future") return "future";
+  if (presentation.badge === "testing") return "testing";
   if (runtimeStatus === "offline" || isOffline(cam)) return "offline";
   return "live";
 }
 
 function setHeroBackground() {
   const hero = document.getElementById("hero");
-  const first = liveCameras.find(cam => cam.fallbackImage) || PUBLIC_CAMERAS.find(cam => getPreview(cam));
+  const first = liveCameras.find(cam => cam.fallbackImage) || PUBLIC_CAMERAS.find(cam => getHeroImage(cam));
   if (hero && first) {
-    hero.style.setProperty("--hero-image", `url("${getPreview(first)}")`);
+    hero.style.setProperty("--hero-image", `url("${getHeroImage(first)}")`);
   }
 }
 
@@ -3369,7 +3432,7 @@ function updateCounts() {
   ).length;
 
   const future = PUBLIC_CAMERAS.filter(
-    cam => getCameraPresentation(cam).useFallback
+    cam => getCameraPresentation(cam).badge === "future"
   ).length;
 
   setText(
@@ -3400,7 +3463,7 @@ function setMapStatus(cam, status) {
 
   if (!marker) return;
 
-  marker.classList.remove("live", "future", "offline");
+  marker.classList.remove("live", "future", "testing", "maintenance", "offline");
   marker.classList.add(status);
 }
 
@@ -3418,7 +3481,7 @@ function setCardLive(block) {
   block.classList.remove("has-fallback-active");
   cameraRuntimeStatus.set(block._cam.id, "live");
   updateCounts();
-  setMapStatus(block._cam, "live");
+  setMapStatus(block._cam, getMapStatus(block._cam, "live"));
 }
 
 function setCardOffline(block) {
@@ -3443,7 +3506,7 @@ function setCardOffline(block) {
 
   cameraRuntimeStatus.set(block._cam.id, "offline");
   updateCounts();
-  setMapStatus(block._cam, "offline");
+  setMapStatus(block._cam, getMapStatus(block._cam, "offline"));
 }
 
 function setCardChecking(block) {
@@ -3486,13 +3549,13 @@ function createCameraCard(cam, index) {
     mediaHtml = `
       <img class="live-media" src="${escapeHtml(getPreview(cam))}" alt="${escapeHtml(cam.name)}">
     `;
+  } else if (!presentation.allowStream) {
+    mediaHtml = `<img class="live-media" src="${escapeHtml(getEditorialPreview(cam))}" alt="${escapeHtml(cam.name)}">`;
   } else if (cam.type === "snapshot") {
     mediaHtml = `
       <img class="live-media" alt="${escapeHtml(cam.name)}">
       <img class="fallback-media" src="${escapeHtml(cam.fallbackImage || getPreview(cam))}" alt="${escapeHtml(cam.name)}">
     `;
-  } else if (presentation.useFallback) {
-    mediaHtml = `<img class="live-media" src="${escapeHtml(cam.fallbackImage || getPreview(cam))}" alt="${escapeHtml(cam.name)}">`;
   } else {
     mediaHtml = `
       <video autoplay muted playsinline></video>
@@ -3635,6 +3698,7 @@ function createCameraCard(cam, index) {
 }
 
 function loadSnapshot(card, cam) {
+  if (!getCameraPresentation(cam).allowStream) return;
   const img = card.querySelector(".live-media");
   let loadedOnce = false;
   let initialTimer = null;
@@ -3665,6 +3729,7 @@ function loadSnapshot(card, cam) {
 }
 
 function loadHls(card, cam) {
+  if (!getCameraPresentation(cam).allowStream) return;
   const video = card.querySelector("video");
   let hasPlayedOnce = false;
   let offlineTimer = null;
@@ -3832,7 +3897,7 @@ const LazyHlsManager = {
         const card = entry.target;
         const cam = card._cam;
 
-        if (!cam || card.dataset.hlsStarted === "true") return;
+        if (!cam || !getCameraPresentation(cam).allowStream || card.dataset.hlsStarted === "true") return;
 
         card.dataset.hlsStarted = "true";
         console.log("[LVSM lazy] arrancar HLS:", cam.id, cam.name);
@@ -3850,7 +3915,7 @@ const LazyHlsManager = {
 
     if (!this.observer) {
       const cam = card._cam;
-      if (cam && card.dataset.hlsStarted !== "true") {
+      if (cam && getCameraPresentation(cam).allowStream && card.dataset.hlsStarted !== "true") {
         card.dataset.hlsStarted = "true";
         console.log("[LVSM lazy] arrancar HLS:", cam.id, cam.name);
         loadHls(card, cam);
@@ -3885,7 +3950,7 @@ function renderCameras() {
     const card = createCameraCard(cam, index);
     container.appendChild(card);
 
-    if (getOperationalState(cam) === "maintenance") return;
+    if (!getCameraPresentation(cam).allowStream) return;
     if (cam.type === "snapshot") loadSnapshot(card, cam);
     else if (cam.type === "hls") {
       LazyHlsManager.observe(card);
@@ -3943,10 +4008,11 @@ function showMapPopup(cam, pos) {
   popup.style.setProperty("--popup-tx", tx);
   popup.style.setProperty("--popup-ty", ty);  
 
+  const presentation = getCameraPresentation(cam);
   const status = getMapPopupStatus(cam);
 
   popup.innerHTML = `
-    <img src="${escapeHtml(getPreview(cam))}" alt="${escapeHtml(cam.name)}">
+    <img src="${escapeHtml(presentation.allowStream ? getPreview(cam) : getEditorialPreview(cam))}" alt="${escapeHtml(cam.name)}">
 
     <div class="map-popup-body">
       <div class="map-popup-title">${escapeHtml(cam.name)}</div>
@@ -4059,7 +4125,7 @@ function setMapStatus(cam, status) {
 
   if (!marker) return;
 
-  marker.classList.remove("live", "future", "offline");
+  marker.classList.remove("live", "future", "testing", "maintenance", "offline");
   marker.classList.add(status);
 }
 
@@ -4081,21 +4147,22 @@ function attachMediaToElement(media, cam, instanceName) {
     return;
   }
 
+  const presentation = getCameraPresentation(cam);
+
+  if (!presentation.allowStream) {
+    media.src = getEditorialPreview(cam);
+    return;
+  }
+
   if (cam.type === "snapshot") {
     media.src = addCacheBuster(cam.url);
     return;
   }
 
-  const presentation = getCameraPresentation(cam);
   const streamUrl =
     instanceName === "fullscreen" || instanceName === "tv"
       ? (cam.streamUrl || cam.url)
       : (cam.previewStreamUrl || cam.streamUrl || cam.url);  
-
-  if (presentation.useFallback) {
-    media.src = cam.fallbackImage || getPreview(cam);
-    return;
-  }
 
   media.autoplay = true;
   media.muted = true;
@@ -4134,14 +4201,14 @@ function openCameraFullscreen(cam) {
 
   const presentation = getCameraPresentation(cam);
 
-  const media = cam.type === "snapshot" || presentation.useFallback
+  const media = cam.type === "snapshot" || !presentation.allowStream
     ? document.createElement("img")
     : document.createElement("video");
 
   attachMediaToElement(media, cam, "fullscreen");
 
   media.addEventListener("error", () => {
-    if (cam.fallbackImage) {
+    if (presentation.allowStream && cam.fallbackImage) {
       media.replaceWith(Object.assign(document.createElement("img"), {
         src: cam.fallbackImage,
         alt: cam.name
@@ -4192,8 +4259,10 @@ function renderTvCamera(cam) {
 
   tvStage.innerHTML = "";
 
+  const presentation = getCameraPresentation(cam);
+
   const media =
-    cam.type === "snapshot"
+    cam.type === "snapshot" || !presentation.allowStream
       ? document.createElement("img")
       : document.createElement("video");
 
@@ -4201,7 +4270,7 @@ function renderTvCamera(cam) {
 
   media.addEventListener("error", () => {
 
-    if (cam.fallbackImage) {
+    if (presentation.allowStream && cam.fallbackImage) {
 
       const fallback = document.createElement("img");
 

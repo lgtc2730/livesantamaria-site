@@ -1,0 +1,339 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import vm from "node:vm";
+import test from "node:test";
+
+const projectRoot = new URL("../", import.meta.url);
+
+function extractFunction(source, name) {
+  const start = source.indexOf(`function ${name}(`);
+  assert.notEqual(start, -1, `função ${name} não encontrada em index.html`);
+
+  const openingBrace = source.indexOf("{", start);
+  let depth = 0;
+
+  for (let index = openingBrace; index < source.length; index += 1) {
+    if (source[index] === "{") depth += 1;
+    if (source[index] === "}") depth -= 1;
+    if (depth === 0) return source.slice(start, index + 1);
+  }
+
+  assert.fail(`função ${name} não termina em index.html`);
+}
+
+async function loadPresentation() {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const context = {};
+
+  vm.runInNewContext([
+    extractFunction(html, "getOperationalState"),
+    extractFunction(html, "getPublicMedia"),
+    extractFunction(html, "getCameraPresentation"),
+    "result = { getPublicMedia, getCameraPresentation };"
+  ].join("\n"), context);
+
+  return context.result;
+}
+
+test("only explicitly public camera/Future records are included", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const declarationsStart = html.indexOf("const PUBLIC_CAMERAS =");
+  const declarationsEnd = html.indexOf("const expandedMobileCards", declarationsStart);
+  assert.notEqual(declarationsStart, -1);
+  assert.notEqual(declarationsEnd, -1);
+
+  const context = {
+    window: {
+      LVSM_CAMERAS: [
+        { id: "public-camera", type: "hls", operationalState: "testing", publicVisibility: "public", publicMedia: "preview" },
+        { id: "hidden-camera", type: "hls", operationalState: "testing", publicVisibility: "hidden", publicMedia: "stream" },
+        { id: "staging-future", type: "future", operationalState: "future", publicVisibility: "staging", publicMedia: "preview" },
+        { id: "missing-visibility", type: "hls", operationalState: "public" },
+        { id: "public-promo", type: "promo" }
+      ]
+    }
+  };
+
+  vm.runInNewContext([
+    extractFunction(html, "getOperationalState"),
+    extractFunction(html, "getPublicMedia"),
+    extractFunction(html, "getCameraPresentation"),
+    html.slice(declarationsStart, declarationsEnd),
+    "result = { publicIds: PUBLIC_CAMERAS.map(({ id }) => id), presentations: window.LVSM_CAMERAS.map(getCameraPresentation) };"
+  ].join("\n"), context);
+
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(context.result.publicIds)),
+    ["public-camera", "public-promo"]
+  );
+  assert.equal(context.result.presentations[1].visible, false);
+  assert.equal(context.result.presentations[2].visible, false);
+});
+
+test("a compatibilidade de publicMedia falha fechada e preserva streams legados", async () => {
+  const { getPublicMedia, getCameraPresentation } = await loadPresentation();
+
+  assert.equal(getPublicMedia({ operationalState: "future" }), "preview");
+  assert.equal(getPublicMedia({ operationalState: "testing" }), "stream");
+  assert.equal(getPublicMedia({ operationalState: "testing", publicMedia: "preview" }), "preview");
+  assert.equal(getPublicMedia({ operationalState: "testing", publicMedia: "invalid" }), "preview");
+
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(getCameraPresentation({ operationalState: "testing", publicMedia: "preview" }))),
+    {
+      visible: true,
+      useFallback: true,
+      allowStream: false,
+      badge: "future",
+      badgeDot: false,
+      label: "Em prepara\u00e7\u00e3o"
+    }
+  );
+
+  for (const camera of [
+    { operationalState: "testing", publicMedia: "stream" },
+    { operationalState: "testing" }
+  ]) {
+    const presentation = getCameraPresentation(camera);
+    assert.equal(presentation.allowStream, true);
+    assert.equal(presentation.badge, "testing");
+    assert.equal(presentation.label, "Em teste");
+  }
+});
+
+test("the internal camera lifecycle separates technical testing from public exposure", async () => {
+  const { getCameraPresentation } = await loadPresentation();
+  const teaser = {
+    id: "camera-internal",
+    type: "hls",
+    operationalState: "future",
+    publicVisibility: "public",
+    publicMedia: "preview",
+    preview: "./assets/previews/camera-internal.jpg",
+    url: "https://camera.example/cam1/index.m3u8"
+  };
+  const registered = { ...teaser, operationalState: "testing" };
+  const internalPresentation = getCameraPresentation(registered);
+  const exposed = { ...registered, publicMedia: "stream" };
+  const testPresentation = getCameraPresentation(exposed);
+  const published = { ...exposed, operationalState: "public" };
+
+  assert.equal(teaser.publicMedia, "preview");
+  assert.equal(registered.operationalState, "testing");
+  assert.equal(registered.publicMedia, "preview");
+  assert.equal(internalPresentation.allowStream, false);
+  assert.equal(exposed.publicMedia, "stream");
+  assert.equal(testPresentation.allowStream, true);
+  assert.equal(published.operationalState, "public");
+  assert.equal(published.publicMedia, "stream");
+});
+
+test("câmaras publicamente em preview não chegam a construir HLS nem carregar playlists", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const loadHls = extractFunction(html, "loadHls");
+  let hlsConstructions = 0;
+  let playlistRequests = 0;
+  const video = {
+    addEventListener() {},
+    canPlayType() { return ""; },
+    currentTime: 0
+  };
+  const card = {
+    querySelector(selector) {
+      return selector === "video" ? video : null;
+    }
+  };
+  const context = {
+    window: {
+      Hls: class {
+        constructor() { hlsConstructions += 1; }
+        static isSupported() { return true; }
+        loadSource() { playlistRequests += 1; }
+      }
+    },
+    Hls: null,
+    setTimeout() {},
+    setInterval() { return 1; },
+    clearTimeout() {},
+    clearInterval() {},
+    Date,
+    getCameraPresentation() { return { allowStream: false }; },
+    setCardChecking() {},
+    setCardOffline() {},
+    setCardLive() {},
+    mediaLooksAlive() { return false; }
+  };
+  context.Hls = context.window.Hls;
+
+  vm.runInNewContext(`${loadHls}; result = loadHls;`, context);
+  context.result(card, {
+    operationalState: "testing",
+    publicMedia: "preview",
+    url: "https://example.test/private.m3u8"
+  });
+
+  assert.equal(hlsConstructions, 0);
+  assert.equal(playlistRequests, 0);
+});
+
+test("todos os pontos de entrada de stream respeitam allowStream", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const card = extractFunction(html, "createCameraCard");
+  const loadSnapshot = extractFunction(html, "loadSnapshot");
+  const fullscreen = extractFunction(html, "openCameraFullscreen");
+  const tv = extractFunction(html, "renderTvCamera");
+
+  const liveStart = html.indexOf("const liveCameras = PUBLIC_CAMERAS.filter(cam =>");
+  const liveEnd = html.indexOf(";", liveStart);
+  assert.notEqual(liveStart, -1);
+  assert.notEqual(liveEnd, -1);
+  assert.match(
+    html.slice(liveStart, liveEnd + 1),
+    /getCameraPresentation\(cam\)\.allowStream/
+  );
+  assert.match(card, /else if \(!presentation\.allowStream\) \{?[\s\S]*getEditorialPreview\(cam\)[\s\S]*\} else if \(cam\.type === "snapshot"\)[\s\S]*\} else \{[\s\S]*<video/);
+  assert.ok(
+    loadSnapshot.indexOf("if (!getCameraPresentation(cam).allowStream) return;") <
+      loadSnapshot.indexOf("addCacheBuster(cam.url)"),
+    "loadSnapshot deve retornar antes de resolver a URL da câmara"
+  );
+  assert.match(extractFunction(html, "loadHls"), /if \(!getCameraPresentation\(cam\)\.allowStream\) return;/);
+  assert.match(extractFunction(html, "attachMediaToElement"), /if \(!presentation\.allowStream\) \{[\s\S]*media\.src = getEditorialPreview\(cam\);[\s\S]*return;/);
+  assert.match(fullscreen, /!presentation\.allowStream[\s\S]*document\.createElement\("img"\)/);
+  assert.match(tv, /!presentation\.allowStream[\s\S]*document\.createElement\("img"\)/);
+  assert.match(fullscreen, /media\.addEventListener\("error", \(\) => \{\s*if \(presentation\.allowStream && cam\.fallbackImage\)/);
+  assert.match(tv, /const presentation = getCameraPresentation\(cam\);[\s\S]*if \(presentation\.allowStream && cam\.fallbackImage\)/);
+  assert.match(extractFunction(html, "showMapPopup"), /openCameraFullscreen\(cam\)/);
+  assert.match(extractFunction(html, "showMapPopup"), /presentation\.allowStream \? getPreview\(cam\) : getEditorialPreview\(cam\)/);
+});
+
+test("filters, map markers, and popup copy use the presentation model", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const context = {};
+
+  vm.runInNewContext([
+    extractFunction(html, "getOperationalState"),
+    extractFunction(html, "getPublicMedia"),
+    extractFunction(html, "getCameraPresentation"),
+    extractFunction(html, "isOffline"),
+    extractFunction(html, "cameraMatchesFilter"),
+    extractFunction(html, "getMapPopupStatus"),
+    extractFunction(html, "getMapStatus"),
+    "result = { cameraMatchesFilter, getCameraPresentation, getMapPopupStatus, getMapStatus };"
+  ].join("\n"), context);
+
+  const preview = {
+    type: "hls",
+    operationalState: "testing",
+    publicVisibility: "public",
+    publicMedia: "preview",
+    status: "OFFLINE"
+  };
+  const testing = { ...preview, publicMedia: "stream" };
+
+  vm.runInNewContext('activeFilter = "future";', context);
+  assert.equal(context.result.cameraMatchesFilter(preview), true);
+  assert.equal(context.result.cameraMatchesFilter(testing), false);
+
+  vm.runInNewContext('activeFilter = "live";', context);
+  assert.equal(context.result.cameraMatchesFilter(preview), false);
+  assert.equal(context.result.cameraMatchesFilter(testing), true);
+
+  assert.equal(
+    context.result.getMapPopupStatus(preview),
+    context.result.getCameraPresentation(preview).label
+  );
+  assert.equal(context.result.getMapStatus(preview, "offline"), "future");
+  assert.equal(
+    context.result.getMapPopupStatus(testing),
+    "Em teste"
+  );
+  assert.equal(context.result.getMapStatus(testing, "offline"), "testing");
+});
+
+test("erros de fullscreen e TV mantêm o preview editorial de câmaras sem stream", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const stages = {
+    fullscreenStage: { children: [], appendChild(child) { this.children.push(child); } },
+    tvStage: { children: [], appendChild(child) { this.children.push(child); } }
+  };
+  const elements = {
+    fullscreenMode: { classList: { add() {} } },
+    fullscreenStage: stages.fullscreenStage,
+    tvStage: stages.tvStage
+  };
+  const context = {
+    document: {
+      getElementById(id) { return elements[id]; },
+      createElement(tagName) {
+        const listeners = {};
+        return {
+          tagName,
+          children: [],
+          classList: { add() {} },
+          addEventListener(event, listener) { listeners[event] = listener; },
+          dispatchError() { listeners.error?.(); },
+          appendChild(child) { this.children.push(child); },
+          replaceWith(replacement) { this.replacement = replacement; }
+        };
+      }
+    },
+    trackCameraView() {},
+    destroyMediaInstance() {},
+    attachMediaToElement(media, cam) { media.src = cam.preview; },
+    escapeHtml(value) { return value; },
+    getRegion() { return ""; }
+  };
+
+  vm.runInNewContext([
+    extractFunction(html, "getOperationalState"),
+    extractFunction(html, "getPublicMedia"),
+    extractFunction(html, "getCameraPresentation"),
+    extractFunction(html, "openCameraFullscreen"),
+    extractFunction(html, "renderTvCamera"),
+    "result = { openCameraFullscreen, renderTvCamera };"
+  ].join("\n"), context);
+
+  const camera = {
+    id: "internal-camera",
+    name: "Internal camera",
+    type: "hls",
+    operationalState: "testing",
+    publicMedia: "preview",
+    preview: "./assets/previews/editorial.jpeg",
+    fallbackImage: "./assets/fallback/runtime.jpeg"
+  };
+
+  context.result.openCameraFullscreen(camera);
+  const fullscreenMedia = stages.fullscreenStage.children[0];
+  assert.equal(fullscreenMedia.src, camera.preview);
+  fullscreenMedia.dispatchError();
+  assert.equal(fullscreenMedia.replacement, undefined);
+
+  context.result.renderTvCamera(camera);
+  const tvMedia = stages.tvStage.children[1];
+  assert.equal(tvMedia.src, camera.preview);
+  tvMedia.dispatchError();
+  assert.equal(tvMedia.replacement, undefined);
+});
+
+test("o hero usa preview editorial ou imagem neutra quando o stream não é permitido", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const context = {
+    getCameraPresentation() { return { allowStream: false }; }
+  };
+
+  vm.runInNewContext([
+    extractFunction(html, "getEditorialPreview"),
+    extractFunction(html, "getHeroImage"),
+    "result = getHeroImage;"
+  ].join("\n"), context);
+
+  assert.equal(context.result({
+    preview: "./assets/previews/editorial.jpeg",
+    fallbackImage: "./assets/fallback/operational.jpeg"
+  }), "./assets/previews/editorial.jpeg");
+  assert.equal(context.result({
+    fallbackImage: "./assets/fallback/operational-only.jpeg"
+  }), "./assets/previews/lvsm-love-sma.jpg");
+});
