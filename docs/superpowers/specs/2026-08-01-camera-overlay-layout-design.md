@@ -29,6 +29,11 @@ Its intrinsic aspect ratio is preserved with automatic width and height plus
 maximum dimensions, so square logos remain square. Sponsor and Support logos
 are never rendered together.
 
+Generic desktop and mobile camera-media rules must explicitly exclude the
+partner logo. The logo resets media-only presentation such as cover fitting,
+scale transforms, and opaque backgrounds so those rules cannot override its
+intrinsic dimensions.
+
 ## Scope
 
 This change affects the standard public camera card only. It does not change
@@ -49,5 +54,7 @@ Automated coverage must verify all four combinations of logo availability:
 Sponsor only, Support only, both, and neither. It must also assert that the
 card template keeps both text attributions on the left while rendering only
 the selected logo on the right, without partner text or a visual wrapper.
+Coverage must also protect the logo from the generic and compact-mobile image
+rules that size stream, preview, and fallback media.
 Fullscreen coverage must assert top positioning and a top-down gradient
 independently from the unchanged TV overlay.
