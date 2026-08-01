@@ -116,12 +116,89 @@ test("câmaras publicamente em preview não chegam a construir HLS nem carregar 
 
 test("todos os pontos de entrada de stream respeitam allowStream", async () => {
   const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const card = extractFunction(html, "createCameraCard");
+  const loadSnapshot = extractFunction(html, "loadSnapshot");
+  const fullscreen = extractFunction(html, "openCameraFullscreen");
+  const tv = extractFunction(html, "renderTvCamera");
 
   assert.match(html, /const liveCameras = PUBLIC_CAMERAS\.filter\(cam =>[\s\S]*getCameraPresentation\(cam\)\.allowStream/);
-  assert.match(extractFunction(html, "createCameraCard"), /presentation\.allowStream[\s\S]*<video/);
+  assert.match(card, /else if \(!presentation\.allowStream\) \{?[\s\S]*getPreview\(cam\)[\s\S]*\} else if \(cam\.type === "snapshot"\)[\s\S]*\} else \{[\s\S]*<video/);
+  assert.ok(
+    loadSnapshot.indexOf("if (!getCameraPresentation(cam).allowStream) return;") <
+      loadSnapshot.indexOf("addCacheBuster(cam.url)"),
+    "loadSnapshot deve retornar antes de resolver a URL da câmara"
+  );
   assert.match(extractFunction(html, "loadHls"), /if \(!getCameraPresentation\(cam\)\.allowStream\) return;/);
   assert.match(extractFunction(html, "attachMediaToElement"), /if \(!presentation\.allowStream\) \{[\s\S]*media\.src = getPreview\(cam\);[\s\S]*return;/);
-  assert.match(extractFunction(html, "openCameraFullscreen"), /!presentation\.allowStream[\s\S]*document\.createElement\("img"\)/);
-  assert.match(extractFunction(html, "renderTvCamera"), /!getCameraPresentation\(cam\)\.allowStream[\s\S]*document\.createElement\("img"\)/);
+  assert.match(fullscreen, /!presentation\.allowStream[\s\S]*document\.createElement\("img"\)/);
+  assert.match(tv, /!presentation\.allowStream[\s\S]*document\.createElement\("img"\)/);
+  assert.match(fullscreen, /media\.addEventListener\("error", \(\) => \{\s*if \(presentation\.allowStream && cam\.fallbackImage\)/);
+  assert.match(tv, /const presentation = getCameraPresentation\(cam\);[\s\S]*if \(presentation\.allowStream && cam\.fallbackImage\)/);
   assert.match(extractFunction(html, "showMapPopup"), /openCameraFullscreen\(cam\)/);
+});
+
+test("erros de fullscreen e TV mantêm o preview editorial de câmaras sem stream", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const stages = {
+    fullscreenStage: { children: [], appendChild(child) { this.children.push(child); } },
+    tvStage: { children: [], appendChild(child) { this.children.push(child); } }
+  };
+  const elements = {
+    fullscreenMode: { classList: { add() {} } },
+    fullscreenStage: stages.fullscreenStage,
+    tvStage: stages.tvStage
+  };
+  const context = {
+    document: {
+      getElementById(id) { return elements[id]; },
+      createElement(tagName) {
+        const listeners = {};
+        return {
+          tagName,
+          children: [],
+          classList: { add() {} },
+          addEventListener(event, listener) { listeners[event] = listener; },
+          dispatchError() { listeners.error?.(); },
+          appendChild(child) { this.children.push(child); },
+          replaceWith(replacement) { this.replacement = replacement; }
+        };
+      }
+    },
+    trackCameraView() {},
+    destroyMediaInstance() {},
+    attachMediaToElement(media, cam) { media.src = cam.preview; },
+    escapeHtml(value) { return value; },
+    getRegion() { return ""; }
+  };
+
+  vm.runInNewContext([
+    extractFunction(html, "getOperationalState"),
+    extractFunction(html, "getPublicMedia"),
+    extractFunction(html, "getCameraPresentation"),
+    extractFunction(html, "openCameraFullscreen"),
+    extractFunction(html, "renderTvCamera"),
+    "result = { openCameraFullscreen, renderTvCamera };"
+  ].join("\n"), context);
+
+  const camera = {
+    id: "internal-camera",
+    name: "Internal camera",
+    type: "hls",
+    operationalState: "testing",
+    publicMedia: "preview",
+    preview: "./assets/previews/editorial.jpeg",
+    fallbackImage: "./assets/fallback/runtime.jpeg"
+  };
+
+  context.result.openCameraFullscreen(camera);
+  const fullscreenMedia = stages.fullscreenStage.children[0];
+  assert.equal(fullscreenMedia.src, camera.preview);
+  fullscreenMedia.dispatchError();
+  assert.equal(fullscreenMedia.replacement, undefined);
+
+  context.result.renderTvCamera(camera);
+  const tvMedia = stages.tvStage.children[1];
+  assert.equal(tvMedia.src, camera.preview);
+  tvMedia.dispatchError();
+  assert.equal(tvMedia.replacement, undefined);
 });

@@ -4178,7 +4178,7 @@ function openCameraFullscreen(cam) {
   attachMediaToElement(media, cam, "fullscreen");
 
   media.addEventListener("error", () => {
-    if (cam.fallbackImage) {
+    if (presentation.allowStream && cam.fallbackImage) {
       media.replaceWith(Object.assign(document.createElement("img"), {
         src: cam.fallbackImage,
         alt: cam.name
@@ -4229,8 +4229,10 @@ function renderTvCamera(cam) {
 
   tvStage.innerHTML = "";
 
+  const presentation = getCameraPresentation(cam);
+
   const media =
-    cam.type === "snapshot" || !getCameraPresentation(cam).allowStream
+    cam.type === "snapshot" || !presentation.allowStream
       ? document.createElement("img")
       : document.createElement("video");
 
@@ -4238,7 +4240,7 @@ function renderTvCamera(cam) {
 
   media.addEventListener("error", () => {
 
-    if (cam.fallbackImage) {
+    if (presentation.allowStream && cam.fallbackImage) {
 
       const fallback = document.createElement("img");
 
