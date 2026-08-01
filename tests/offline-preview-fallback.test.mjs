@@ -70,6 +70,8 @@ test("câmaras testing mantêm EM TESTE em qualquer estado do player", async () 
   vm.runInNewContext(
     [
       extractFunction(html, "getOperationalState"),
+      extractFunction(html, "getPublicMedia"),
+      extractFunction(html, "getCameraPresentation"),
       extractFunction(html, "getRuntimeBadge"),
       "result = { getRuntimeBadge };"
     ].join("\n"),
@@ -95,4 +97,16 @@ test("câmaras testing mantêm EM TESTE em qualquer estado do player", async () 
   assert.equal(publicOffline.text, "OFFLINE");
   assert.equal(publicOffline.className, "status-badge offline");
   assert.equal(publicOffline.dotOk, false);
+
+  for (const runtimeState of ["checking", "live", "offline"]) {
+    const badge = context.result.getRuntimeBadge(
+      { operationalState: "testing", publicMedia: "preview" },
+      runtimeState
+    );
+
+    assert.notEqual(badge.text, "EM TESTE");
+    assert.equal(badge.text, "EM PREPARA\u00c7\u00c3O");
+    assert.equal(badge.className, "status-badge future");
+    assert.equal(badge.dotOk, false);
+  }
 });

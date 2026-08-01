@@ -23,6 +23,7 @@ test("manutenção prevalece sobre o runtime e usa imagem estática", async () =
   const context = {};
   vm.runInNewContext([
     extractFunction(html, "getOperationalState"),
+    extractFunction(html, "getPublicMedia"),
     extractFunction(html, "getCameraPresentation"),
     extractFunction(html, "getPreview"),
     extractFunction(html, "getOfflineImage"),
@@ -46,6 +47,7 @@ test("manutenção prevalece sobre o runtime e usa imagem estática", async () =
     {
       visible: true,
       useFallback: true,
+      allowStream: false,
       badge: "maintenance",
       badgeDot: false,
       label: "Em manutenção"

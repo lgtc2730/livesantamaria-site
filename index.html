@@ -2928,6 +2928,14 @@ function getOperationalState(cam) {
   return state === "future" ? "preparing" : state;
 }
 
+function getPublicMedia(cam) {
+  if (cam?.publicMedia === "preview" || cam?.publicMedia === "stream") {
+    return cam.publicMedia;
+  }
+  if (cam?.publicMedia !== undefined) return "preview";
+  return getOperationalState(cam) === "preparing" ? "preview" : "stream";
+}
+
 function getCameraPresentation(cam) {
   const state = getOperationalState(cam);
 
@@ -2935,6 +2943,7 @@ function getCameraPresentation(cam) {
     return {
       visible: false,
       useFallback: true,
+      allowStream: false,
       badge: "hidden",
       label: "Não instalada"
     };
@@ -2944,9 +2953,21 @@ function getCameraPresentation(cam) {
     return {
         visible: true,
         useFallback: true,
+        allowStream: false,
         badge: "future",
         badgeDot: false,
         label: "Em preparação"
+    };
+  }
+
+  if (getPublicMedia(cam) === "preview" && state !== "maintenance") {
+    return {
+      visible: true,
+      useFallback: true,
+      allowStream: false,
+      badge: "future",
+      badgeDot: false,
+      label: "Em prepara\u00e7\u00e3o"
     };
   }
 
@@ -2954,6 +2975,7 @@ function getCameraPresentation(cam) {
     return {
       visible: true,
       useFallback: false,
+      allowStream: true,
       badge: "testing",
       label: "Em testes"
     };
@@ -2963,6 +2985,7 @@ function getCameraPresentation(cam) {
     return {
       visible: true,
       useFallback: true,
+      allowStream: false,
       badge: "maintenance",
       badgeDot: false,
       label: "Em manutenção"
@@ -2972,6 +2995,7 @@ function getCameraPresentation(cam) {
   return {
     visible: true,
     useFallback: false,
+    allowStream: true,
     badge: "live",
     label: "LIVE"
   };
@@ -2985,7 +3009,7 @@ const PUBLIC_CAMERAS = (window.LVSM_CAMERAS || []).filter(cam =>
 const liveCameras = PUBLIC_CAMERAS.filter(cam =>
   ["hls", "snapshot"].includes(cam.type) &&
   cam.url &&
-  getOperationalState(cam) !== "maintenance"
+  getCameraPresentation(cam).allowStream
 );
 const expandedMobileCards = new Set();
 const cameraRuntimeStatus = new Map();
@@ -3106,7 +3130,17 @@ function getRuntimeBadge(cam, runtimeState) {
     };
   }
 
-  const testing = getOperationalState(cam) === "testing";
+  if (!getCameraPresentation(cam).allowStream) {
+    return {
+      className: "status-badge future",
+      text: "EM PREPARA\u00c7\u00c3O",
+      dotOk: false
+    };
+  }
+
+  const testing =
+    getOperationalState(cam) === "testing" &&
+    getCameraPresentation(cam).allowStream;
 
   if (testing) {
     return {
@@ -3486,13 +3520,13 @@ function createCameraCard(cam, index) {
     mediaHtml = `
       <img class="live-media" src="${escapeHtml(getPreview(cam))}" alt="${escapeHtml(cam.name)}">
     `;
+  } else if (!presentation.allowStream) {
+    mediaHtml = `<img class="live-media" src="${escapeHtml(getPreview(cam))}" alt="${escapeHtml(cam.name)}">`;
   } else if (cam.type === "snapshot") {
     mediaHtml = `
       <img class="live-media" alt="${escapeHtml(cam.name)}">
       <img class="fallback-media" src="${escapeHtml(cam.fallbackImage || getPreview(cam))}" alt="${escapeHtml(cam.name)}">
     `;
-  } else if (presentation.useFallback) {
-    mediaHtml = `<img class="live-media" src="${escapeHtml(cam.fallbackImage || getPreview(cam))}" alt="${escapeHtml(cam.name)}">`;
   } else {
     mediaHtml = `
       <video autoplay muted playsinline></video>
@@ -3635,6 +3669,7 @@ function createCameraCard(cam, index) {
 }
 
 function loadSnapshot(card, cam) {
+  if (!getCameraPresentation(cam).allowStream) return;
   const img = card.querySelector(".live-media");
   let loadedOnce = false;
   let initialTimer = null;
@@ -3665,6 +3700,7 @@ function loadSnapshot(card, cam) {
 }
 
 function loadHls(card, cam) {
+  if (!getCameraPresentation(cam).allowStream) return;
   const video = card.querySelector("video");
   let hasPlayedOnce = false;
   let offlineTimer = null;
@@ -3832,7 +3868,7 @@ const LazyHlsManager = {
         const card = entry.target;
         const cam = card._cam;
 
-        if (!cam || card.dataset.hlsStarted === "true") return;
+        if (!cam || !getCameraPresentation(cam).allowStream || card.dataset.hlsStarted === "true") return;
 
         card.dataset.hlsStarted = "true";
         console.log("[LVSM lazy] arrancar HLS:", cam.id, cam.name);
@@ -3850,7 +3886,7 @@ const LazyHlsManager = {
 
     if (!this.observer) {
       const cam = card._cam;
-      if (cam && card.dataset.hlsStarted !== "true") {
+      if (cam && getCameraPresentation(cam).allowStream && card.dataset.hlsStarted !== "true") {
         card.dataset.hlsStarted = "true";
         console.log("[LVSM lazy] arrancar HLS:", cam.id, cam.name);
         loadHls(card, cam);
@@ -3885,7 +3921,7 @@ function renderCameras() {
     const card = createCameraCard(cam, index);
     container.appendChild(card);
 
-    if (getOperationalState(cam) === "maintenance") return;
+    if (!getCameraPresentation(cam).allowStream) return;
     if (cam.type === "snapshot") loadSnapshot(card, cam);
     else if (cam.type === "hls") {
       LazyHlsManager.observe(card);
@@ -4081,21 +4117,22 @@ function attachMediaToElement(media, cam, instanceName) {
     return;
   }
 
+  const presentation = getCameraPresentation(cam);
+
+  if (!presentation.allowStream) {
+    media.src = getPreview(cam);
+    return;
+  }
+
   if (cam.type === "snapshot") {
     media.src = addCacheBuster(cam.url);
     return;
   }
 
-  const presentation = getCameraPresentation(cam);
   const streamUrl =
     instanceName === "fullscreen" || instanceName === "tv"
       ? (cam.streamUrl || cam.url)
       : (cam.previewStreamUrl || cam.streamUrl || cam.url);  
-
-  if (presentation.useFallback) {
-    media.src = cam.fallbackImage || getPreview(cam);
-    return;
-  }
 
   media.autoplay = true;
   media.muted = true;
@@ -4134,7 +4171,7 @@ function openCameraFullscreen(cam) {
 
   const presentation = getCameraPresentation(cam);
 
-  const media = cam.type === "snapshot" || presentation.useFallback
+  const media = cam.type === "snapshot" || !presentation.allowStream
     ? document.createElement("img")
     : document.createElement("video");
 
@@ -4193,7 +4230,7 @@ function renderTvCamera(cam) {
   tvStage.innerHTML = "";
 
   const media =
-    cam.type === "snapshot"
+    cam.type === "snapshot" || !getCameraPresentation(cam).allowStream
       ? document.createElement("img")
       : document.createElement("video");
 
