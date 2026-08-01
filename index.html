@@ -821,19 +821,13 @@
       text-shadow: 0 2px 10px rgba(0,0,0,.45);
     }
 
-    .camera-partner {
-      position: absolute;
-      right: 5px;
-      bottom: 5px;
-      z-index: 4;
+    .camera-sponsor {
+      margin-top: 12px;
       display: grid;
-      justify-items: end;
       gap: 2px;
-      max-width: 150px;
-      text-align: right;
     }
 
-    .camera-partner span {
+    .camera-sponsor span {
       font-size: .52rem;
       letter-spacing: .16em;
       text-transform: uppercase;
@@ -841,22 +835,50 @@
       font-weight: 800;
     }
 
-    .camera-partner strong,
-    .camera-partner a {
-      font-size: .72rem;
+    .camera-sponsor strong,
+    .camera-sponsor a {
+      font-size: .78rem;
       color: rgba(255,255,255,.88);
       font-weight: 650;
     }
 
+    .camera-support {
+      margin-top: 8px;
+      padding-left: 9px;
+      border-left: 2px solid rgba(66,183,255,.34);
+      display: grid;
+      gap: 2px;
+    }
+
+    .camera-support span {
+      color: rgba(126,215,255,.72);
+      font-size: .5rem;
+      font-weight: 850;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .camera-support strong,
+    .camera-support a {
+      color: rgba(255,255,255,.78);
+      font-size: .72rem;
+      font-weight: 650;
+    }
+
     .camera-partner-logo {
+      position: absolute;
+      right: 5px;
+      bottom: 5px;
+      z-index: 4;
       display: block;
-      max-width: 100%;
-      max-height: 28px;
       width: auto;
       height: auto;
+      max-width: 110px;
+      max-height: 40px;
       object-fit: contain;
       opacity: .75;
       filter: drop-shadow(0 2px 5px rgba(0,0,0,.55));
+      pointer-events: none;
     }
 
     .camera-state {
@@ -3075,13 +3097,11 @@ function selectCameraCardPartner(cam) {
   return null;
 }
 
-function renderCameraCardPartner(cam) {
+function renderCameraCardPartnerLogo(cam) {
   const entity = selectCameraCardPartner(cam);
   if (!entity) return "";
-  return renderCameraAttribution(entity, {
-    defaultLabel: entity === cam.sponsor ? "Sponsor" : "Apoio",
-    className: "camera-partner"
-  });
+  const logo = safeAttributionLogoUrl(entity.logo);
+  return `<img class="camera-partner-logo" src="${escapeHtml(logo)}" alt="${escapeHtml(entity.name)}">`;
 }
 
 function addCacheBuster(url) {
@@ -3598,9 +3618,26 @@ function createCameraCard(cam, index) {
               : ""
         }
 
+        ${renderCameraAttribution(
+          cam.sponsor,
+          {
+            defaultLabel: "Sponsor",
+            className: "camera-sponsor",
+            showLogo: false
+          }
+        )}
+        ${renderCameraAttribution(
+          cam.support,
+          {
+            defaultLabel: "Apoio",
+            className: "camera-support",
+            showLogo: false
+          }
+        )}
+
       </div>
     </div>
-    ${renderCameraCardPartner(cam)}
+    ${renderCameraCardPartnerLogo(cam)}
   `;
 
   let pointerStartX = 0;
