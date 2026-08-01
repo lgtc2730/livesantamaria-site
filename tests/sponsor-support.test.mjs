@@ -24,12 +24,11 @@ function createCardPartnerFactory() {
     ${extractFunction("escapeHtml")}
     ${extractFunction("safeHttpsUrl")}
     ${extractFunction("safeAttributionLogoUrl")}
-    ${extractFunction("renderCameraAttribution")}
     ${extractFunction("selectCameraCardPartner")}
-    ${extractFunction("renderCameraCardPartner")}
+    ${extractFunction("renderCameraCardPartnerLogo")}
     return {
       select: selectCameraCardPartner,
-      render: renderCameraCardPartner
+      render: renderCameraCardPartnerLogo
     };
   `);
   return factory();
@@ -47,26 +46,45 @@ test("card partner selection prefers the only valid logo and Sponsor when both a
   assert.equal(render({ sponsor: null, support: null }), "");
 
   const sponsorMarkup = render({ sponsor, support });
-  assert.match(sponsorMarkup, /class="camera-partner"/);
-  assert.match(sponsorMarkup, />Sponsor</);
+  assert.match(sponsorMarkup, /^\s*<img /);
+  assert.match(sponsorMarkup, /class="camera-partner-logo"/);
   assert.match(sponsorMarkup, /src="\.\/assets\/sponsors\/sponsor\.png"/);
-  assert.doesNotMatch(sponsorMarkup, /support\.png|>Apoio</);
+  assert.match(sponsorMarkup, /alt="Sponsor"/);
+  assert.doesNotMatch(sponsorMarkup, /<div|<span|<strong|<a|support\.png|>Apoio</);
 
   const supportMarkup = render({
     sponsor: { name: "Sem logo" },
     support
   });
-  assert.match(supportMarkup, />Apoio</);
+  assert.match(supportMarkup, /alt="Apoio"/);
   assert.match(supportMarkup, /support\.png/);
 });
 
-test("camera card renders one right-hand partner and no left attribution", () => {
+test("camera card keeps partner text left and renders only the selected logo right", () => {
   const createCard = extractFunction("createCameraCard");
-  assert.match(createCard, /renderCameraCardPartner\(cam\)/);
-  assert.doesNotMatch(
+  assert.match(
     createCard,
-    /renderCameraAttribution\(\s*cam\.(?:sponsor|support)/
+    /renderCameraAttribution\(\s*cam\.sponsor,[^]*?showLogo:\s*false/
   );
+  assert.match(
+    createCard,
+    /renderCameraAttribution\(\s*cam\.support,[^]*?showLogo:\s*false/
+  );
+  assert.match(createCard, /renderCameraCardPartnerLogo\(cam\)/);
+
+  const logoRule = source.match(/\.camera-partner-logo\s*\{([^}]*)\}/);
+  assert.ok(logoRule, "camera partner logo rule missing");
+  for (const expected of [
+    /position:\s*absolute/,
+    /width:\s*auto/,
+    /height:\s*auto/,
+    /max-width:/,
+    /max-height:/,
+    /object-fit:\s*contain/
+  ]) {
+    assert.match(logoRule[1], expected);
+  }
+  assert.doesNotMatch(logoRule[1], /background|padding/);
 });
 
 test("camera attribution is optional and safely rendered", () => {
