@@ -35,6 +35,41 @@ async function loadPresentation() {
   return context.result;
 }
 
+test("only explicitly public camera/Future records are included", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const declarationsStart = html.indexOf("const PUBLIC_CAMERAS =");
+  const declarationsEnd = html.indexOf("const expandedMobileCards", declarationsStart);
+  assert.notEqual(declarationsStart, -1);
+  assert.notEqual(declarationsEnd, -1);
+
+  const context = {
+    window: {
+      LVSM_CAMERAS: [
+        { id: "public-camera", type: "hls", operationalState: "testing", publicVisibility: "public", publicMedia: "preview" },
+        { id: "hidden-camera", type: "hls", operationalState: "testing", publicVisibility: "hidden", publicMedia: "stream" },
+        { id: "staging-future", type: "future", operationalState: "future", publicVisibility: "staging", publicMedia: "preview" },
+        { id: "missing-visibility", type: "hls", operationalState: "public" },
+        { id: "public-promo", type: "promo" }
+      ]
+    }
+  };
+
+  vm.runInNewContext([
+    extractFunction(html, "getOperationalState"),
+    extractFunction(html, "getPublicMedia"),
+    extractFunction(html, "getCameraPresentation"),
+    html.slice(declarationsStart, declarationsEnd),
+    "result = { publicIds: PUBLIC_CAMERAS.map(({ id }) => id), presentations: window.LVSM_CAMERAS.map(getCameraPresentation) };"
+  ].join("\n"), context);
+
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(context.result.publicIds)),
+    ["public-camera", "public-promo"]
+  );
+  assert.equal(context.result.presentations[1].visible, false);
+  assert.equal(context.result.presentations[2].visible, false);
+});
+
 test("a compatibilidade de publicMedia falha fechada e preserva streams legados", async () => {
   const { getPublicMedia, getCameraPresentation } = await loadPresentation();
 
@@ -62,7 +97,7 @@ test("a compatibilidade de publicMedia falha fechada e preserva streams legados"
     const presentation = getCameraPresentation(camera);
     assert.equal(presentation.allowStream, true);
     assert.equal(presentation.badge, "testing");
-    assert.equal(presentation.label, "Em testes");
+    assert.equal(presentation.label, "Em teste");
   }
 });
 
@@ -148,20 +183,72 @@ test("todos os pontos de entrada de stream respeitam allowStream", async () => {
   const fullscreen = extractFunction(html, "openCameraFullscreen");
   const tv = extractFunction(html, "renderTvCamera");
 
-  assert.match(html, /const liveCameras = PUBLIC_CAMERAS\.filter\(cam =>[\s\S]*getCameraPresentation\(cam\)\.allowStream/);
-  assert.match(card, /else if \(!presentation\.allowStream\) \{?[\s\S]*getPreview\(cam\)[\s\S]*\} else if \(cam\.type === "snapshot"\)[\s\S]*\} else \{[\s\S]*<video/);
+  const liveStart = html.indexOf("const liveCameras = PUBLIC_CAMERAS.filter(cam =>");
+  const liveEnd = html.indexOf(";", liveStart);
+  assert.notEqual(liveStart, -1);
+  assert.notEqual(liveEnd, -1);
+  assert.match(
+    html.slice(liveStart, liveEnd + 1),
+    /getCameraPresentation\(cam\)\.allowStream/
+  );
+  assert.match(card, /else if \(!presentation\.allowStream\) \{?[\s\S]*getEditorialPreview\(cam\)[\s\S]*\} else if \(cam\.type === "snapshot"\)[\s\S]*\} else \{[\s\S]*<video/);
   assert.ok(
     loadSnapshot.indexOf("if (!getCameraPresentation(cam).allowStream) return;") <
       loadSnapshot.indexOf("addCacheBuster(cam.url)"),
     "loadSnapshot deve retornar antes de resolver a URL da câmara"
   );
   assert.match(extractFunction(html, "loadHls"), /if \(!getCameraPresentation\(cam\)\.allowStream\) return;/);
-  assert.match(extractFunction(html, "attachMediaToElement"), /if \(!presentation\.allowStream\) \{[\s\S]*media\.src = getPreview\(cam\);[\s\S]*return;/);
+  assert.match(extractFunction(html, "attachMediaToElement"), /if \(!presentation\.allowStream\) \{[\s\S]*media\.src = getEditorialPreview\(cam\);[\s\S]*return;/);
   assert.match(fullscreen, /!presentation\.allowStream[\s\S]*document\.createElement\("img"\)/);
   assert.match(tv, /!presentation\.allowStream[\s\S]*document\.createElement\("img"\)/);
   assert.match(fullscreen, /media\.addEventListener\("error", \(\) => \{\s*if \(presentation\.allowStream && cam\.fallbackImage\)/);
   assert.match(tv, /const presentation = getCameraPresentation\(cam\);[\s\S]*if \(presentation\.allowStream && cam\.fallbackImage\)/);
   assert.match(extractFunction(html, "showMapPopup"), /openCameraFullscreen\(cam\)/);
+  assert.match(extractFunction(html, "showMapPopup"), /presentation\.allowStream \? getPreview\(cam\) : getEditorialPreview\(cam\)/);
+});
+
+test("filters, map markers, and popup copy use the presentation model", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const context = {};
+
+  vm.runInNewContext([
+    extractFunction(html, "getOperationalState"),
+    extractFunction(html, "getPublicMedia"),
+    extractFunction(html, "getCameraPresentation"),
+    extractFunction(html, "isOffline"),
+    extractFunction(html, "cameraMatchesFilter"),
+    extractFunction(html, "getMapPopupStatus"),
+    extractFunction(html, "getMapStatus"),
+    "result = { cameraMatchesFilter, getCameraPresentation, getMapPopupStatus, getMapStatus };"
+  ].join("\n"), context);
+
+  const preview = {
+    type: "hls",
+    operationalState: "testing",
+    publicVisibility: "public",
+    publicMedia: "preview",
+    status: "OFFLINE"
+  };
+  const testing = { ...preview, publicMedia: "stream" };
+
+  vm.runInNewContext('activeFilter = "future";', context);
+  assert.equal(context.result.cameraMatchesFilter(preview), true);
+  assert.equal(context.result.cameraMatchesFilter(testing), false);
+
+  vm.runInNewContext('activeFilter = "live";', context);
+  assert.equal(context.result.cameraMatchesFilter(preview), false);
+  assert.equal(context.result.cameraMatchesFilter(testing), true);
+
+  assert.equal(
+    context.result.getMapPopupStatus(preview),
+    context.result.getCameraPresentation(preview).label
+  );
+  assert.equal(context.result.getMapStatus(preview, "offline"), "future");
+  assert.equal(
+    context.result.getMapPopupStatus(testing),
+    "Em teste"
+  );
+  assert.equal(context.result.getMapStatus(testing, "offline"), "testing");
 });
 
 test("erros de fullscreen e TV mantêm o preview editorial de câmaras sem stream", async () => {

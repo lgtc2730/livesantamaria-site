@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Live Santa Maria</title>
 
-  <script src="./cameras.public.js?v=d53e4ccfa168"></script>
+  <script src="./cameras.public.js?v=02c1b867fc4e"></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.16/dist/hls.min.js"></script>
 
   <style>
@@ -1004,6 +1004,14 @@
 
     .map-camera.future .map-dot {
       background: #f59e0b;
+    }
+
+    .map-camera.testing .map-dot {
+      background: #42b7ff;
+    }
+
+    .map-camera.maintenance .map-dot {
+      background: #94a3b8;
     }
 
     .map-camera.offline .map-dot {
@@ -2939,7 +2947,11 @@ function getPublicMedia(cam) {
 function getCameraPresentation(cam) {
   const state = getOperationalState(cam);
 
-  if (state === "not-installed") {
+  if (
+    state === "not-installed" ||
+    cam?.publicVisibility === "hidden" ||
+    cam?.publicVisibility === "staging"
+  ) {
     return {
       visible: false,
       useFallback: true,
@@ -2977,7 +2989,7 @@ function getCameraPresentation(cam) {
       useFallback: false,
       allowStream: true,
       badge: "testing",
-      label: "Em testes"
+      label: "Em teste"
     };
   }
 
@@ -3003,7 +3015,8 @@ function getCameraPresentation(cam) {
 
 const PUBLIC_CAMERAS = (window.LVSM_CAMERAS || []).filter(cam =>
   cam.enabled !== false &&
-  getOperationalState(cam) !== "not-installed"
+  (cam.type === "promo" || cam.publicVisibility === "public") &&
+  getCameraPresentation(cam).visible
 );
 
 const liveCameras = PUBLIC_CAMERAS.filter(cam =>
@@ -3015,9 +3028,10 @@ const expandedMobileCards = new Set();
 const cameraRuntimeStatus = new Map();
 
 PUBLIC_CAMERAS.forEach(cam => {
+  const presentation = getCameraPresentation(cam);
   cameraRuntimeStatus.set(
     cam.id,
-    cam.type === "future" ? "future" : "checking"
+    presentation.badge === "future" ? "future" : "checking"
   );
 });
 
@@ -3117,6 +3131,10 @@ function getPreview(cam) {
   return cam.preview || cam.fallbackImage || "./assets/previews/lvsm-love-sma.jpg";
 }
 
+function getEditorialPreview(cam) {
+  return cam.preview || "./assets/previews/lvsm-love-sma.jpg";
+}
+
 function getOfflineImage(cam) {
   return cam?.fallbackImage || getPreview(cam);
 }
@@ -3182,22 +3200,31 @@ function cameraMatchesFilter(cam) {
   const presentation = getCameraPresentation(cam);
   const state = getOperationalState(cam);
 
+  if (!presentation.visible) return false;
   if (activeFilter === "all") return true;
-  if (activeFilter === "live") return state !== "maintenance" && !presentation.useFallback;
-  if (activeFilter === "future") return state === "preparing";
+  if (activeFilter === "live") return state !== "maintenance" && presentation.allowStream;
+  if (activeFilter === "future") return presentation.badge === "future";
 
   return true;
 }
 
 function getMapPopupStatus(cam) {
-  if (getOperationalState(cam) === "maintenance") return "Em manutenção";
-  if (cam.type === "future") return "Em preparação";
+  const presentation = getCameraPresentation(cam);
+  if (
+    presentation.badge === "maintenance" ||
+    presentation.badge === "future" ||
+    presentation.badge === "testing"
+  ) {
+    return presentation.label;
+  }
   return isOffline(cam) ? "Offline" : "Em directo";
 }
 
 function getMapStatus(cam, runtimeStatus) {
-  if (getOperationalState(cam) === "maintenance") return "maintenance";
-  if (cam.type === "future") return "future";
+  const presentation = getCameraPresentation(cam);
+  if (presentation.badge === "maintenance") return "maintenance";
+  if (presentation.badge === "future") return "future";
+  if (presentation.badge === "testing") return "testing";
   if (runtimeStatus === "offline" || isOffline(cam)) return "offline";
   return "live";
 }
@@ -3403,7 +3430,7 @@ function updateCounts() {
   ).length;
 
   const future = PUBLIC_CAMERAS.filter(
-    cam => getCameraPresentation(cam).useFallback
+    cam => getCameraPresentation(cam).badge === "future"
   ).length;
 
   setText(
@@ -3434,7 +3461,7 @@ function setMapStatus(cam, status) {
 
   if (!marker) return;
 
-  marker.classList.remove("live", "future", "offline");
+  marker.classList.remove("live", "future", "testing", "maintenance", "offline");
   marker.classList.add(status);
 }
 
@@ -3452,7 +3479,7 @@ function setCardLive(block) {
   block.classList.remove("has-fallback-active");
   cameraRuntimeStatus.set(block._cam.id, "live");
   updateCounts();
-  setMapStatus(block._cam, "live");
+  setMapStatus(block._cam, getMapStatus(block._cam, "live"));
 }
 
 function setCardOffline(block) {
@@ -3477,7 +3504,7 @@ function setCardOffline(block) {
 
   cameraRuntimeStatus.set(block._cam.id, "offline");
   updateCounts();
-  setMapStatus(block._cam, "offline");
+  setMapStatus(block._cam, getMapStatus(block._cam, "offline"));
 }
 
 function setCardChecking(block) {
@@ -3521,7 +3548,7 @@ function createCameraCard(cam, index) {
       <img class="live-media" src="${escapeHtml(getPreview(cam))}" alt="${escapeHtml(cam.name)}">
     `;
   } else if (!presentation.allowStream) {
-    mediaHtml = `<img class="live-media" src="${escapeHtml(getPreview(cam))}" alt="${escapeHtml(cam.name)}">`;
+    mediaHtml = `<img class="live-media" src="${escapeHtml(getEditorialPreview(cam))}" alt="${escapeHtml(cam.name)}">`;
   } else if (cam.type === "snapshot") {
     mediaHtml = `
       <img class="live-media" alt="${escapeHtml(cam.name)}">
@@ -3979,10 +4006,11 @@ function showMapPopup(cam, pos) {
   popup.style.setProperty("--popup-tx", tx);
   popup.style.setProperty("--popup-ty", ty);  
 
+  const presentation = getCameraPresentation(cam);
   const status = getMapPopupStatus(cam);
 
   popup.innerHTML = `
-    <img src="${escapeHtml(getPreview(cam))}" alt="${escapeHtml(cam.name)}">
+    <img src="${escapeHtml(presentation.allowStream ? getPreview(cam) : getEditorialPreview(cam))}" alt="${escapeHtml(cam.name)}">
 
     <div class="map-popup-body">
       <div class="map-popup-title">${escapeHtml(cam.name)}</div>
@@ -4095,7 +4123,7 @@ function setMapStatus(cam, status) {
 
   if (!marker) return;
 
-  marker.classList.remove("live", "future", "offline");
+  marker.classList.remove("live", "future", "testing", "maintenance", "offline");
   marker.classList.add(status);
 }
 
@@ -4120,7 +4148,7 @@ function attachMediaToElement(media, cam, instanceName) {
   const presentation = getCameraPresentation(cam);
 
   if (!presentation.allowStream) {
-    media.src = getPreview(cam);
+    media.src = getEditorialPreview(cam);
     return;
   }
 

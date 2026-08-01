@@ -26,6 +26,7 @@ test("manutenção prevalece sobre o runtime e usa imagem estática", async () =
     extractFunction(html, "getPublicMedia"),
     extractFunction(html, "getCameraPresentation"),
     extractFunction(html, "getPreview"),
+    extractFunction(html, "getEditorialPreview"),
     extractFunction(html, "getOfflineImage"),
     extractFunction(html, "getRuntimeBadge"),
     extractFunction(html, "isOffline"),

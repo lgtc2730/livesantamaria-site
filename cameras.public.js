@@ -427,7 +427,8 @@ window.LVSM_CAMERAS = [
     "message": "Futura vista sobre o ilhéu e costa norte",
     "status": "Em preparação",
     "commissioned": null,
-    "publicVisibility": "staging",
+    "publicVisibility": "public",
+    "publicMedia": "preview",
     "position": {
       "lat": 37.005331,
       "lon": -25.06801,
@@ -451,7 +452,8 @@ window.LVSM_CAMERAS = [
     "preview": "./assets/previews/farol-maia.jpeg",
     "message": "Vista sobre a Maia",
     "status": "Brevemente",
-    "publicVisibility": "staging",
+    "publicVisibility": "public",
+    "publicMedia": "preview",
     "commissioned": null,
     "position": {
       "lat": 36.930009,
@@ -476,7 +478,8 @@ window.LVSM_CAMERAS = [
     "preview": "./assets/previews/porto-do-castelo.jpeg",
     "message": "Vista sobre o Porto do Castelo",
     "status": "Brevemente",
-    "publicVisibility": "staging",
+    "publicVisibility": "public",
+    "publicMedia": "preview",
     "commissioned": null,
     "position": {
       "lat": 36.929656,
@@ -496,7 +499,8 @@ window.LVSM_CAMERAS = [
     "preview": "./assets/previews/pico-alto-nascente.jpeg",
     "message": null,
     "status": "Brevemente",
-    "publicVisibility": "staging",
+    "publicVisibility": "public",
+    "publicMedia": "preview",
     "commissioned": null,
     "position": {
       "lat": 36.979503,
@@ -521,7 +525,8 @@ window.LVSM_CAMERAS = [
     "preview": "./assets/previews/pico-alto-poente.jpeg",
     "message": null,
     "status": "Brevemente",
-    "publicVisibility": "staging",
+    "publicVisibility": "public",
+    "publicMedia": "preview",
     "commissioned": null,
     "position": {
       "lat": 36.979503,
@@ -546,7 +551,8 @@ window.LVSM_CAMERAS = [
     "preview": "./assets/previews/aeroporto.jpeg",
     "message": null,
     "status": "Brevemente",
-    "publicVisibility": "staging",
+    "publicVisibility": "public",
+    "publicMedia": "preview",
     "commissioned": null,
     "position": {
       "lat": 36.975991,
@@ -571,7 +577,8 @@ window.LVSM_CAMERAS = [
     "preview": "./assets/previews/praia-castelo.jpg",
     "message": null,
     "status": "Brevemente",
-    "publicVisibility": "staging",
+    "publicVisibility": "public",
+    "publicMedia": "preview",
     "commissioned": null,
     "position": {
       "lat": 36.952287,

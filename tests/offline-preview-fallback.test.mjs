@@ -28,8 +28,9 @@ test("a imagem offline prefere fallback e usa preview quando ainda não existe s
   vm.runInNewContext(
     [
       extractFunction(html, "getPreview"),
+      extractFunction(html, "getEditorialPreview"),
       extractFunction(html, "getOfflineImage"),
-      "result = { getPreview, getOfflineImage };"
+      "result = { getPreview, getEditorialPreview, getOfflineImage };"
     ].join("\n"),
     context
   );
@@ -48,6 +49,13 @@ test("a imagem offline prefere fallback e usa preview quando ainda não existe s
       preview: "./assets/previews/maia-sul.jpeg"
     }),
     "./assets/fallback/maia-sul.jpeg"
+  );
+
+  assert.equal(
+    context.result.getEditorialPreview({
+      fallbackImage: "./assets/fallback/operational-only.jpeg"
+    }),
+    "./assets/previews/lvsm-love-sma.jpg"
   );
 });
 
