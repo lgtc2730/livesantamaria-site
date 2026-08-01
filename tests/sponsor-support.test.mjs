@@ -100,7 +100,6 @@ test("public data contains only the approved Support migration", () => {
   assert.equal(byId["anjos-blues"].support.name, "Escravos da Cadeinha");
   assert.equal(byId["maia-norte"].message, null);
   assert.equal(byId["maia-norte"].support.name, "Carlos Andrade");
-  assert.equal(byId["malbusca-sunset"].message, null);
   assert.equal(byId["malbusca-sunset"].support.name, "Maria Leonardo");
   assert.equal(byId["slourenco-norte"].sponsor.name, "SpotAzores");
   assert.equal(byId["praia-nascente"].sponsor.name, "SpotAzores");

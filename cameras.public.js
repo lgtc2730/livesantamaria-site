@@ -360,7 +360,7 @@ window.LVSM_CAMERAS = [
     "type": "hls",
     "preview": "./assets/previews/malbusca-sunset.jpeg",
     "fallbackImage": "./assets/previews/malbusca-sunset.jpeg",
-    "message": null,
+    "message": "Teste editorial Lab — remover após validação",
     "status": null,
     "operationalState": "public",
     "publicVisibility": "public",
