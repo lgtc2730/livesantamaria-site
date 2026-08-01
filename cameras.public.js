@@ -246,7 +246,7 @@ window.LVSM_CAMERAS = [
     "message": null,
     "status": null,
     "publicVisibility": "public",
-    "operationalState": "maintenance",
+    "operationalState": "public",
     "commissioned": "2013",
     "position": {
       "lat": 36.950908,
@@ -372,7 +372,7 @@ window.LVSM_CAMERAS = [
       "fov": 100
     },
     "sponsor": {
-      "name": "Donna-Corália Pastelaria",
+      "name": "Donna Corália Pastelaria",
       "logo": "./assets/sponsors/donna-coralia.jpeg",
       "url": null,
       "label": "Sponsor"

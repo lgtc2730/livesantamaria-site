@@ -66,6 +66,33 @@ test("a compatibilidade de publicMedia falha fechada e preserva streams legados"
   }
 });
 
+test("the internal camera lifecycle separates technical testing from public exposure", async () => {
+  const { getCameraPresentation } = await loadPresentation();
+  const teaser = {
+    id: "camera-internal",
+    type: "hls",
+    operationalState: "future",
+    publicVisibility: "public",
+    publicMedia: "preview",
+    preview: "./assets/previews/camera-internal.jpg",
+    url: "https://camera.example/cam1/index.m3u8"
+  };
+  const registered = { ...teaser, operationalState: "testing" };
+  const internalPresentation = getCameraPresentation(registered);
+  const exposed = { ...registered, publicMedia: "stream" };
+  const testPresentation = getCameraPresentation(exposed);
+  const published = { ...exposed, operationalState: "public" };
+
+  assert.equal(teaser.publicMedia, "preview");
+  assert.equal(registered.operationalState, "testing");
+  assert.equal(registered.publicMedia, "preview");
+  assert.equal(internalPresentation.allowStream, false);
+  assert.equal(exposed.publicMedia, "stream");
+  assert.equal(testPresentation.allowStream, true);
+  assert.equal(published.operationalState, "public");
+  assert.equal(published.publicMedia, "stream");
+});
+
 test("câmaras publicamente em preview não chegam a construir HLS nem carregar playlists", async () => {
   const html = await readFile(new URL("index.html", projectRoot), "utf8");
   const loadHls = extractFunction(html, "loadHls");
