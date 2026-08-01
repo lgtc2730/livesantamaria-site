@@ -274,6 +274,7 @@ window.LVSM_CAMERAS = [
     "status": "Em preparação",
     "operationalState": "testing",
     "publicVisibility": "public",
+    "publicMedia": "preview",
     "commissioned": null,
     "position": {
       "lat": 36.939774,
@@ -303,6 +304,7 @@ window.LVSM_CAMERAS = [
     "message": null,
     "status": "Em preparação",
     "publicVisibility": "public",
+    "publicMedia": "preview",
     "operationalState": "testing",
     "commissioned": null,
     "position": {
@@ -334,6 +336,7 @@ window.LVSM_CAMERAS = [
     "status": "Em preparação",
     "commissioned": null,
     "publicVisibility": "public",
+    "publicMedia": "preview",
     "operationalState": "testing",
     "position": {
       "lat": 36.938183,
@@ -398,6 +401,7 @@ window.LVSM_CAMERAS = [
     "status": "Em preparação",
     "operationalState": "testing",
     "publicVisibility": "public",
+    "publicMedia": "preview",
     "commissioned": null,
     "position": {
       "lat": 36.950578,
