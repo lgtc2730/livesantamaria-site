@@ -360,7 +360,7 @@ window.LVSM_CAMERAS = [
     "type": "hls",
     "preview": "./assets/previews/malbusca-sunset.jpeg",
     "fallbackImage": "./assets/previews/malbusca-sunset.jpeg",
-    "message": "Teste editorial Lab — remover após validação",
+    "message": null,
     "status": null,
     "operationalState": "public",
     "publicVisibility": "public",
@@ -372,7 +372,7 @@ window.LVSM_CAMERAS = [
       "fov": 100
     },
     "sponsor": {
-      "name": "Donna-Corália Pastelaria",
+      "name": "Donna Corália Pastelaria",
       "logo": "./assets/sponsors/donna-coralia.jpeg",
       "url": null,
       "label": "Sponsor"
