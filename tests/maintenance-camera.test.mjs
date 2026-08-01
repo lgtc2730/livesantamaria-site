@@ -75,3 +75,12 @@ test("manutenção prevalece sobre o runtime e usa imagem estática", async () =
     status: "OFFLINE"
   }, "offline"), "maintenance");
 });
+
+test("o marcador de manutenção conserva um único estilo âmbar", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const rules = [...html.matchAll(/\.map-camera\.maintenance \.map-dot\s*\{([^}]*)\}/g)];
+
+  assert.equal(rules.length, 1);
+  assert.match(rules[0][1], /background:\s*#fbbf24/);
+  assert.match(rules[0][1], /box-shadow:\s*0 0 14px rgba\(251,191,36,\.7\)/);
+});

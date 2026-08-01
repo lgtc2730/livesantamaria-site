@@ -316,3 +316,24 @@ test("erros de fullscreen e TV mantêm o preview editorial de câmaras sem strea
   tvMedia.dispatchError();
   assert.equal(tvMedia.replacement, undefined);
 });
+
+test("o hero usa preview editorial ou imagem neutra quando o stream não é permitido", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const context = {
+    getCameraPresentation() { return { allowStream: false }; }
+  };
+
+  vm.runInNewContext([
+    extractFunction(html, "getEditorialPreview"),
+    extractFunction(html, "getHeroImage"),
+    "result = getHeroImage;"
+  ].join("\n"), context);
+
+  assert.equal(context.result({
+    preview: "./assets/previews/editorial.jpeg",
+    fallbackImage: "./assets/fallback/operational.jpeg"
+  }), "./assets/previews/editorial.jpeg");
+  assert.equal(context.result({
+    fallbackImage: "./assets/fallback/operational-only.jpeg"
+  }), "./assets/previews/lvsm-love-sma.jpg");
+});

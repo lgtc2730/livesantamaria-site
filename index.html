@@ -1010,10 +1010,6 @@
       background: #42b7ff;
     }
 
-    .map-camera.maintenance .map-dot {
-      background: #94a3b8;
-    }
-
     .map-camera.offline .map-dot {
       background: #e11d48;
     }
@@ -3135,6 +3131,12 @@ function getEditorialPreview(cam) {
   return cam.preview || "./assets/previews/lvsm-love-sma.jpg";
 }
 
+function getHeroImage(cam) {
+  return getCameraPresentation(cam).allowStream
+    ? getPreview(cam)
+    : getEditorialPreview(cam);
+}
+
 function getOfflineImage(cam) {
   return cam?.fallbackImage || getPreview(cam);
 }
@@ -3231,9 +3233,9 @@ function getMapStatus(cam, runtimeStatus) {
 
 function setHeroBackground() {
   const hero = document.getElementById("hero");
-  const first = liveCameras.find(cam => cam.fallbackImage) || PUBLIC_CAMERAS.find(cam => getPreview(cam));
+  const first = liveCameras.find(cam => cam.fallbackImage) || PUBLIC_CAMERAS.find(cam => getHeroImage(cam));
   if (hero && first) {
-    hero.style.setProperty("--hero-image", `url("${getPreview(first)}")`);
+    hero.style.setProperty("--hero-image", `url("${getHeroImage(first)}")`);
   }
 }
 
