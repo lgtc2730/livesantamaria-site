@@ -1581,9 +1581,6 @@
     .tv-info,
     .fullscreen-info {
       position: absolute;
-      left: 28px;
-      right: 28px;
-      bottom: 24px;
       z-index: 3;
       display: flex;
       justify-content: space-between;
@@ -1593,11 +1590,24 @@
       text-shadow: 0 3px 18px rgba(0,0,0,.7);
     }
 
+    .tv-info {
+      left: 28px;
+      right: 28px;
+      bottom: 24px;
+    }
+
+    .fullscreen-info {
+      left: 28px;
+      right: 84px;
+      top: 24px;
+      align-items: flex-start;
+    }
+
     .fullscreen-sponsor-logo {
       position: absolute;
 
       right: 24px;
-      bottom: 0;
+      bottom: 24px;
 
       display: flex;
       align-items: center;
@@ -1631,11 +1641,19 @@
       position: fixed;
       left: 0;
       right: 0;
-      bottom: 0;
       height: 34vh;
-      background: linear-gradient(0deg, rgba(0,0,0,.72), transparent);
       z-index: -1;
       pointer-events: none;
+    }
+
+    .tv-info::before {
+      bottom: 0;
+      background: linear-gradient(0deg, rgba(0,0,0,.72), transparent);
+    }
+
+    .fullscreen-info::before {
+      top: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,.72), transparent);
     }
 
     .tv-name {
@@ -4165,6 +4183,9 @@ function openCameraFullscreen(cam) {
     </div>
   `;
 
+  fsStage.appendChild(media);
+  fsStage.appendChild(info);
+
   if (cam.sponsor?.logo) {
     const logo = document.createElement("div");
 
@@ -4176,10 +4197,8 @@ function openCameraFullscreen(cam) {
         alt="${escapeHtml(cam.sponsor.name || "Sponsor")}"
       >
     `;
-    info.appendChild(logo);
+    fsStage.appendChild(logo);
   }
-  fsStage.appendChild(media);
-  fsStage.appendChild(info);
   fsMode.classList.add("show");
 }
 
