@@ -3003,6 +3003,56 @@ const PUBLIC_CAMERAS = (window.LVSM_CAMERAS || []).filter(cam =>
   getCameraPresentation(cam).visible
 );
 
+function getPublicCameraGroup(cam) {
+  if (cam.type === "promo") return 3;
+  return getCameraPresentation(cam).allowStream ? 1 : 2;
+}
+
+function isValidPublicCameraOrder(value) {
+  return Number.isSafeInteger(value) && value > 0;
+}
+
+const publicCameraSourceIndexes = new WeakMap();
+const publicCameraOrderCounts = new Map();
+
+PUBLIC_CAMERAS.forEach((cam, sourceIndex) => {
+  publicCameraSourceIndexes.set(cam, sourceIndex);
+
+  if (!isValidPublicCameraOrder(cam.publicOrder)) return;
+
+  const group = getPublicCameraGroup(cam);
+  const groupOrderCounts = publicCameraOrderCounts.get(group) || new Map();
+  groupOrderCounts.set(
+    cam.publicOrder,
+    (groupOrderCounts.get(cam.publicOrder) || 0) + 1
+  );
+  publicCameraOrderCounts.set(group, groupOrderCounts);
+});
+
+function comparePublicCameras(left, right) {
+  const leftGroup = getPublicCameraGroup(left);
+  const rightGroup = getPublicCameraGroup(right);
+
+  if (leftGroup !== rightGroup) return leftGroup - rightGroup;
+
+  const leftOrderIsValid =
+    isValidPublicCameraOrder(left.publicOrder) &&
+    publicCameraOrderCounts.get(leftGroup)?.get(left.publicOrder) === 1;
+  const rightOrderIsValid =
+    isValidPublicCameraOrder(right.publicOrder) &&
+    publicCameraOrderCounts.get(rightGroup)?.get(right.publicOrder) === 1;
+
+  if (leftOrderIsValid && rightOrderIsValid && left.publicOrder !== right.publicOrder) {
+    return left.publicOrder - right.publicOrder;
+  }
+  if (leftOrderIsValid !== rightOrderIsValid) return leftOrderIsValid ? -1 : 1;
+
+  return (
+    (publicCameraSourceIndexes.get(left) ?? Number.MAX_SAFE_INTEGER) -
+    (publicCameraSourceIndexes.get(right) ?? Number.MAX_SAFE_INTEGER)
+  );
+}
+
 const liveCameras = PUBLIC_CAMERAS.filter(cam =>
   ["hls", "snapshot"].includes(cam.type) &&
   cam.url &&
@@ -3927,19 +3977,10 @@ const LazyHlsManager = {
 function renderCameras() {
   container.innerHTML = "";
 
-  const typeOrder = {
-    hls: 1,
-    snapshot: 1,
-    future: 2,
-    promo: 3
-  };
-
   const visible = PUBLIC_CAMERAS
     .filter(cam => cam.type !== "promo")
     .filter(cameraMatchesFilter)
-    .sort((a, b) => {
-      return (typeOrder[a.type] || 99) - (typeOrder[b.type] || 99);
-    });
+    .sort(comparePublicCameras);
 
   container.classList.toggle("camera-list", listMode);
 
