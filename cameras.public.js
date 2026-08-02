@@ -262,6 +262,11 @@ window.LVSM_CAMERAS = [
       "bearing": 270,
       "fov": 65
     },
+    "digitalZoom": {
+      "factor": 1.35,
+      "x": 70,
+      "y": 35
+    },
     "sponsor": {
       "name": "Apartamentos Mar e Sol",
       "logo": "./assets/sponsors/apartamentos-maresol.jpeg",
