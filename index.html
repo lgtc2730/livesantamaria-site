@@ -1620,6 +1620,7 @@
       width: 100%;
       height: 100%;
       position: relative;
+      overflow: hidden;
     }
 
     .tv-stage > video,
@@ -3009,6 +3010,26 @@ function getCameraPresentation(cam) {
   };
 }
 
+function normalizeDigitalZoom(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const { factor, x, y } = value;
+  if (![factor, x, y].every(Number.isFinite)) return null;
+  return {
+    factor: Math.max(1, factor),
+    x: Math.min(100, Math.max(0, x)),
+    y: Math.min(100, Math.max(0, y))
+  };
+}
+
+function applyDigitalZoom(media, cam) {
+  if (media?.tagName !== "VIDEO" || cam?.type !== "hls") return false;
+  const zoom = normalizeDigitalZoom(cam.digitalZoom);
+  if (!zoom) return false;
+  media.style.transform = `scale(${zoom.factor})`;
+  media.style.transformOrigin = `${zoom.x}% ${zoom.y}%`;
+  return true;
+}
+
 const PUBLIC_CAMERAS = (window.LVSM_CAMERAS || []).filter(cam =>
   cam.enabled !== false &&
   (cam.type === "promo" || cam.publicVisibility === "public") &&
@@ -3645,6 +3666,9 @@ function createCameraCard(cam, index) {
     ${renderCameraSponsorLogo(cam.sponsor)}
   `;
 
+  const liveVideo = card.querySelector("video");
+  if (liveVideo) applyDigitalZoom(liveVideo, cam);
+
   let pointerStartX = 0;
   let pointerStartY = 0;
   let pointerMoved = false;
@@ -4158,6 +4182,8 @@ function attachMediaToElement(media, cam, instanceName) {
     media.src = addCacheBuster(cam.url);
     return;
   }
+
+  applyDigitalZoom(media, cam);
 
   const streamUrl =
     instanceName === "fullscreen" || instanceName === "tv"
