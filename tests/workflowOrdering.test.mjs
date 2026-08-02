@@ -20,3 +20,14 @@ test("a decisão de apresentação acontece antes da seleção e ligação de me
     /if \(!getCameraPresentation\(cam\)\.allowStream\) return;/
   );
 });
+
+test("the public grid applies the editorial comparator before media initialization", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const renderCameras = html.indexOf("function renderCameras()");
+  const attachMedia = html.indexOf("function attachMediaToElement(media, cam, instanceName)");
+
+  assert.match(
+    html.slice(renderCameras, attachMedia),
+    /\.sort\(comparePublicCameras\)/
+  );
+});
