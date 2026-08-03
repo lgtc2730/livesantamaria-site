@@ -638,6 +638,27 @@ window.LVSM_CAMERAS = [
     "enabled": true
   },
   {
+    "id": "promo-cultura-em-movimento",
+    "name": "Cultura em Movimento",
+    "region": null,
+    "type": "promo",
+    "url": "https://www.exploresantamaria.pt/agenda",
+    "refresh": null,
+    "fallbackImage": null,
+    "preview": "./assets/previews/cultura-movimento.png",
+    "message": "Agenda mensal de eventos em Santa Maria.",
+    "status": "Ampliar agenda",
+    "position": null,
+    "sponsor": {
+      "name": "Câmara Municipal de Vila do Porto",
+      "logo": "./assets/sponsors/cmvp.png",
+      "url": "https://www.cm-viladoporto.pt",
+      "label": "Agenda cultural"
+    },
+    "promoAction": "expand-image",
+    "enabled": true
+  },
+  {
     "id": "promo-villa-natura",
     "name": "Villa Natura",
     "region": null,
