@@ -1605,8 +1605,11 @@
     }
 
     .promo-image-lightbox__image {
-      width: 100%;
-      height: 100%;
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
       object-fit: contain;
     }
 
@@ -3628,6 +3631,14 @@ function isOffline(cam) {
   return cam.status === "OFFLINE";
 }
 
+function activatePromoCard(cam, card) {
+  if (cam.promoAction === "expand-image") {
+    openPromoImageLightbox(cam, card);
+  } else {
+    window.open(cam.url, "_blank", "noopener,noreferrer");
+  }
+}
+
 function createCameraCard(cam, index) {
   
   const presentation = getCameraPresentation(cam);
@@ -3642,6 +3653,11 @@ function createCameraCard(cam, index) {
 
   card.id = `camera-${cam.id}`;
   card.dataset.type = cam.type;
+
+  if (cam.type === "promo") {
+    card.setAttribute("role", "button");
+    card.tabIndex = 0;
+  }
 
   if (expandedMobileCards.has(cam.id)) {
     card.classList.add("expanded-mobile");
@@ -3756,6 +3772,14 @@ function createCameraCard(cam, index) {
   const liveVideo = card.querySelector("video");
   if (liveVideo) applyDigitalZoom(liveVideo, cam);
 
+  if (cam.type === "promo") {
+    card.addEventListener("keydown", (e) => {
+      if (e.target !== card || (e.key !== "Enter" && e.key !== " ")) return;
+      if (e.key === " ") e.preventDefault();
+      activatePromoCard(cam, card);
+    });
+  }
+
   let pointerStartX = 0;
   let pointerStartY = 0;
   let pointerMoved = false;
@@ -3784,11 +3808,7 @@ function createCameraCard(cam, index) {
 
     if (cam.type === "promo") {
       if (e.pointerType === "touch" && pointerMoved) return;
-      if (cam.promoAction === "expand-image") {
-        openPromoImageLightbox(cam, card);
-      } else {
-        window.open(cam.url, "_blank", "noopener,noreferrer");
-      }
+      activatePromoCard(cam, card);
       return;
     }
 
