@@ -1585,6 +1585,31 @@
 
     .tv-mode.show { display: block; }
 
+    .promo-image-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: grid;
+      place-items: center;
+      padding: clamp(12px, 3vw, 36px);
+      background: rgba(0, 0, 0, .94);
+    }
+
+    .promo-image-lightbox[hidden] { display: none; }
+
+    .promo-image-lightbox__stage {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+    }
+
+    .promo-image-lightbox__image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
     .tv-stage,
     .fullscreen-stage {
       width: 100%;
@@ -2916,6 +2941,11 @@
     <button class="close-button" id="fullscreenCloseButton" aria-label="Fechar">×</button>
   </div>
 
+  <div class="promo-image-lightbox" id="promoImageLightbox" role="dialog" aria-modal="true" aria-label="Imagem promocional ampliada" hidden>
+    <div class="promo-image-lightbox__stage" id="promoImageLightboxStage"></div>
+    <button class="close-button" id="promoImageLightboxClose" type="button" aria-label="Fechar imagem ampliada">×</button>
+  </div>
+
 <script>
 const container = document.getElementById("cameraContainer");
 
@@ -3105,6 +3135,8 @@ let tvIndex = 0;
 let tvTimer = null;
 let tvHls = null;
 let fullscreenHls = null;
+let promoImageLightboxTrigger = null;
+let promoImageLightboxPreviousOverflow = "";
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -3752,7 +3784,11 @@ function createCameraCard(cam, index) {
 
     if (cam.type === "promo") {
       if (e.pointerType === "touch" && pointerMoved) return;
-      window.open(cam.url, "_blank", "noopener,noreferrer");
+      if (cam.promoAction === "expand-image") {
+        openPromoImageLightbox(cam, card);
+      } else {
+        window.open(cam.url, "_blank", "noopener,noreferrer");
+      }
       return;
     }
 
@@ -4322,6 +4358,52 @@ function closeFullscreenCamera() {
   destroyMediaInstance("fullscreen");
   fsStage.innerHTML = "";
   fsMode.classList.remove("show");
+}
+
+function openPromoImageLightbox(cam, trigger) {
+  const cardPreview = trigger?.querySelector(".live-media");
+  if (!cam?.preview || !cardPreview?.complete || cardPreview.naturalWidth === 0) return;
+  const lightbox = document.getElementById("promoImageLightbox");
+  const stage = document.getElementById("promoImageLightboxStage");
+  const close = document.getElementById("promoImageLightboxClose");
+  const image = document.createElement("img");
+  image.className = "promo-image-lightbox__image";
+  image.src = cam.preview;
+  image.alt = cam.name;
+  image.addEventListener("error", closePromoImageLightbox, { once: true });
+  stage.replaceChildren(image);
+  promoImageLightboxTrigger = trigger;
+  promoImageLightboxPreviousOverflow = document.body.style.overflow;
+  document.body.style.overflow = "hidden";
+  lightbox.hidden = false;
+  close.focus();
+}
+
+function closePromoImageLightbox() {
+  const lightbox = document.getElementById("promoImageLightbox");
+  document.getElementById("promoImageLightboxStage").replaceChildren();
+  lightbox.hidden = true;
+  document.body.style.overflow = promoImageLightboxPreviousOverflow;
+  promoImageLightboxTrigger?.focus();
+  promoImageLightboxTrigger = null;
+}
+
+function setupPromoImageLightboxInteractions() {
+  const lightbox = document.getElementById("promoImageLightbox");
+  const stage = document.getElementById("promoImageLightboxStage");
+  const close = document.getElementById("promoImageLightboxClose");
+
+  close.addEventListener("click", closePromoImageLightbox);
+  lightbox.addEventListener("click", event => {
+    if (event.target === lightbox || event.target === stage) {
+      closePromoImageLightbox();
+    }
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && !lightbox.hidden) {
+      closePromoImageLightbox();
+    }
+  });
 }
 
 function renderTvCamera(cam) {
@@ -4959,6 +5041,7 @@ document.getElementById("supportShortcut")
 
 document.getElementById("tvCloseButton")?.addEventListener("click", stopTvMode);
 document.getElementById("fullscreenCloseButton")?.addEventListener("click", closeFullscreenCamera);
+setupPromoImageLightboxInteractions();
 
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") {
