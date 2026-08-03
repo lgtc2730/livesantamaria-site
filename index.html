@@ -2257,6 +2257,14 @@
     }
 
     @media (max-width: 680px) and (orientation: portrait) {
+      .camera-card.compact-mobile.expanded-mobile::after,
+      .camera-card.compact-mobile.expanded-mobile .status-badge,
+      .camera-card.compact-mobile.expanded-mobile .camera-info,
+      .camera-card.compact-mobile.expanded-mobile .camera-partner-logo,
+      .camera-card.compact-mobile.expanded-mobile .viewer-count {
+        display: none;
+      }
+
       .timelapse-dashboard-card {
         overflow: hidden;
       }
