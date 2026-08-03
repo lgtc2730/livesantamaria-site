@@ -23,6 +23,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
+    "publicOrder": 1,
     "commissioned": "2020",
     "position": {
       "lat": 36.946593,
@@ -54,6 +55,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
+    "publicOrder": 2,
     "commissioned": "2021",
     "position": {
       "lat": 37.0039,
@@ -84,6 +86,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
+    "publicOrder": 3,
     "commissioned": "2026-07",
     "position": {
       "lat": 37.00799592,
@@ -118,6 +121,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
+    "publicOrder": 4,
     "commissioned": "2023",
     "position": {
       "lat": 36.9843,
@@ -149,6 +153,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
+    "publicOrder": 5,
     "commissioned": "2012",
     "position": {
       "lat": 36.9952,
@@ -181,6 +186,7 @@ window.LVSM_CAMERAS = [
     "commissioned": "2023",
     "publicVisibility": "public",
     "operationalState": "public",
+    "publicOrder": 6,
     "position": {
       "lat": 36.94428,
       "lon": -25.016115,
@@ -216,6 +222,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
+    "publicOrder": 8,
     "commissioned": "2023",
     "position": {
       "lat": 36.952592,
@@ -247,6 +254,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
+    "publicOrder": 9,
     "commissioned": "2013",
     "position": {
       "lat": 36.950908,
@@ -280,6 +288,7 @@ window.LVSM_CAMERAS = [
     "operationalState": "testing",
     "publicVisibility": "public",
     "publicMedia": "preview",
+    "publicOrder": 2,
     "commissioned": null,
     "position": {
       "lat": 36.939774,
@@ -311,6 +320,7 @@ window.LVSM_CAMERAS = [
     "publicVisibility": "public",
     "publicMedia": "preview",
     "operationalState": "testing",
+    "publicOrder": 1,
     "commissioned": null,
     "position": {
       "lat": 36.946241,
@@ -343,6 +353,7 @@ window.LVSM_CAMERAS = [
     "publicVisibility": "public",
     "publicMedia": "preview",
     "operationalState": "testing",
+    "publicOrder": 3,
     "position": {
       "lat": 36.938183,
       "lon": -25.015193,
@@ -372,6 +383,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "operationalState": "public",
     "publicVisibility": "public",
+    "publicOrder": 7,
     "commissioned": "2026-07",
     "position": {
       "lat": 36.94324,
@@ -407,6 +419,7 @@ window.LVSM_CAMERAS = [
     "operationalState": "testing",
     "publicVisibility": "public",
     "publicMedia": "preview",
+    "publicOrder": 4,
     "commissioned": null,
     "position": {
       "lat": 36.950578,

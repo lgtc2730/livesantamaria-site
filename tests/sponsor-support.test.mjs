@@ -19,11 +19,85 @@ function extractFunction(name) {
   return source.slice(start, nextFunction);
 }
 
-test("Site renders Sponsor and Support independently", () => {
-  assert.match(source, /renderCameraAttribution\(\s*cam\.sponsor/);
-  assert.match(source, /renderCameraAttribution\(\s*cam\.support/);
-  assert.match(source, /defaultLabel:\s*"Apoio"/);
-  assert.doesNotMatch(source, /cam\.message[^]*Apoio de/);
+function createCardPartnerFactory() {
+  const factory = new Function(`
+    ${extractFunction("escapeHtml")}
+    ${extractFunction("safeHttpsUrl")}
+    ${extractFunction("safeAttributionLogoUrl")}
+    ${extractFunction("selectCameraCardPartner")}
+    ${extractFunction("renderCameraCardPartnerLogo")}
+    return {
+      select: selectCameraCardPartner,
+      render: renderCameraCardPartnerLogo
+    };
+  `);
+  return factory();
+}
+
+test("card partner selection prefers the only valid logo and Sponsor when both are valid", () => {
+  const { select, render } = createCardPartnerFactory();
+  const sponsor = { name: "Sponsor", logo: "./assets/sponsors/sponsor.png" };
+  const support = { name: "Apoio", logo: "./assets/sponsors/support.png" };
+
+  assert.equal(select({ sponsor, support: null }), sponsor);
+  assert.equal(select({ sponsor: { name: "Sem logo" }, support }), support);
+  assert.equal(select({ sponsor, support }), sponsor);
+  assert.equal(select({ sponsor: null, support: null }), null);
+  assert.equal(render({ sponsor: null, support: null }), "");
+
+  const sponsorMarkup = render({ sponsor, support });
+  assert.match(sponsorMarkup, /^\s*<img /);
+  assert.match(sponsorMarkup, /class="camera-partner-logo"/);
+  assert.match(sponsorMarkup, /src="\.\/assets\/sponsors\/sponsor\.png"/);
+  assert.match(sponsorMarkup, /alt="Sponsor"/);
+  assert.doesNotMatch(sponsorMarkup, /<div|<span|<strong|<a|support\.png|>Apoio</);
+
+  const supportMarkup = render({
+    sponsor: { name: "Sem logo" },
+    support
+  });
+  assert.match(supportMarkup, /alt="Apoio"/);
+  assert.match(supportMarkup, /support\.png/);
+});
+
+test("camera card keeps partner text left and renders only the selected logo right", () => {
+  const createCard = extractFunction("createCameraCard");
+  assert.match(
+    createCard,
+    /renderCameraAttribution\(\s*cam\.sponsor,[^]*?showLogo:\s*false/
+  );
+  assert.match(
+    createCard,
+    /renderCameraAttribution\(\s*cam\.support,[^]*?showLogo:\s*false/
+  );
+  assert.match(createCard, /renderCameraCardPartnerLogo\(cam\)/);
+
+  const logoRule = source.match(/\.camera-partner-logo\s*\{([^}]*)\}/);
+  assert.ok(logoRule, "camera partner logo rule missing");
+  for (const expected of [
+    /position:\s*absolute/,
+    /width:\s*auto/,
+    /height:\s*auto/,
+    /max-width:/,
+    /max-height:/,
+    /object-fit:\s*contain/
+  ]) {
+    assert.match(logoRule[1], expected);
+  }
+  assert.doesNotMatch(logoRule[1], /padding/);
+
+  assert.doesNotMatch(source, /\.camera-card img\s*\{/);
+  assert.match(
+    source,
+    /\.camera-card img:not\(\.camera-partner-logo\)\s*\{/
+  );
+  assert.doesNotMatch(source, /compact-mobile[^\{]*\simg\s*\{/g);
+  assert.match(
+    source,
+    /compact-mobile[^\{]*\simg:not\(\.camera-partner-logo\)\s*\{/
+  );
+  assert.match(logoRule[1], /transform:\s*none/);
+  assert.match(logoRule[1], /background:\s*transparent/);
 });
 
 test("camera attribution is optional and safely rendered", () => {
@@ -103,53 +177,4 @@ test("public data contains only the approved Support migration", () => {
   assert.equal(byId["malbusca-sunset"].support.name, "Maria Leonardo");
   assert.equal(byId["slourenco-norte"].sponsor.name, "SpotAzores");
   assert.equal(byId["praia-nascente"].sponsor.name, "SpotAzores");
-});
-
-test("Sponsor logo uses the restored card container while Apoio stays inline", () => {
-  const factory = new Function(`
-    ${extractFunction("escapeHtml")}
-    ${extractFunction("safeHttpsUrl")}
-    ${extractFunction("safeAttributionLogoUrl")}
-    ${extractFunction("renderCameraSponsorLogo")}
-    return renderCameraSponsorLogo;
-  `);
-  const renderSponsorLogo = factory();
-
-  assert.equal(renderSponsorLogo(null), "");
-  assert.equal(renderSponsorLogo({ name: "Sem logo" }), "");
-
-  const valid = renderSponsorLogo({
-    name: "Sponsor",
-    logo: "./assets/sponsors/sponsor.png"
-  });
-  assert.match(valid, /class="camera-sponsor-logo"/);
-  assert.match(valid, /<img/);
-  assert.match(valid, /src="\.\/assets\/sponsors\/sponsor\.png"/);
-  assert.match(valid, /alt="Sponsor"/);
-
-  const hostile = renderSponsorLogo({
-    name: "<img src=x onerror=alert(1)>",
-    logo: "javascript:alert(1)"
-  });
-  assert.equal(hostile, "");
-
-  assert.match(source, /className:\s*"camera-sponsor",\s*showLogo:\s*false/);
-  assert.match(source, /renderCameraSponsorLogo\(cam\.sponsor\)/);
-
-  const containerRule = source.match(/\.camera-sponsor-logo\s*\{([^}]*)\}/);
-  assert.ok(containerRule, "Sponsor logo container rule missing");
-  assert.match(containerRule[1], /position:\s*absolute/);
-  assert.match(containerRule[1], /max-width:\s*150px/);
-  assert.match(containerRule[1], /max-height:\s*55px/);
-
-  const imageRule = source.match(/\.camera-sponsor-logo img\s*\{([^}]*)\}/);
-  assert.ok(imageRule, "Sponsor logo image rule missing");
-  assert.match(imageRule[1], /max-height:\s*28px/);
-  assert.match(imageRule[1], /object-fit:\s*contain/);
-
-  const supportRule = source.match(/\.camera-support-logo\s*\{([^}]*)\}/);
-  assert.ok(supportRule, "Apoio logo rule missing");
-  assert.match(supportRule[1], /max-width:\s*110px/);
-  assert.match(supportRule[1], /max-height:\s*24px/);
-  assert.doesNotMatch(supportRule[1], /position:\s*absolute/);
 });

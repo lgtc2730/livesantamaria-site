@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Live Santa Maria</title>
 
-  <script src="./cameras.public.js?v=22146f7aaefc"></script>
+  <script src="./cameras.public.js?v=f20d5ec5b95c"></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.16/dist/hls.min.js"></script>
 
   <style>
@@ -578,7 +578,7 @@
     }
 
     .camera-card video,
-    .camera-card img {
+    .camera-card img:not(.camera-partner-logo) {
       width: 100%;
       height: 100%;
       display: block;
@@ -823,27 +823,22 @@
 
     .camera-sponsor {
       margin-top: 12px;
-
       display: grid;
       gap: 2px;
     }
 
     .camera-sponsor span {
       font-size: .52rem;
-
       letter-spacing: .16em;
       text-transform: uppercase;
-
       color: rgba(255,255,255,.48);
-
       font-weight: 800;
     }
 
-    .camera-sponsor strong {
+    .camera-sponsor strong,
+    .camera-sponsor a {
       font-size: .78rem;
-
       color: rgba(255,255,255,.88);
-
       font-weight: 650;
     }
 
@@ -870,47 +865,22 @@
       font-weight: 650;
     }
 
-    .camera-support-logo {
-      display: block;
-      width: auto;
-      height: auto;
-      max-width: 110px;
-      max-height: 24px;
-      margin-top: 4px;
-      object-fit: contain;
-      opacity: .72;
-      filter: drop-shadow(0 2px 5px rgba(0,0,0,.55));
-    }
-
-    .camera-sponsor-logo {
+    .camera-partner-logo {
       position: absolute;
       right: 5px;
       bottom: 5px;
       z-index: 4;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      padding: 3px 6px;
-      max-width: 150px;
-      max-height: 55px;
-
-      background: transparent;
-      opacity: .75;
-
-      pointer-events: none;
-    }
-
-    .camera-sponsor-logo img {
       display: block;
-      max-width: 100%;
-      max-height: 28px;
       width: auto;
       height: auto;
+      max-width: 110px;
+      max-height: 40px;
       object-fit: contain;
-
+      opacity: .75;
+      background: transparent;
+      transform: none;
       filter: drop-shadow(0 2px 5px rgba(0,0,0,.55));
+      pointer-events: none;
     }
 
     .camera-state {
@@ -1636,9 +1606,6 @@
     .tv-info,
     .fullscreen-info {
       position: absolute;
-      left: 28px;
-      right: 28px;
-      bottom: 24px;
       z-index: 3;
       display: flex;
       justify-content: space-between;
@@ -1648,11 +1615,24 @@
       text-shadow: 0 3px 18px rgba(0,0,0,.7);
     }
 
+    .tv-info {
+      left: 28px;
+      right: 28px;
+      bottom: 24px;
+    }
+
+    .fullscreen-info {
+      left: 28px;
+      right: 84px;
+      top: 24px;
+      align-items: flex-start;
+    }
+
     .fullscreen-sponsor-logo {
       position: absolute;
 
       right: 24px;
-      bottom: 0;
+      bottom: 24px;
 
       display: flex;
       align-items: center;
@@ -1686,11 +1666,19 @@
       position: fixed;
       left: 0;
       right: 0;
-      bottom: 0;
       height: 34vh;
-      background: linear-gradient(0deg, rgba(0,0,0,.72), transparent);
       z-index: -1;
       pointer-events: none;
+    }
+
+    .tv-info::before {
+      bottom: 0;
+      background: linear-gradient(0deg, rgba(0,0,0,.72), transparent);
+    }
+
+    .fullscreen-info::before {
+      top: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,.72), transparent);
     }
 
     .tv-name {
@@ -2118,7 +2106,7 @@
       }
 
       .camera-card:not(.featured-card).compact-mobile:not(.expanded-mobile) video,
-      .camera-card:not(.featured-card).compact-mobile:not(.expanded-mobile) img {
+      .camera-card:not(.featured-card).compact-mobile:not(.expanded-mobile) img:not(.camera-partner-logo) {
         height: 92px;
       }
 
@@ -2157,7 +2145,7 @@
       }
 
       .camera-card.compact-mobile.expanded-mobile video,
-      .camera-card.compact-mobile.expanded-mobile img {
+      .camera-card.compact-mobile.expanded-mobile img:not(.camera-partner-logo) {
         height: 100%;
       }
 
@@ -2257,12 +2245,12 @@
       }
 
       .camera-card:not(.featured-card).compact-mobile:not(.expanded-mobile) video,
-      .camera-card:not(.featured-card).compact-mobile:not(.expanded-mobile) img {
+      .camera-card:not(.featured-card).compact-mobile:not(.expanded-mobile) img:not(.camera-partner-logo) {
         height: 86px;
       }
 
       .camera-card.compact-mobile.expanded-mobile video,
-      .camera-card.compact-mobile.expanded-mobile img {
+      .camera-card.compact-mobile.expanded-mobile img:not(.camera-partner-logo) {
         width: 100%;
         height: 100%;
       }
@@ -3036,6 +3024,56 @@ const PUBLIC_CAMERAS = (window.LVSM_CAMERAS || []).filter(cam =>
   getCameraPresentation(cam).visible
 );
 
+function getPublicCameraGroup(cam) {
+  if (cam.type === "promo") return 3;
+  return getCameraPresentation(cam).allowStream ? 1 : 2;
+}
+
+function isValidPublicCameraOrder(value) {
+  return Number.isSafeInteger(value) && value > 0;
+}
+
+const publicCameraSourceIndexes = new WeakMap();
+const publicCameraOrderCounts = new Map();
+
+PUBLIC_CAMERAS.forEach((cam, sourceIndex) => {
+  publicCameraSourceIndexes.set(cam, sourceIndex);
+
+  if (!isValidPublicCameraOrder(cam.publicOrder)) return;
+
+  const group = getPublicCameraGroup(cam);
+  const groupOrderCounts = publicCameraOrderCounts.get(group) || new Map();
+  groupOrderCounts.set(
+    cam.publicOrder,
+    (groupOrderCounts.get(cam.publicOrder) || 0) + 1
+  );
+  publicCameraOrderCounts.set(group, groupOrderCounts);
+});
+
+function comparePublicCameras(left, right) {
+  const leftGroup = getPublicCameraGroup(left);
+  const rightGroup = getPublicCameraGroup(right);
+
+  if (leftGroup !== rightGroup) return leftGroup - rightGroup;
+
+  const leftOrderIsValid =
+    isValidPublicCameraOrder(left.publicOrder) &&
+    publicCameraOrderCounts.get(leftGroup)?.get(left.publicOrder) === 1;
+  const rightOrderIsValid =
+    isValidPublicCameraOrder(right.publicOrder) &&
+    publicCameraOrderCounts.get(rightGroup)?.get(right.publicOrder) === 1;
+
+  if (leftOrderIsValid && rightOrderIsValid && left.publicOrder !== right.publicOrder) {
+    return left.publicOrder - right.publicOrder;
+  }
+  if (leftOrderIsValid !== rightOrderIsValid) return leftOrderIsValid ? -1 : 1;
+
+  return (
+    (publicCameraSourceIndexes.get(left) ?? Number.MAX_SAFE_INTEGER) -
+    (publicCameraSourceIndexes.get(right) ?? Number.MAX_SAFE_INTEGER)
+  );
+}
+
 const liveCameras = PUBLIC_CAMERAS.filter(cam =>
   ["hls", "snapshot"].includes(cam.type) &&
   cam.url &&
@@ -3122,17 +3160,21 @@ function renderCameraAttribution(
   `;
 }
 
-function renderCameraSponsorLogo(entity) {
-  if (!entity?.name) return "";
+function selectCameraCardPartner(cam) {
+  if (cam?.sponsor?.name && safeAttributionLogoUrl(cam.sponsor.logo)) {
+    return cam.sponsor;
+  }
+  if (cam?.support?.name && safeAttributionLogoUrl(cam.support.logo)) {
+    return cam.support;
+  }
+  return null;
+}
 
+function renderCameraCardPartnerLogo(cam) {
+  const entity = selectCameraCardPartner(cam);
+  if (!entity) return "";
   const logo = safeAttributionLogoUrl(entity.logo);
-  if (!logo) return "";
-
-  return `
-    <div class="camera-sponsor-logo">
-      <img src="${escapeHtml(logo)}" alt="${escapeHtml(entity.name)}">
-    </div>
-  `;
+  return `<img class="camera-partner-logo" src="${escapeHtml(logo)}" alt="${escapeHtml(entity.name)}">`;
 }
 
 function addCacheBuster(url) {
@@ -3659,11 +3701,16 @@ function createCameraCard(cam, index) {
         )}
         ${renderCameraAttribution(
           cam.support,
-          { defaultLabel: "Apoio", className: "camera-support" }
+          {
+            defaultLabel: "Apoio",
+            className: "camera-support",
+            showLogo: false
+          }
         )}
+
       </div>
     </div>
-    ${renderCameraSponsorLogo(cam.sponsor)}
+    ${renderCameraCardPartnerLogo(cam)}
   `;
 
   const liveVideo = card.querySelector("video");
@@ -3954,19 +4001,10 @@ const LazyHlsManager = {
 function renderCameras() {
   container.innerHTML = "";
 
-  const typeOrder = {
-    hls: 1,
-    snapshot: 1,
-    future: 2,
-    promo: 3
-  };
-
   const visible = PUBLIC_CAMERAS
     .filter(cam => cam.type !== "promo")
     .filter(cameraMatchesFilter)
-    .sort((a, b) => {
-      return (typeOrder[a.type] || 99) - (typeOrder[b.type] || 99);
-    });
+    .sort(comparePublicCameras);
 
   container.classList.toggle("camera-list", listMode);
 
@@ -4251,6 +4289,9 @@ function openCameraFullscreen(cam) {
     </div>
   `;
 
+  fsStage.appendChild(media);
+  fsStage.appendChild(info);
+
   if (cam.sponsor?.logo) {
     const logo = document.createElement("div");
 
@@ -4262,10 +4303,8 @@ function openCameraFullscreen(cam) {
         alt="${escapeHtml(cam.sponsor.name || "Sponsor")}"
       >
     `;
-    info.appendChild(logo);
+    fsStage.appendChild(logo);
   }
-  fsStage.appendChild(media);
-  fsStage.appendChild(info);
   fsMode.classList.add("show");
 }
 
