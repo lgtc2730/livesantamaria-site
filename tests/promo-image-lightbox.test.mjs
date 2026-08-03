@@ -265,8 +265,8 @@ test("promo image lightbox has an isolated contained-image dialog", async () => 
   assert.match(html, /\.promo-image-lightbox[\s\S]*position:\s*fixed/);
   const imageRule = extractCssRule(html, ".promo-image-lightbox__image");
   assert.match(imageRule, /display:\s*block/);
-  assert.match(imageRule, /max-width:\s*100%/);
-  assert.match(imageRule, /max-height:\s*100%/);
+  assert.match(imageRule, /max-width:\s*min\(100%,\s*760px\)/);
+  assert.match(imageRule, /max-height:\s*min\(100%,\s*760px\)/);
   assert.match(imageRule, /width:\s*auto/);
   assert.match(imageRule, /height:\s*auto/);
   assert.match(imageRule, /object-fit:\s*contain/);
@@ -279,6 +279,17 @@ test("promo image lightbox has an isolated contained-image dialog", async () => 
   assert.match(activatePromoCardSource, /window\.open\(cam\.url, "_blank", "noopener,noreferrer"\)/);
   assert.match(createCameraCardSource, /activatePromoCard\(cam, card\)/);
   assert.match(createCameraCardSource, /e\.pointerType === "touch" && pointerMoved/);
+});
+
+test("promo card keeps the complete QR image visible without cover zoom", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const promoImageRule = extractCssRule(
+    html,
+    '.camera-card[data-type="promo"] .live-media'
+  );
+
+  assert.match(promoImageRule, /object-fit:\s*contain/);
+  assert.match(promoImageRule, /transform:\s*none/);
 });
 
 test("opens only loaded image promos and restores the originating activation on every close path", async () => {
