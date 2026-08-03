@@ -8,7 +8,20 @@ const projectRoot = new URL("../", import.meta.url);
 function extractFunction(source, name) {
   const start = source.indexOf(`function ${name}(`);
   assert.notEqual(start, -1, `function ${name} not found in index.html`);
-  const openingBrace = source.indexOf("{", start);
+  const openingParenthesis = source.indexOf("(", start);
+  let parenthesisDepth = 0;
+  let openingBrace = -1;
+
+  for (let index = openingParenthesis; index < source.length; index += 1) {
+    if (source[index] === "(") parenthesisDepth += 1;
+    if (source[index] === ")") parenthesisDepth -= 1;
+    if (parenthesisDepth === 0) {
+      openingBrace = source.indexOf("{", index);
+      break;
+    }
+  }
+
+  assert.notEqual(openingBrace, -1, `function ${name} body not found in index.html`);
   let depth = 0;
 
   for (let index = openingBrace; index < source.length; index += 1) {
@@ -39,6 +52,7 @@ class ElementDouble {
     this.listeners = new Map();
     this.hidden = true;
     this.dataset = {};
+    this.parentElement = null;
     this.tabIndex = this.tagName === "BUTTON" ? 0 : -1;
     this.classList = {
       values: new Set(),
@@ -57,6 +71,12 @@ class ElementDouble {
 
   setAttribute(name, value) {
     this.attributes.set(name, value);
+    if (name === "class") {
+      String(value).split(/\s+/).filter(Boolean)
+        .forEach(className => this.classList.values.add(className));
+    }
+    if (name === "href" && this.tagName === "A") this.tabIndex = 0;
+    if (name === "tabindex") this.tabIndex = Number(value);
   }
 
   getAttribute(name) {
@@ -68,7 +88,25 @@ class ElementDouble {
   }
 
   dispatch(type, event = {}) {
-    this.listeners.get(type)?.({ target: this, ...event });
+    let defaultPrevented = false;
+    const suppliedPreventDefault = event.preventDefault;
+    const dispatchedEvent = {
+      target: this,
+      ...event,
+      preventDefault() {
+        defaultPrevented = true;
+        suppliedPreventDefault?.();
+      }
+    };
+    this.listeners.get(type)?.(dispatchedEvent);
+
+    const isNativeButtonActivation = this.tagName === "BUTTON" && (
+      (type === "keydown" && event.key === "Enter") ||
+      (type === "keyup" && event.key === " ")
+    );
+    if (isNativeButtonActivation && !defaultPrevented) {
+      this.dispatch("click");
+    }
   }
 
   replaceChildren(...children) {
@@ -79,7 +117,15 @@ class ElementDouble {
     if (this.tabIndex >= 0) this.document.activeElement = this;
   }
 
-  closest() {
+  closest(selector) {
+    const selectors = selector.split(",").map(value => value.trim());
+    for (let element = this; element; element = element.parentElement) {
+      if (selectors.some(value => (
+        value.startsWith(".")
+          ? element.classList.values.has(value.slice(1))
+          : element.tagName === value.toUpperCase()
+      ))) return element;
+    }
     return null;
   }
 
@@ -88,6 +134,16 @@ class ElementDouble {
     this.liveMedia = value.includes('class="live-media"')
       ? { complete: true, naturalWidth: 640 }
       : null;
+    this.children = [];
+
+    for (const match of value.matchAll(/<(button|a)\b([^>]*)>/gi)) {
+      const element = new ElementDouble(this.document, match[1]);
+      for (const attribute of match[2].matchAll(/([:\w-]+)(?:="([^"]*)")?/g)) {
+        element.setAttribute(attribute[1], attribute[2] ?? "");
+      }
+      element.parentElement = this;
+      this.children.push(element);
+    }
   }
 
   get innerHTML() {
@@ -96,7 +152,11 @@ class ElementDouble {
 
   querySelector(selector) {
     if (selector === ".live-media") return this.liveMedia;
-    return null;
+    return this.children.find(element => (
+      selector.startsWith(".")
+        ? element.classList.values.has(selector.slice(1))
+        : element.tagName === selector.toUpperCase()
+    )) ?? null;
   }
 }
 
@@ -139,6 +199,7 @@ async function loadPromoCards() {
       matchMedia() { return { matches: false }; },
       open(...args) { openCalls.push(args); }
     },
+    URL,
     expandedMobileCards: new Set(),
     getCameraPresentation() {
       return { allowStream: false, badge: "live", badgeDot: true, useFallback: false };
@@ -147,7 +208,6 @@ async function loadPromoCards() {
     getEditorialPreview(cam) { return cam.preview; },
     escapeHtml(value) { return String(value ?? ""); },
     needsSponsor() { return false; },
-    renderCameraAttribution() { return ""; },
     renderCameraCardPartnerLogo() { return ""; },
     applyDigitalZoom() {},
     isOffline() { return false; },
@@ -160,6 +220,9 @@ async function loadPromoCards() {
     extractFunction(html, "openPromoImageLightbox"),
     extractFunction(html, "closePromoImageLightbox"),
     extractFunction(html, "setupPromoImageLightboxInteractions"),
+    extractFunction(html, "safeHttpsUrl"),
+    extractFunction(html, "safeAttributionLogoUrl"),
+    extractFunction(html, "renderCameraAttribution"),
     optionalActivation,
     extractFunction(html, "createCameraCard"),
     "setupPromoImageLightboxInteractions();",
@@ -218,15 +281,18 @@ test("promo image lightbox has an isolated contained-image dialog", async () => 
   assert.match(createCameraCardSource, /e\.pointerType === "touch" && pointerMoved/);
 });
 
-test("opens only loaded image promos and restores the originating card on every close path", async () => {
+test("opens only loaded image promos and restores the originating activation on every close path", async () => {
   const { document, lightbox, stage, close, openPromoImageLightbox } = await loadLightbox();
-  const trigger = new ElementDouble(document, "ARTICLE");
-  trigger.tabIndex = 0;
+  const card = new ElementDouble(document, "ARTICLE");
+  const activation = new ElementDouble(document, "BUTTON");
   const preview = { complete: true, naturalWidth: 640 };
-  trigger.querySelector = selector => selector === ".live-media" ? preview : null;
+  card.querySelector = selector => (
+    selector === ".live-media" ? preview :
+      selector === ".promo-card-activation" ? activation : null
+  );
   const cam = { name: "Cultura em Movimento", preview: "/promo.jpg" };
 
-  openPromoImageLightbox(cam, trigger);
+  openPromoImageLightbox(cam, card);
   assert.equal(lightbox.hidden, false);
   assert.equal(document.body.style.overflow, "hidden");
   assert.equal(document.activeElement, close);
@@ -243,13 +309,14 @@ test("opens only loaded image promos and restores the originating card on every 
     assert.equal(lightbox.hidden, true);
     assert.equal(stage.children.length, 0);
     assert.equal(document.body.style.overflow, "auto");
-    assert.equal(document.activeElement, trigger);
-    openPromoImageLightbox(cam, trigger);
+    assert.equal(document.activeElement, activation);
+    openPromoImageLightbox(cam, card);
   }
 
   const unloaded = new ElementDouble(document, "ARTICLE");
-  unloaded.tabIndex = 0;
-  unloaded.querySelector = () => ({ complete: false, naturalWidth: 640 });
+  unloaded.querySelector = selector => (
+    selector === ".live-media" ? { complete: false, naturalWidth: 640 } : activation
+  );
   close.dispatch("click");
   openPromoImageLightbox(cam, unloaded);
   assert.equal(lightbox.hidden, true);
@@ -270,30 +337,80 @@ test("backdrop selection leaves the image and close control to their own handler
   assert.equal(lightbox.hidden, false);
 });
 
-test("Promo cards expose button semantics and activate ordinary URLs by pointer, Enter, and Space", async () => {
-  const { createCameraCard, openCalls, fullscreenCalls } = await loadPromoCards();
+test("compact Promo attribution stays pointer-operable above the activation control", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+
+  assert.match(extractCssRule(html, ".camera-info"), /z-index:\s*3/);
+  assert.match(extractCssRule(html, ".promo-card-activation"), /z-index:\s*2/);
+  assert.match(
+    extractCssRule(html, '.camera-card.compact-mobile[data-type="promo"] .camera-info'),
+    /pointer-events:\s*auto/
+  );
+});
+
+test("Promo cards keep attribution links separate from a native activation button", async () => {
+  const { html, document, createCameraCard, openCalls, fullscreenCalls } = await loadPromoCards();
   const promo = {
     id: "ordinary-promo",
     type: "promo",
     name: "Ordinary Promo",
     preview: "/ordinary.jpg",
-    url: "https://example.test/promo"
+    url: "https://example.test/promo",
+    sponsor: {
+      name: "Promo Sponsor",
+      url: "https://sponsor.example.test/"
+    }
   };
   const card = createCameraCard(promo, 0);
+  const activation = card.querySelector(".promo-card-activation");
+  const attributionLink = card.querySelector("a");
   let prevented = 0;
 
-  assert.equal(card.getAttribute("role"), "button");
-  assert.equal(card.tabIndex, 0);
+  assert.equal(card.getAttribute("role"), null);
+  assert.equal(card.tabIndex, -1);
+  assert.equal(activation?.tagName, "BUTTON");
+  assert.equal(activation?.getAttribute("type"), "button");
+  assert.equal(activation?.getAttribute("aria-label"), "Abrir promoção: Ordinary Promo");
+  assert.equal(activation?.tabIndex, 0);
+  assert.equal(attributionLink?.tagName, "A");
+  assert.equal(attributionLink?.tabIndex, 0);
+  assert.ok(
+    card.innerHTML.indexOf("</button>") < card.innerHTML.indexOf("<a "),
+    "the activation button must close before attribution links are rendered"
+  );
+
+  card.focus();
+  assert.equal(document.activeElement, null);
+  activation.focus();
+  assert.equal(document.activeElement, activation);
+  attributionLink.focus();
+  assert.equal(document.activeElement, attributionLink);
+
   card.dispatch("pointerup", { pointerType: "mouse" });
+  card.dispatch("pointerup", { target: activation, pointerType: "mouse" });
+  activation.dispatch("click");
+  card.dispatch("pointerup", { target: attributionLink, pointerType: "mouse" });
+  activation.dispatch("keydown", { key: "Enter", preventDefault() { prevented += 1; } });
+  activation.dispatch("keyup", { key: " ", preventDefault() { prevented += 1; } });
   card.dispatch("keydown", { key: "Enter", preventDefault() { prevented += 1; } });
   card.dispatch("keydown", { key: " ", preventDefault() { prevented += 1; } });
 
   assert.deepEqual(openCalls, [
     ["https://example.test/promo", "_blank", "noopener,noreferrer"],
     ["https://example.test/promo", "_blank", "noopener,noreferrer"],
+    ["https://example.test/promo", "_blank", "noopener,noreferrer"],
     ["https://example.test/promo", "_blank", "noopener,noreferrer"]
   ]);
-  assert.equal(prevented, 1);
+  assert.equal(prevented, 0);
+
+  const activationRule = extractCssRule(html, ".promo-card-activation");
+  assert.match(activationRule, /position:\s*absolute/);
+  assert.match(activationRule, /inset:\s*0/);
+  assert.match(activationRule, /z-index:\s*2/);
+  assert.match(
+    extractCssRule(html, ".promo-card-activation:focus-visible"),
+    /(?:outline|box-shadow):/
+  );
 
   const cameraCard = createCameraCard({
     id: "camera",
@@ -303,10 +420,11 @@ test("Promo cards expose button semantics and activate ordinary URLs by pointer,
   }, 1);
   assert.equal(cameraCard.getAttribute("role"), null);
   assert.equal(cameraCard.tabIndex, -1);
+  assert.equal(cameraCard.querySelector(".promo-card-activation"), null);
   assert.equal(fullscreenCalls.length, 0);
 });
 
-test("expand-image Promo keyboard activation opens the lightbox and close restores real card focus", async () => {
+test("expand-image Promo native activation opens the lightbox and restores button focus", async () => {
   const { document, lightbox, close, createCameraCard, openCalls } = await loadPromoCards();
   const card = createCameraCard({
     id: "image-promo",
@@ -316,15 +434,17 @@ test("expand-image Promo keyboard activation opens the lightbox and close restor
     url: "https://example.test/fallback",
     promoAction: "expand-image"
   }, 0);
+  const activation = card.querySelector(".promo-card-activation");
 
-  card.focus();
-  assert.equal(document.activeElement, card);
-  card.dispatch("keydown", { key: "Enter", preventDefault() {} });
+  assert.equal(activation?.getAttribute("aria-label"), "Ampliar imagem promocional: Image Promo");
+  activation.focus();
+  assert.equal(document.activeElement, activation);
+  activation.dispatch("keydown", { key: "Enter" });
   assert.equal(lightbox.hidden, false);
   assert.equal(document.activeElement, close);
   assert.deepEqual(openCalls, []);
 
   close.dispatch("click");
   assert.equal(lightbox.hidden, true);
-  assert.equal(document.activeElement, card);
+  assert.equal(document.activeElement, activation);
 });
