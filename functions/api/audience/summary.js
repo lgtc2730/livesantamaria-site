@@ -38,7 +38,47 @@ function zonedMidnightUtc(year, month, day) {
     guess -= actualAsUtc - desiredAsUtc;
   }
 
-  return new Date(guess);
+  const resolved = new Date(guess);
+  const resolvedParts = getZonedParts(resolved);
+
+  if (
+    resolvedParts.year === year &&
+    resolvedParts.month === month &&
+    resolvedParts.day === day
+  ) {
+    return resolved;
+  }
+
+  let lower = desiredAsUtc - 36 * 60 * 60 * 1000;
+  let upper = desiredAsUtc + 36 * 60 * 60 * 1000;
+
+  while (lower < upper) {
+    const middle = lower + Math.floor((upper - lower) / 2);
+    const parts = getZonedParts(new Date(middle));
+    const isBeforeTarget =
+      parts.year < year ||
+      (parts.year === year && parts.month < month) ||
+      (parts.year === year && parts.month === month && parts.day < day);
+
+    if (isBeforeTarget) {
+      lower = middle + 1;
+    } else {
+      upper = middle;
+    }
+  }
+
+  const firstValidInstant = new Date(lower);
+  const firstValidParts = getZonedParts(firstValidInstant);
+
+  if (
+    firstValidParts.year !== year ||
+    firstValidParts.month !== month ||
+    firstValidParts.day !== day
+  ) {
+    throw new RangeError("Unable to resolve Atlantic/Azores calendar day");
+  }
+
+  return firstValidInstant;
 }
 
 function addCalendarDays(year, month, day, amount) {
@@ -133,7 +173,8 @@ export async function onRequestGet(context) {
 
   const db = context.env.LVSM_AUDIENCE;
 
-  const periods = getPeriodBoundaries();
+  const now = context.now ?? new Date();
+  const periods = getPeriodBoundaries(now);
 
   const [
     todayResult,
@@ -205,7 +246,7 @@ export async function onRequestGet(context) {
 
   return Response.json({
     apiVersion: 1,
-    generatedAt: new Date().toISOString(),
+    generatedAt: now.toISOString(),
 
     visits: {
 
