@@ -35,3 +35,11 @@ test("privacy page publishes the approved v2 transparency contract", async () =>
   assert.doesNotMatch(html, /audience\/event|hls\.min\.js|timelapse\.js/);
   assert.doesNotMatch(html, /dados anónimos|nenhum IP|conformidade garantida/i);
 });
+
+test("public site links to privacy information without treating navigation as consent", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+
+  assert.match(html, /<a[^>]+href="\.\/privacidade\.html"[^>]*>Privacidade<\/a>/);
+  assert.match(html, /<a[^>]+href="\.\/privacidade\.html#metricas"[^>]*>Saber mais na Política de Privacidade<\/a>/);
+  assert.match(html, /id="audiencePrivacySettings"[^>]*>Definições de métricas<\/button>/);
+});

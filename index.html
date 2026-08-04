@@ -1808,6 +1808,13 @@
       cursor: pointer;
     }
 
+    .audience-consent__more {
+      display: inline-block;
+      margin-top: 10px;
+      color: var(--blue2);
+      text-decoration: underline;
+    }
+
     .audience-consent {
       position: fixed;
       z-index: 1000;
@@ -3006,7 +3013,8 @@
 
     <div class="footer">
       © Live Santa Maria · v2 · Imagens em directo para apoio à observação meteorológica e marítima informal.
-      · <button class="footer-privacy-button" id="audiencePrivacySettings" type="button">Privacidade</button>
+      · <a class="footer-privacy-button" href="./privacidade.html">Privacidade</a>
+      · <button class="footer-privacy-button" id="audiencePrivacySettings" type="button">Definições de métricas</button>
     </div>
   </div>
 
@@ -3022,6 +3030,7 @@
   <section class="audience-consent" id="audienceConsentPanel" role="region" aria-labelledby="audienceConsentTitle" hidden>
     <h2 id="audienceConsentTitle">Métricas de audiência opcionais</h2>
     <p>Podemos contar visitas e câmaras públicas abertas através de uma sessão aleatória de 30 minutos. Os eventos brutos são eliminados após 30 dias e não são associados a uma conta identificada.</p>
+    <a class="audience-consent__more" href="./privacidade.html#metricas">Saber mais na Política de Privacidade</a>
     <div class="audience-consent__actions">
       <button id="audienceConsentAccept" type="button">Aceitar métricas</button>
       <button id="audienceConsentRefuse" type="button">Recusar</button>
