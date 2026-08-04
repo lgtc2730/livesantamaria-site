@@ -49,14 +49,15 @@ async function loadDatabase() {
   return import(sourceUrl);
 }
 
-async function loadBrowserAudience(fetchImpl) {
+async function loadBrowserAudience(fetchImpl, initialStorage = {}) {
   const html = await readFile(new URL("index.html", projectRoot), "utf8");
   const start = html.indexOf('const AUDIENCE_SESSION_KEY = "lvsm-audience-session";');
   const end = html.indexOf("function trackVisit()", start);
   assert.notEqual(start, -1, "audience browser session code must exist");
   assert.notEqual(end, -1, "audience visit tracker must follow the sender");
 
-  const stored = new Map();
+  const stored = new Map(Object.entries(initialStorage));
+  const storageOperations = [];
   const context = {
     console: { warn() {} },
     crypto: { randomUUID: () => validSession },
@@ -64,17 +65,33 @@ async function loadBrowserAudience(fetchImpl) {
     fetch: fetchImpl,
     JSON,
     localStorage: {
-      getItem: key => stored.get(key) ?? null,
-      setItem: (key, value) => stored.set(key, value)
+      getItem: key => {
+        storageOperations.push(["get", key]);
+        return stored.get(key) ?? null;
+      },
+      setItem: (key, value) => {
+        storageOperations.push(["set", key]);
+        stored.set(key, value);
+      },
+      removeItem: key => {
+        storageOperations.push(["remove", key]);
+        stored.delete(key);
+      }
     },
     location: { hostname: "www.livesantamaria.org" }
   };
 
   vm.runInNewContext(
-    `${html.slice(start, end)}\nglobalThis.__sendAudienceEvent = sendAudienceEvent;`,
+    `${html.slice(start, end)}
+globalThis.__audience = {
+  sendAudienceEvent,
+  getAudienceConsent,
+  setAudienceConsent,
+  clearAudienceSession
+};`,
     context
   );
-  return context.__sendAudienceEvent;
+  return { ...context.__audience, stored, storageOperations };
 }
 
 class DeduplicatingD1 {
@@ -115,7 +132,7 @@ test("the real browser visit payload passes the handler and inserts once across 
   const db = new DeduplicatingD1();
   const payloads = [];
   const statuses = [];
-  const sendAudienceEvent = await loadBrowserAudience(async (url, options) => {
+  const { sendAudienceEvent } = await loadBrowserAudience(async (url, options) => {
     payloads.push(JSON.parse(options.body));
     const response = await onRequestPost({
       request: new Request(new URL(url, "https://www.livesantamaria.org"), {
@@ -129,7 +146,7 @@ test("the real browser visit payload passes the handler and inserts once across 
     });
     statuses.push(response.status);
     return response;
-  });
+  }, { "lvsm-audience-consent-v1": "accepted" });
 
   await sendAudienceEvent("visit");
   await sendAudienceEvent("visit");
@@ -141,6 +158,52 @@ test("the real browser visit payload passes the handler and inserts once across 
   assert.deepEqual(statuses, [200, 200]);
   assert.equal(db.statements.length, 2);
   assert.equal(db.rows.length, 1);
+});
+
+test("pending consent neither touches the audience session nor sends an event", async () => {
+  let requests = 0;
+  const browser = await loadBrowserAudience(async () => {
+    requests += 1;
+  });
+
+  await browser.sendAudienceEvent("visit");
+
+  assert.equal(requests, 0);
+  assert.equal(
+    browser.storageOperations.some(([, key]) => key === "lvsm-audience-session"),
+    false
+  );
+});
+
+test("refusing consent removes legacy audience state and keeps events disabled", async () => {
+  let requests = 0;
+  const browser = await loadBrowserAudience(async () => {
+    requests += 1;
+  }, {
+    "lvsm-audience-session": JSON.stringify({ id: validSession, lastActivity: Date.now(), cameras: [] })
+  });
+
+  browser.setAudienceConsent("refused");
+  await browser.sendAudienceEvent("camera_view", "cnsm");
+
+  assert.equal(browser.stored.get("lvsm-audience-consent-v1"), "refused");
+  assert.equal(browser.stored.has("lvsm-audience-session"), false);
+  assert.equal(requests, 0);
+});
+
+test("withdrawing accepted consent clears the session and disables later events", async () => {
+  let requests = 0;
+  const browser = await loadBrowserAudience(async () => {
+    requests += 1;
+    return new Response(null, { status: 200 });
+  }, { "lvsm-audience-consent-v1": "accepted" });
+
+  await browser.sendAudienceEvent("visit");
+  browser.setAudienceConsent("refused");
+  await browser.sendAudienceEvent("camera_view", "cnsm");
+
+  assert.equal(requests, 1);
+  assert.equal(browser.stored.has("lvsm-audience-session"), false);
 });
 
 test("loads LF and CRLF handler sources without redeclaring injected dependencies", async () => {

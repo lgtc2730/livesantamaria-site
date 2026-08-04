@@ -5320,9 +5320,51 @@ function stopGridHlsPlayers() {
 }
 
 const AUDIENCE_SESSION_KEY = "lvsm-audience-session";
+const AUDIENCE_CONSENT_KEY = "lvsm-audience-consent-v1";
 const AUDIENCE_SESSION_MS = 30 * 60 * 1000;
 
+function getAudienceConsent() {
+  try {
+    const consent = localStorage.getItem(AUDIENCE_CONSENT_KEY);
+    return consent === "accepted" || consent === "refused" ? consent : null;
+  } catch (error) {
+    console.warn("Preferência de métricas indisponível:", error);
+    return null;
+  }
+}
+
+function clearAudienceSession() {
+  try {
+    localStorage.removeItem(AUDIENCE_SESSION_KEY);
+  } catch (error) {
+    console.warn("Não foi possível limpar a sessão de métricas:", error);
+  }
+}
+
+function setAudienceConsent(consent) {
+  if (consent !== "accepted" && consent !== "refused") {
+    return false;
+  }
+
+  try {
+    localStorage.setItem(AUDIENCE_CONSENT_KEY, consent);
+  } catch (error) {
+    console.warn("Não foi possível guardar a preferência de métricas:", error);
+    return false;
+  }
+
+  if (consent === "refused") {
+    clearAudienceSession();
+  }
+
+  return true;
+}
+
 function getAudienceSession() {
+  if (getAudienceConsent() !== "accepted") {
+    return null;
+  }
+
   const now = Date.now();
 
   try {
@@ -5362,11 +5404,17 @@ function getAudienceSession() {
 }
 
 async function sendAudienceEvent(event, camera = null) {
-  if (location.hostname !== "www.livesantamaria.org") {
+  if (
+    location.hostname !== "www.livesantamaria.org" ||
+    getAudienceConsent() !== "accepted"
+  ) {
     return;
   }
 
   const session = getAudienceSession();
+  if (!session) {
+    return;
+  }
   const payload = {
     event,
     session: session.id
@@ -5393,7 +5441,7 @@ async function sendAudienceEvent(event, camera = null) {
 function trackVisit() {
   const session = getAudienceSession();
 
-  if (session.visitSent) {
+  if (!session || session.visitSent) {
     return;
   }
 
@@ -5414,6 +5462,9 @@ function trackCameraView(cameraId) {
   }
 
   const session = getAudienceSession();
+  if (!session) {
+    return;
+  }
   const viewedCameras = new Set(session.cameras || []);
 
   if (viewedCameras.has(cameraId)) {
