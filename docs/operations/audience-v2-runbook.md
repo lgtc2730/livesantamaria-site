@@ -188,10 +188,10 @@ Pare a promoção e informe o responsável de lançamento se a regra WAF bloquea
 
 Antes de promoção de produção, o responsável pelo projecto e a administração técnica têm de concluir e aprovar esta lista. A Política de Privacidade deve descrever o comportamento efectivamente publicado, não a implementação planeada nem uma versão anterior.
 
-- [ ] Identificar o responsável pelo tratamento e contacto de privacidade.
+- [x] Registar Luis Mesquita, em nome individual, como responsável pelo tratamento; Luis Carreiro, em nome individual, como responsável técnico e operacional (não Encarregado de Proteção de Dados); e `livesantamaria.project@gmail.com` como contacto público do projecto e de privacidade.
 - [ ] Descrever a finalidade específica das métricas de audiência.
 - [ ] Determinar e documentar a base de licitude aplicável.
-- [ ] Avaliar em Portugal a utilização de `localStorage`, o identificador de sessão de 30 minutos e qualquer requisito de consentimento; não presumir que o consentimento é dispensado.
+- [x] Exigir consentimento prévio e explícito antes de ler/criar a sessão analítica de 30 minutos em `localStorage` ou enviar eventos; a recusa não limita o Site e a retirada apaga a sessão local e bloqueia eventos posteriores.
 - [ ] Rever Cloudflare como subcontratante e os respectivos subprocessadores/termos aplicáveis.
 - [ ] Publicar procedimento de exercício de direitos, incluindo contacto, verificação e resposta a objecções.
 - [ ] Divulgar claramente a retenção de eventos brutos por 30 dias.
@@ -199,3 +199,12 @@ Antes de promoção de produção, o responsável pelo projecto e a administraç
 - [ ] Indicar o proprietário da política, data de publicação e versão.
 
 Enquanto qualquer item estiver incompleto, não publique texto de privacidade, não faça alegações de anonimato ou de dispensa de consentimento e não promova o lançamento.
+
+### Prova imediata do consentimento antes da promoção
+
+- [ ] Sem decisão guardada, confirmar que o Site e as câmaras funcionam, que o painel apresenta `Aceitar métricas` e `Recusar`, e que não há acesso à chave `lvsm-audience-session` nem pedidos para `/api/audience/event`.
+- [ ] Depois de `Recusar`, confirmar navegação normal, ausência de pedidos de audiência e remoção de qualquer sessão analítica legada.
+- [ ] Reabrir `Privacidade`, escolher `Aceitar métricas` e confirmar uma única visita e deduplicação de câmaras na sessão de 30 minutos.
+- [ ] Recarregar a página e confirmar que a decisão guardada é respeitada sem criar uma visita duplicada na mesma sessão.
+- [ ] Retirar a aceitação através de `Privacidade`, confirmar a remoção da sessão local e a ausência de eventos posteriores.
+- [ ] Confirmar que o texto público informa a finalidade, a sessão aleatória de 30 minutos, a eliminação dos eventos brutos após 30 dias, o contacto e a forma de alterar a escolha.

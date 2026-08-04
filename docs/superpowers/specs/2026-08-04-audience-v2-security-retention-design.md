@@ -126,14 +126,20 @@ Malformed and abusive requests produce bounded responses. A telemetry failure ne
 
 ## RGPD and privacy requirements
 
-The implementation follows data-minimization and storage-limitation principles. Technical implementation is not a legal determination and does not, by itself, establish the applicable lawful basis or whether local storage requires consent under Portuguese electronic-communications rules.
+The implementation follows data-minimization and storage-limitation principles. Technical implementation is not a legal determination and does not, by itself, establish every applicable RGPD obligation. For release v2, the approved conservative implementation requires prior, explicit consent before the browser reads or creates the audience session in `localStorage` or sends an audience event. Refusal leaves the Site fully operational, and withdrawal removes the local audience session and stops later events.
+
+The recorded project roles and contact are:
+
+- Luis Mesquita: responsible for the processing, acting in an individual capacity;
+- Luis Carreiro: technical and operational responsible, acting in an individual capacity; this does not designate him as Data Protection Officer;
+- `livesantamaria.project@gmail.com`: public project and privacy contact.
 
 Before production release, technical administration and the responsible project owner must record:
 
-- the controller and privacy contact;
+- the controller, technical role, and privacy contact recorded above;
 - the precise analytics purpose;
 - the lawful basis selected for the processing;
-- the assessment of consent requirements for the browser's `localStorage` identifier;
+- the approved prior-consent behavior for the browser's `localStorage` identifier;
 - recipients/processors and relevant Cloudflare terms;
 - the 30-day raw-event retention period;
 - how data-subject rights and objections are handled;
