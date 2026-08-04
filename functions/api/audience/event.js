@@ -1,4 +1,14 @@
 import { insertEvent } from "./db.js";
+import audienceCatalog from "../../../audience.public.json" with { type: "json" };
+import { readAudienceRequest, validateAudiencePayload } from "./validation.js";
+
+function logAudienceEvent(eventType, camera, outcome) {
+  try {
+    console.log({ eventType, camera, outcome });
+  } catch {
+    // Telemetry must not affect audience-event ingestion.
+  }
+}
 
 export async function onRequestPost(context) {
 
@@ -10,33 +20,32 @@ export async function onRequestPost(context) {
     });
   }
 
-  const body = await context.request.json();
+  let event;
 
-  if (!body.event || !body.session) {
+  try {
+    const body = await readAudienceRequest(context.request);
+    event = validateAudiencePayload(body, new Set(audienceCatalog.cameraIds));
+  } catch (error) {
     return Response.json(
       { error: "invalid request" },
-      { status: 400 }
+      { status: error?.code === "body_too_large" ? 413 : 400 }
     );
   }
 
-  console.log("[Audience]", {
-    event: body.event,
-    camera: body.camera,
-    session: body.session,
-    host
-  });
+  try {
+    await insertEvent(
+      context.env.LVSM_AUDIENCE,
+      { ...event, host }
+    );
+  } catch {
+    logAudienceEvent(event.type, event.camera, "failed");
+    return Response.json(
+      { error: "service unavailable" },
+      { status: 503 }
+    );
+  }
 
-  const result = await insertEvent(
-    context.env.LVSM_AUDIENCE,
-    {
-      type: body.event,
-      camera: body.camera,
-      session: body.session,
-      host
-    }
-  );
-
-  console.log("[Audience] DB", result);
+  logAudienceEvent(event.type, event.camera, "stored");
 
   return Response.json({
     ok: true
