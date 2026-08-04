@@ -51,11 +51,16 @@ Execute e guarde apenas os resultados de sucesso/falha e contagens, nunca valore
 ```powershell
 npm test
 npm run retention:dry-run
-& npx.cmd wrangler d1 migrations apply LVSM_AUDIENCE --local -c wrangler.jsonc
-& npx.cmd wrangler d1 migrations list LVSM_AUDIENCE --local -c wrangler.jsonc
+node --experimental-vm-modules --test tests/audience-database.test.mjs
+$cleanPersist = Join-Path ([System.IO.Path]::GetTempPath()) ("lvsm-audience-clean-" + [guid]::NewGuid())
+New-Item -ItemType Directory -Path $cleanPersist | Out-Null
+& npx.cmd wrangler d1 migrations apply LVSM_AUDIENCE --local -c wrangler.jsonc --persist-to $cleanPersist
+& npx.cmd wrangler d1 migrations list LVSM_AUDIENCE --local -c wrangler.jsonc --persist-to $cleanPersist
 ```
 
-Aceitação local: a suite passa, o dry-run constrói o Worker agendado sem rota HTTP, a migration local aplica numa base descartável e a listagem local não mostra migrations pendentes. Apague apenas o estado local descartável segundo o procedimento de desenvolvimento aprovado; nunca use esse estado como evidência de produção.
+O teste de base de dados executa a migration real numa base vazia e noutra base legacy populada. A aceitação exige preservação exacta da contagem e dos campos das linhas legacy, manutenção dos duplicados, chaves distintas para tuplos que colidiam com concatenação por delimitador, `event_key` nullable, índice único parcial, escrita pelo SQL antigo de cinco colunas, escrita/deduplicação pelo código novo e nova escrita depois de simular rollback para o SQL antigo.
+
+Aceitação local: a suite passa, o dry-run constrói o Worker agendado sem rota HTTP, os dois ensaios passam, a migration local aplica numa base descartável limpa e a listagem local não mostra migrations pendentes. Apague apenas o estado local descartável segundo o procedimento de desenvolvimento aprovado; nunca use esse estado como evidência de produção.
 
 ### Preparação remota e marcador Time Travel
 
@@ -73,7 +78,22 @@ Aceitação local: a suite passa, o dry-run constrói o Worker agendado sem rota
 
 Não publique o bookmark no repositório nem em canais públicos. Confirme no resultado que Time Travel é suportado e que a janela de recuperação disponível é suficiente para a mudança. Se não for, pare e peça orientação ao responsável de lançamento.
 
-### Aplicar migrations e publicar o Worker
+### Sequência obrigatória: migration compatível, Pages e Worker
+
+Esta ordem é obrigatória e cada mutação remota requer aprovação separada. Não avance por inferência:
+
+1. concluir a pré-verificação privada e registar o bookmark Time Travel privado;
+2. aplicar apenas a migration compatível que acrescenta `event_key` nullable e o índice único parcial;
+3. com a versão Pages antiga ainda activa, provar por contagens agregadas que a ingestão antiga continua a escrever;
+4. publicar o commit Pages novo, exacto e revisto;
+5. provar visitas produzidas pelo browser, visualizações de câmaras e deduplicação de retries, sempre por resposta e contagens agregadas;
+6. publicar o Worker de retenção como mutação separada;
+7. observar o cron, uma execução `ok` e a contagem agregada de retenção;
+8. só numa mudança futura e separadamente aprovada considerar constraints finais, depois de retirar todas as versões Pages antigas.
+
+O alvo de rollback Pages e o alvo de versão/deployment do Worker têm de ser registados privadamente com SHA/ID exactos e prova de compatibilidade com o schema migrado antes da etapa 2. Um nome de branch, “commit anterior” ou “última versão” não é um alvo. A prova local desta mudança cobre explicitamente o SQL Pages antigo de cinco colunas, o código novo de seis colunas e o retorno ao SQL antigo. O relatório final de correcção regista os SHAs de origem testados; o registo privado de lançamento tem ainda de associá-los às versões remotas efectivamente publicadas.
+
+#### 2. Aplicar a migration compatível
 
 **[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA — mutação remota]** Só depois das pré-verificações, da revisão da migration e do registo privado do bookmark, aplique as migrations:
 
@@ -83,7 +103,23 @@ Não publique o bookmark no repositório nem em canais públicos. Confirme no re
 
 Registe de forma privada apenas o estado aplicado e a hora UTC. Não execute SQL ad hoc, não faça exportação de linhas e não tente uma migration inversa destrutiva.
 
-**[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA — mutação remota]** Depois de a migration remota estar confirmada, publique o Worker de retenção:
+Confirme em modo de leitura que `event_key` é nullable e que o índice único é parcial para `event_key IS NOT NULL`. Não imponha `NOT NULL`, checks de tipo/evento ou normalização de linhas nesta janela.
+
+#### 3. Provar a ingestão Pages antiga
+
+Ainda sem publicar código Pages novo, registe uma contagem agregada antes, produza uma visita controlada através da versão antiga e registe a contagem agregada depois. Não capture nem exporte o corpo, `session_id`, `event_key`, valores SQL ou identificadores de rede. Pare se a escrita antiga falhar: não publique Pages novo e não publique o Worker.
+
+#### 4. Publicar o Pages novo
+
+**[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA — mutação remota Pages]** Publique apenas o SHA Pages exacto revisto e registado. Confirme que o artefacto contém o browser que omite `camera` em `visit`, a validação estrita e a geração de chave `v1` collision-safe. Não combine esta aprovação com a publicação do Worker.
+
+#### 5. Provar visitas, views e deduplicação novas
+
+Numa sessão controlada, prove por respostas e diferenças de contagens agregadas: uma visita aceite e inserida; uma visualização de câmara pública aceite e inserida; o retry exacto de cada evento aceite sem nova linha. Não guarde o identificador da sessão, chave do evento, corpo do pedido ou valores ligados. Pare se qualquer prova falhar e use apenas o alvo Pages de rollback registado e compatível.
+
+#### 6. Publicar o Worker separadamente
+
+**[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA — mutação remota]** Só depois de concluir com sucesso as provas Pages das etapas 3–5, publique o Worker de retenção:
 
 ```powershell
 & npx.cmd wrangler deploy --config workers/audience-retention/wrangler.jsonc
@@ -91,7 +127,11 @@ Registe de forma privada apenas o estado aplicado e a hora UTC. Não execute SQL
 
 A publicação tem de usar a configuração revista, sem rota pública. Não substitua a configuração, não acrescente `routes`, e não invoque manualmente o cron sem nova aprovação explícita: uma invocação pode eliminar eventos expirados.
 
-### Confirmar cron e uma execução bem-sucedida
+#### Constraint final explicitamente adiada
+
+Esta janela não inclui `event_key NOT NULL`, rebuild de tabela, eliminação/reconciliação destrutiva de duplicados, checks finais nem normalização de linhas históricas. Uma migration final só pode existir numa mudança posterior, revista e aprovada separadamente, depois de provar que todas as versões Pages antigas foram retiradas, rever evidência remota agregada, definir o tratamento sem perda para linhas incompatíveis e voltar a testar os alvos de rollback.
+
+### 7. Observar cron e uma execução bem-sucedida
 
 **[LEITURA REMOTA — sem mutação]** Confirme que a versão publicada existe:
 
@@ -124,8 +164,11 @@ Registe também a hora UTC de início da query e a prova local de fronteira acim
 O responsável de lançamento só pode aprovar promoção depois de verificar e anexar, em armazenamento de evidência privado:
 
 - resultados do teste local, dry-run e ensaio local de migrations;
+- comparação agregada que prova preservação integral das linhas da base legacy populada e compatibilidade de escrita old/new/rollback;
 - revisão da migration pendente antes de a aplicar e confirmação de aplicada depois;
 - bookmark Time Travel criado imediatamente antes da migration, janela de recuperação e operador;
+- ID/SHA exacto da versão Pages antiga provada na etapa 3, SHA exacto Pages novo provado na etapa 5 e alvo exacto Pages de rollback compatível;
+- alvo exacto de versão/deployment do Worker compatível com o schema, ou bloqueio explícito por ainda não existir versão anterior;
 - configuração publicada sem rota, cron confirmado e uma execução bem-sucedida;
 - contagem agregada zero para eventos com mais de 30 dias;
 - registo WAF completo, com `IP`/`ip.src`, pedidos medidos por período, ação/timeout suportados pelo plano, duas aprovações separadas, teste controlado de ação eficaz e teste de falsos positivos;
@@ -138,7 +181,7 @@ Não trate uma captura de configuração, uma aprovação verbal, uma compilaç�
 Pare a promoção e informe o responsável de lançamento se a regra WAF bloquear tráfego legítimo, se a migration falhar, se o cron não estiver activo, se não houver execução `ok`, ou se a prova de retenção falhar.
 
 - **WAF:** **[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA — mutação remota]** corrija a expressão ou volte a uma observação temporária/limiar mais alto baseado em medição. Registe a nova decisão, prazo e responsável. Desactivar o controlo eficaz reabre a falha de consumo de recursos e bloqueia a aceitação do lançamento.
-- **Código/Worker:** antes do lançamento, registe privadamente um commit Pages e um alvo de deployment/versão do Worker que tenham sido testados e sejam compatíveis com o schema depois da migration. **[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA — mutação remota]** um rollback só pode publicar esses alvos identificados, nunca um “commit anterior” não especificado. Se não existir versão anterior do Worker compatível, obtenha aprovação separada para o procedimento temporário de retenção e para desactivar o Worker, com duração, evidência e responsável documentados; a interrupção não pode prolongar silenciosamente a retenção.
+- **Código/Worker:** antes de aplicar a migration, registe privadamente o ID/SHA exacto da versão Pages antiga cuja escrita foi testada, o SHA Pages novo, o alvo Pages de rollback e o alvo de deployment/versão do Worker; cada um tem de ter prova de compatibilidade com `event_key` nullable e o índice parcial. **[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA — mutação remota]** um rollback só pode publicar esses alvos identificados, nunca um nome de branch, “commit anterior” ou “última versão”. Depois de rollback Pages, repita a prova agregada de escrita antiga. Se não existir versão anterior do Worker compatível, obtenha aprovação separada para o procedimento temporário de retenção e para desactivar o Worker, com duração, evidência e responsável documentados; a interrupção não pode prolongar silenciosamente a retenção.
 - **Dados:** a alteração de schema é forward-compatible e não deve ser removida de forma destrutiva. **[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA — mutação remota e destrutiva]** um restauro Time Travel exige incidente aprovado, o bookmark privado imediatamente anterior à migration, confirmação de que o commit Pages e a versão Worker a reabrir são compatíveis com o schema restaurado, e validação pós-restauro. O restauro pode ressuscitar eventos expirados/apagados, perder escritas posteriores e restaurar um schema incompatível. Depois do restauro, obtenha aprovação explícita separada para executar a limpeza de retenção pelo Worker revisto (sem SQL ad hoc), prove com a query `julianday` acima que há zero eventos expirados, e só então reabra o serviço.
 
 ## Bloqueio obrigatório: Política de Privacidade e RGPD

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import vm from "node:vm";
 
 const projectRoot = new URL("../", import.meta.url);
 const validSession = "123e4567-e89b-42d3-a456-426614174000";
@@ -39,6 +40,64 @@ async function loadEvent(insertEvent) {
   }
 }
 
+async function loadDatabase() {
+  const source = await readFile(
+    new URL("functions/api/audience/db.js", projectRoot),
+    "utf8"
+  );
+  const sourceUrl = `data:text/javascript;base64,${Buffer.from(source).toString("base64")}#${crypto.randomUUID()}`;
+  return import(sourceUrl);
+}
+
+async function loadBrowserAudience(fetchImpl) {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const start = html.indexOf('const AUDIENCE_SESSION_KEY = "lvsm-audience-session";');
+  const end = html.indexOf("function trackVisit()", start);
+  assert.notEqual(start, -1, "audience browser session code must exist");
+  assert.notEqual(end, -1, "audience visit tracker must follow the sender");
+
+  const stored = new Map();
+  const context = {
+    console: { warn() {} },
+    crypto: { randomUUID: () => validSession },
+    Date,
+    fetch: fetchImpl,
+    JSON,
+    localStorage: {
+      getItem: key => stored.get(key) ?? null,
+      setItem: (key, value) => stored.set(key, value)
+    },
+    location: { hostname: "www.livesantamaria.org" }
+  };
+
+  vm.runInNewContext(
+    `${html.slice(start, end)}\nglobalThis.__sendAudienceEvent = sendAudienceEvent;`,
+    context
+  );
+  return context.__sendAudienceEvent;
+}
+
+class DeduplicatingD1 {
+  statements = [];
+  rows = [];
+
+  prepare(sql) {
+    return {
+      bind: (...values) => ({
+        run: async () => {
+          this.statements.push({ sql, values });
+          const eventKey = values[5];
+          if (this.rows.some(row => row.eventKey === eventKey)) {
+            return { success: true, meta: { changes: 0 } };
+          }
+          this.rows.push({ eventKey, values });
+          return { success: true, meta: { changes: 1 } };
+        }
+      })
+    };
+  }
+}
+
 function eventRequest(payload) {
   return new Request("https://www.livesantamaria.org/api/audience/event", {
     method: "POST",
@@ -49,6 +108,40 @@ function eventRequest(payload) {
     body: JSON.stringify(payload)
   });
 }
+
+test("the real browser visit payload passes the handler and inserts once across a retry", async () => {
+  const { insertEvent } = await loadDatabase();
+  const { onRequestPost } = await loadEvent(insertEvent);
+  const db = new DeduplicatingD1();
+  const payloads = [];
+  const statuses = [];
+  const sendAudienceEvent = await loadBrowserAudience(async (url, options) => {
+    payloads.push(JSON.parse(options.body));
+    const response = await onRequestPost({
+      request: new Request(new URL(url, "https://www.livesantamaria.org"), {
+        ...options,
+        headers: {
+          ...options.headers,
+          host: "www.livesantamaria.org"
+        }
+      }),
+      env: { LVSM_AUDIENCE: db }
+    });
+    statuses.push(response.status);
+    return response;
+  });
+
+  await sendAudienceEvent("visit");
+  await sendAudienceEvent("visit");
+
+  assert.deepEqual(payloads, [
+    { event: "visit", session: validSession },
+    { event: "visit", session: validSession }
+  ]);
+  assert.deepEqual(statuses, [200, 200]);
+  assert.equal(db.statements.length, 2);
+  assert.equal(db.rows.length, 1);
+});
 
 test("stores a normalized allowed event and records only safe telemetry", async () => {
   const inserted = [];

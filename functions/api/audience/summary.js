@@ -235,11 +235,13 @@ export async function onRequestGet(context) {
       WHERE event_type='camera_view'
         AND camera_id IS NOT NULL
         AND created_at>=?
+        AND created_at<?
       GROUP BY camera_id
       ORDER BY count DESC,camera_id ASC
       LIMIT 5
     `).bind(
-      periods.last30Start
+      periods.last30Start,
+      periods.tomorrowStart
     )
 
   ]);

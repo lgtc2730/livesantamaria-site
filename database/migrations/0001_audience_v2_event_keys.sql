@@ -7,42 +7,42 @@ CREATE TABLE IF NOT EXISTS events (
   host TEXT
 );
 
-CREATE TABLE events_v2 (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  created_at TEXT NOT NULL,
-  event_type TEXT NOT NULL CHECK (event_type IN ('visit', 'camera_view')),
-  camera_id TEXT,
-  session_id TEXT NOT NULL,
-  host TEXT NOT NULL,
-  event_key TEXT NOT NULL UNIQUE
-);
+ALTER TABLE events ADD COLUMN event_key TEXT;
 
-INSERT OR IGNORE INTO events_v2 (
-  id,
-  created_at,
-  event_type,
-  camera_id,
-  session_id,
-  host,
-  event_key
-)
-SELECT id,
-       created_at,
-       event_type,
-       CASE WHEN event_type = 'camera_view' THEN camera_id ELSE NULL END,
-       session_id,
-       COALESCE(host, 'www.livesantamaria.org'),
-       CASE WHEN event_type = 'visit'
-            THEN 'visit:' || session_id
-            ELSE 'camera_view:' || session_id || ':' || camera_id END
-FROM events
-WHERE event_type IN ('visit', 'camera_view')
-  AND session_id IS NOT NULL
-  AND (event_type = 'visit' OR camera_id IS NOT NULL)
-ORDER BY id;
+UPDATE events
+SET event_key =
+  CASE event_type
+    WHEN 'visit' THEN
+      'v1:visit:' || hex(CAST(session_id AS BLOB))
+    WHEN 'camera_view' THEN
+      'v1:camera_view:' || hex(CAST(session_id AS BLOB)) ||
+      ':' || hex(CAST(camera_id AS BLOB))
+  END
+WHERE session_id IS NOT NULL
+  AND (
+    (event_type = 'visit' AND camera_id IS NULL) OR
+    (event_type = 'camera_view' AND camera_id IS NOT NULL)
+  )
+  AND id IN (
+    SELECT MIN(id)
+    FROM events
+    WHERE session_id IS NOT NULL
+      AND (
+        (event_type = 'visit' AND camera_id IS NULL) OR
+        (event_type = 'camera_view' AND camera_id IS NOT NULL)
+      )
+    GROUP BY event_type, session_id, camera_id
+  );
 
-DROP TABLE events;
-ALTER TABLE events_v2 RENAME TO events;
-CREATE INDEX idx_events_created ON events(created_at);
-CREATE INDEX idx_events_type ON events(event_type);
-CREATE INDEX idx_events_camera ON events(camera_id);
+CREATE INDEX IF NOT EXISTS idx_events_created
+ON events(created_at);
+
+CREATE INDEX IF NOT EXISTS idx_events_type
+ON events(event_type);
+
+CREATE INDEX IF NOT EXISTS idx_events_camera
+ON events(camera_id);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_events_event_key_unique
+ON events(event_key)
+WHERE event_key IS NOT NULL;

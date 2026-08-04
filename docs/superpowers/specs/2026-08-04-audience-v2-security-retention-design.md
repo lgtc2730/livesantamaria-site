@@ -57,7 +57,7 @@ Rules:
 
 - `event` is exactly `visit` or `camera_view`;
 - `session` is a UUID produced by the browser and has a fixed maximum length;
-- `camera` is absent/null for `visit`;
+- `camera` is omitted for `visit`; the browser must emit that canonical shape rather than serializing `camera: null`;
 - `camera` is required for `camera_view`, follows the repository's safe public-ID pattern, has a fixed maximum length, and refers to a public camera known to the published catalog;
 - unknown fields, malformed JSON, invalid types, invalid identifiers, and inconsistent event/camera pairs are rejected;
 - a body beyond the limit returns `413`;
@@ -68,14 +68,16 @@ The exact byte and identifier limits will be constants shared by validation and 
 
 ## Deduplication and database shape
 
-Each accepted event receives a deterministic key:
+Each accepted event receives a versioned, collision-safe deterministic key. Every variable field is encoded as uppercase hexadecimal UTF-8 before separators are added:
 
-- `visit:<session>`;
-- `camera_view:<session>:<camera>`.
+- `v1:visit:<HEX_UTF8(session)>`;
+- `v1:camera_view:<HEX_UTF8(session)>:<HEX_UTF8(camera)>`.
 
-The D1 schema adds a non-null `event_key` with a unique index. Ingestion uses uniqueness as the authoritative server-side deduplication boundary. A duplicate valid request returns success without adding another row.
+The first-stage D1 schema adds a nullable `event_key` and a partial unique index that covers only non-null keys. New ingestion supplies a key and uses uniqueness as the authoritative server-side deduplication boundary. A duplicate valid request returns success without adding another row. Legacy Pages code can continue inserting its five-column shape, including during rollback, because an omitted key remains null.
 
-The migration must preserve existing rows. Existing data receives deterministic keys derived from its current fields; duplicate legacy rows are reconciled deterministically before the unique index is created. Applied migrations are immutable, so this is a new additive migration.
+The migration is additive and must preserve every existing row, ID, timestamp, event type, camera, session, and host value. It never rebuilds or drops the table and never deletes duplicate or incompatible history. For structurally compatible legacy tuples, it assigns the collision-safe key only to the lowest-ID row; exact duplicates remain present with a null key. Unsupported event types and inconsistent historical event/camera shapes remain present with a null key. Applied migrations are immutable, so this is a new additive migration.
+
+Final `NOT NULL`, host, event-type, or event/camera constraints are explicitly deferred. They require a later, separately reviewed and approved migration only after all old Pages versions are retired, remote aggregate evidence has been reviewed, and a schema-compatible rollback target has been recorded. They are not part of the audience v2 rollout.
 
 Deduplication limits accidental retries and repeated browser submissions. It does not replace edge rate limiting because a malicious client can generate distinct UUIDs.
 
@@ -158,7 +160,7 @@ Automated tests cover:
 Release validation also requires:
 
 - the full Site suite passing;
-- a clean D1 migration rehearsal on a disposable database;
+- clean and populated-legacy D1 migration rehearsals on disposable databases, proving exact row preservation, collision-safe backfill, old-code writes, new-code writes/deduplication, and rollback writes;
 - a read-only review of WAF rule scope and effective action;
 - evidence of one successful scheduled cleanup;
 - confirmation through a parsed-timestamp (`julianday`) aggregate query that events older than 30 days are absent, backed by an exact cutoff-boundary test;
@@ -166,7 +168,7 @@ Release validation also requires:
 
 ## Rollback
 
-Before release, privately record tested, schema-compatible Pages commit and Worker deployment/version rollback targets; never roll back to an unspecified preceding commit. If no compatible prior Worker exists, its disablement requires a separately approved temporary-retention procedure with an owner. The unique schema addition remains forward-compatible and is not destructively removed. The WAF rule can return to observation or a higher threshold only with separate approval and measured evidence; disabling effective abuse control reopens the security finding and blocks release acceptance.
+Before release, privately record tested, schema-compatible Pages commit and Worker deployment/version rollback targets; never roll back to an unspecified preceding commit. The compatible nullable/partial-index migration is applied while the old Pages version is still active, old ingestion is proved before deploying new Pages code, and the new visit/view/dedup flows are proved before the retention Worker is deployed separately. If no compatible prior Worker exists, its disablement requires a separately approved temporary-retention procedure with an owner. The additive schema remains forward-compatible and is not destructively removed. The WAF rule can return to observation or a higher threshold only with separate approval and measured evidence; disabling effective abuse control reopens the security finding and blocks release acceptance.
 
 Time Travel restore is destructive: it can resurrect events deleted since the bookmark, lose later writes, and restore a schema incompatible with the current code. Capture a private bookmark immediately before the migration. Before an approved restore, validate the Pages commit and Worker version against the target schema. After restoring, separately approve and run the reviewed retention cleanup, prove with the parsed-timestamp aggregate that zero expired rows remain, and only then reopen service.
 

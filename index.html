@@ -5367,6 +5367,14 @@ async function sendAudienceEvent(event, camera = null) {
   }
 
   const session = getAudienceSession();
+  const payload = {
+    event,
+    session: session.id
+  };
+
+  if (camera !== null) {
+    payload.camera = camera;
+  }
 
   try {
     await fetch("/api/audience/event", {
@@ -5375,11 +5383,7 @@ async function sendAudienceEvent(event, camera = null) {
         "Content-Type": "application/json"
       },
       keepalive: true,
-      body: JSON.stringify({
-        event,
-        camera,
-        session: session.id
-      })
+      body: JSON.stringify(payload)
     });
   } catch (error) {
     console.warn("Audience indisponível:", error);

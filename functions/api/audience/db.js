@@ -1,7 +1,14 @@
+function encodeEventKeyPart(value) {
+  return Array.from(
+    new TextEncoder().encode(value),
+    byte => byte.toString(16).padStart(2, "0").toUpperCase()
+  ).join("");
+}
+
 export function buildEventKey(event) {
   return event.type === "visit"
-    ? `visit:${event.session}`
-    : `camera_view:${event.session}:${event.camera}`;
+    ? `v1:visit:${encodeEventKeyPart(event.session)}`
+    : `v1:camera_view:${encodeEventKeyPart(event.session)}:${encodeEventKeyPart(event.camera)}`;
 }
 
 export async function insertEvent(db, event) {

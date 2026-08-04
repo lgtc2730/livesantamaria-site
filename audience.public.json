@@ -1,18 +1,18 @@
 {
-    "schemaVersion":  1,
-    "cameraIds":  [
-                      "anjos-blues",
-                      "anjos-porto",
-                      "cnsm",
-                      "maia-norte",
-                      "maia-piscina",
-                      "maia-sul",
-                      "malbusca-sunset",
-                      "marina-club-motard",
-                      "praia-malbusca",
-                      "praia-nascente",
-                      "praia-poente",
-                      "slourenco-norte",
-                      "slourenco-sul"
-                  ]
+  "schemaVersion": 1,
+  "cameraIds": [
+    "anjos-blues",
+    "anjos-porto",
+    "cnsm",
+    "maia-norte",
+    "maia-piscina",
+    "maia-sul",
+    "malbusca-sunset",
+    "marina-club-motard",
+    "praia-malbusca",
+    "praia-nascente",
+    "praia-poente",
+    "slourenco-norte",
+    "slourenco-sul"
+  ]
 }

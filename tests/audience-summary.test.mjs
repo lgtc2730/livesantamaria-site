@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { DatabaseSync } from "node:sqlite";
 import test from "node:test";
 
 const projectRoot = new URL("../", import.meta.url);
@@ -54,6 +55,37 @@ class RecordingD1 {
   }
 }
 
+class SqliteD1 {
+  constructor(rows) {
+    this.database = new DatabaseSync(":memory:");
+    this.database.exec(`
+      CREATE TABLE events (
+        created_at TEXT NOT NULL,
+        event_type TEXT NOT NULL,
+        camera_id TEXT
+      );
+    `);
+    const insert = this.database.prepare(
+      "INSERT INTO events (created_at, event_type, camera_id) VALUES (?, ?, ?)"
+    );
+    for (const row of rows) {
+      insert.run(row.created_at, row.event_type, row.camera_id ?? null);
+    }
+  }
+
+  prepare(sql) {
+    return {
+      bind: (...values) => ({ sql, values })
+    };
+  }
+
+  async batch(statements) {
+    return statements.map(({ sql, values }) => ({
+      results: this.database.prepare(sql).all(...values)
+    }));
+  }
+}
+
 test("calculates retained boundaries from Atlantic/Azores calendar days", async () => {
   const { getPeriodBoundaries } = await loadSummary();
   const periods = getPeriodBoundaries(new Date("2026-01-01T00:30:00.000Z"));
@@ -99,7 +131,8 @@ test("limits visits and top cameras to the retained 30-day window", async () => 
   assert.deepEqual(last30Statement.values, [last30Start, tomorrowStart]);
   assert.ok(topStatement);
   assert.match(topStatement.sql, /created_at>=\?/);
-  assert.deepEqual(topStatement.values, [last30Start]);
+  assert.match(topStatement.sql, /created_at<\?/);
+  assert.deepEqual(topStatement.values, [last30Start, tomorrowStart]);
   assert.equal(body.generatedAt, now.toISOString());
   assert.deepEqual(body.visits, {
     today: 1,
@@ -110,4 +143,21 @@ test("limits visits and top cameras to the retained 30-day window", async () => 
   assert.equal("total" in body.visits, false);
   assert.equal("activatedAt" in body, false);
   assert.doesNotMatch(JSON.stringify(body), /session_id|event_key/i);
+});
+
+test("excludes a top-camera row at the future tomorrow boundary", async () => {
+  const { onRequestGet } = await loadSummary();
+  const db = new SqliteD1([
+    { created_at: "2026-04-27T10:00:00.000Z", event_type: "camera_view", camera_id: "cnsm" },
+    { created_at: "2026-04-27T11:00:00.000Z", event_type: "camera_view", camera_id: "cnsm" },
+    { created_at: "2026-04-28T00:00:00.000Z", event_type: "camera_view", camera_id: "future" }
+  ]);
+
+  const response = await onRequestGet({
+    env: { LVSM_AUDIENCE: db },
+    now: new Date("2026-04-27T12:00:00.000Z")
+  });
+  const body = await response.json();
+
+  assert.deepEqual(body.top, [{ camera: "cnsm", count: 2 }]);
 });

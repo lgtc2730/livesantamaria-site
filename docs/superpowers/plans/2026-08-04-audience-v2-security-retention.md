@@ -1,10 +1,12 @@
 # Audience v2 Security and Retention Implementation Plan
 
+Status: amended after final review. The compatibility, migration, rollout, summary-boundary, browser-integration, and deterministic-byte requirements below supersede the earlier single-rebuild implementation details.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Preserve required audience metrics while bounding anonymous ingestion, deduplicating events, limiting summaries to 30 days, and deleting raw events daily after 30 days.
 
-**Architecture:** The PWA canonical-data generator emits a minimal Site-side allowlist of public camera IDs. The Site validates and deduplicates ingestion against that allowlist and a D1 unique event key. A separate scheduled Worker bound only to the audience D1 performs daily retention; Cloudflare WAF provides the mandatory edge rate limit.
+**Architecture:** The PWA canonical-data generator emits a minimal Site-side allowlist of public camera IDs. The Site validates and deduplicates new ingestion against that allowlist and a D1 partial unique index for non-null event keys, while legacy rows and old-code writes remain compatible with null keys. A separate scheduled Worker bound only to the audience D1 performs daily retention; Cloudflare WAF provides the mandatory edge rate limit.
 
 **Tech Stack:** Cloudflare Pages Functions, Cloudflare D1/SQLite migrations, Cloudflare Workers Cron Triggers, Cloudflare WAF rate-limiting rules, JavaScript ES modules, Node.js test runner, PowerShell sync tooling.
 
@@ -80,14 +82,23 @@ if (-not [string]::IsNullOrWhiteSpace($AudienceOutputFile)) {
     [System.IO.Directory]::CreateDirectory($audienceDirectory) | Out-Null
   }
 
+  $audienceCameraIds = @(
+    $publicCameras | ForEach-Object { [string]$_.id }
+  )
+  [System.Array]::Sort($audienceCameraIds, [System.StringComparer]::Ordinal)
+
   $audiencePayload = [ordered]@{
     schemaVersion = 1
-    cameraIds = @($publicCameras | ForEach-Object { [string]$_.id } | Sort-Object)
+    cameraIds = $audienceCameraIds
   }
-  $audienceJson = (ConvertTo-Json -InputObject $audiencePayload -Depth 3) + "`n"
+  $audienceJson = (
+    ConvertTo-DeterministicJson -Value $audiencePayload
+  ).Replace("`r`n", "`n").Replace("`r", "`n") + "`n"
   [System.IO.File]::WriteAllText($AudienceOutputFile, $audienceJson, $utf8NoBom)
 }
 ```
+
+Add an exact-byte assertion for the canonical pretty JSON, UTF-8 without BOM, ordinal IDs, no carriage returns, and exactly one final LF. Local tests require only the available PowerShell host; CI repeats the same byte assertion on Ubuntu `pwsh` for cross-host validation.
 
 Pass `(Join-Path $SiteRoot "audience.public.json")` from `tools/sync-public-data.ps1`. Include that path in its generated diff and in the workflow's `git add` list.
 
@@ -193,6 +204,8 @@ Implement `readAudienceRequest()` by checking `Content-Type`, rejecting `Content
 
 Import the JSON allowlist with `import audienceCatalog from "../../../audience.public.json" with { type: "json" };` and pass `new Set(audienceCatalog.cameraIds)` to the validator. Return `413` for `body_too_large`, `400` for invalid input, and a safe `503` for D1 failure. Log only `{ eventType, camera, outcome }`; never log the session, event key, request body, or raw D1 result.
 
+Change the real browser `sendAudienceEvent` path to omit `camera` for visits. Add an integration test that executes the sender extracted from `index.html`, forwards its exact serialized body through the real handler and validator, and uses the real D1 insert helper with a uniqueness-aware local fake. Two sends of the same visit must both return success while producing one logical inserted row.
+
 - [ ] **Step 5: Run focused and complete Site tests**
 
 ```powershell
@@ -221,37 +234,50 @@ git commit -m "fix: validate audience event ingestion"
 
 **Interfaces:**
 - Consumes: validated `{ type, session, camera, host }`.
-- Produces: `buildEventKey(event) -> string`; `insertEvent(db, event) -> D1Result` using a unique `event_key`.
+- Produces: `buildEventKey(event) -> string`; `insertEvent(db, event) -> D1Result` using a nullable `event_key` covered by a partial unique index when non-null.
 
-- [ ] **Step 1: Write failing key and insertion tests**
+- [ ] **Step 1: Write failing key, migration, and compatibility tests**
 
 ```js
-assert.equal(buildEventKey({ type: "visit", session: "s" }), "visit:s");
-assert.equal(buildEventKey({ type: "camera_view", session: "s", camera: "cnsm" }), "camera_view:s:cnsm");
+assert.equal(buildEventKey({ type: "visit", session: "s" }), "v1:visit:73");
+assert.equal(buildEventKey({ type: "camera_view", session: "s", camera: "cnsm" }), "v1:camera_view:73:636E736D");
+assert.notEqual(
+  buildEventKey({ type: "camera_view", session: "a:b", camera: "c" }),
+  buildEventKey({ type: "camera_view", session: "a", camera: "b:c" })
+);
 ```
 
-Use a recording D1 fake to assert the SQL includes `event_key`, the sixth bound value is deterministic, and a repeated key produces no second logical row.
+Use a recording D1 fake to assert the SQL includes `event_key`, the sixth bound value is deterministic, and a repeated key produces no second logical row. Execute the real migration with `node:sqlite` against both an empty database and a populated legacy database containing exact duplicates, unsupported event types, inconsistent event/camera shapes, null legacy hosts, and delimiter-collision tuples. Assert every original row and field remains, only one exact duplicate receives a key, incompatible rows retain null keys, collision tuples receive distinct keys, and `event_key` is nullable with a partial unique index.
+
+Against the migrated populated database, execute the exact old five-column insert shape, the new six-column insert/dedup path, and another old five-column insert representing rollback. All must write successfully; the repeated new logical event must insert only once.
 
 - [ ] **Step 2: Run the focused test and verify failure**
 
 Run: `node --experimental-vm-modules --test tests/audience-database.test.mjs`
-Expected: FAIL because `buildEventKey` and the event-key column do not exist.
+Expected: FAIL because delimiter concatenation collides, the table rebuild drops legacy rows, and the final constraints reject old-code and rollback inserts.
 
-- [ ] **Step 3: Implement key generation and insertion**
+- [ ] **Step 3: Implement collision-safe key generation and insertion**
 
 ```js
+function encodeEventKeyPart(value) {
+  return Array.from(
+    new TextEncoder().encode(value),
+    byte => byte.toString(16).padStart(2, "0").toUpperCase()
+  ).join("");
+}
+
 export function buildEventKey(event) {
   return event.type === "visit"
-    ? `visit:${event.session}`
-    : `camera_view:${event.session}:${event.camera}`;
+    ? `v1:visit:${encodeEventKeyPart(event.session)}`
+    : `v1:camera_view:${encodeEventKeyPart(event.session)}:${encodeEventKeyPart(event.camera)}`;
 }
 ```
 
 Insert `(created_at, event_type, camera_id, session_id, host, event_key)` with `INSERT OR IGNORE`; bind the generated key last.
 
-- [ ] **Step 4: Add a migration that works for existing and clean databases**
+- [ ] **Step 4: Add the staged compatibility migration**
 
-The migration must:
+The migration must create the legacy table only when absent, add a nullable column in place, backfill only the lowest-ID row for each structurally compatible exact tuple, and add partial uniqueness. It must not rebuild, copy, filter, delete, normalize, or impose final constraints:
 
 ```sql
 CREATE TABLE IF NOT EXISTS events (
@@ -263,51 +289,53 @@ CREATE TABLE IF NOT EXISTS events (
   host TEXT
 );
 
-CREATE TABLE events_v2 (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  created_at TEXT NOT NULL,
-  event_type TEXT NOT NULL CHECK (event_type IN ('visit', 'camera_view')),
-  camera_id TEXT,
-  session_id TEXT NOT NULL,
-  host TEXT NOT NULL,
-  event_key TEXT NOT NULL UNIQUE
-);
+ALTER TABLE events ADD COLUMN event_key TEXT;
 
-INSERT OR IGNORE INTO events_v2 (id, created_at, event_type, camera_id, session_id, host, event_key)
-SELECT id, created_at, event_type,
-       CASE WHEN event_type = 'camera_view' THEN camera_id ELSE NULL END,
-       session_id, COALESCE(host, 'www.livesantamaria.org'),
-       CASE WHEN event_type = 'visit'
-            THEN 'visit:' || session_id
-            ELSE 'camera_view:' || session_id || ':' || camera_id END
-FROM events
-WHERE event_type IN ('visit', 'camera_view')
-  AND session_id IS NOT NULL
-  AND (event_type = 'visit' OR camera_id IS NOT NULL)
-ORDER BY id;
+UPDATE events
+SET event_key = CASE event_type
+  WHEN 'visit' THEN 'v1:visit:' || hex(CAST(session_id AS BLOB))
+  WHEN 'camera_view' THEN
+    'v1:camera_view:' || hex(CAST(session_id AS BLOB)) || ':' ||
+    hex(CAST(camera_id AS BLOB))
+END
+WHERE session_id IS NOT NULL
+  AND (
+    (event_type = 'visit' AND camera_id IS NULL) OR
+    (event_type = 'camera_view' AND camera_id IS NOT NULL)
+  )
+  AND id IN (
+    SELECT MIN(id)
+    FROM events
+    WHERE session_id IS NOT NULL
+      AND (
+        (event_type = 'visit' AND camera_id IS NULL) OR
+        (event_type = 'camera_view' AND camera_id IS NOT NULL)
+      )
+    GROUP BY event_type, session_id, camera_id
+  );
 
-DROP TABLE events;
-ALTER TABLE events_v2 RENAME TO events;
-CREATE INDEX idx_events_created ON events(created_at);
-CREATE INDEX idx_events_type ON events(event_type);
-CREATE INDEX idx_events_camera ON events(camera_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_events_event_key_unique
+ON events(event_key)
+WHERE event_key IS NOT NULL;
 ```
 
-Mirror the final table and indexes in `database/schema.sql`.
+Mirror this staged table and partial index in `database/schema.sql`: keep `host` and `event_key` nullable and do not add event-type or event/camera checks. Final `NOT NULL` and other constraints are deferred to a later, separately approved migration after old Pages versions are retired and remote evidence is reviewed.
 
 Set `"migrations_dir": "database/migrations"` on the `LVSM_AUDIENCE` binding in `wrangler.jsonc` so local and remote Wrangler commands use the reviewed migration directory.
 
-- [ ] **Step 5: Rehearse migration twice on a disposable local D1**
+- [ ] **Step 5: Rehearse clean and populated migration paths locally**
 
 Run:
 
 ```powershell
-npx wrangler d1 migrations apply LVSM_AUDIENCE --local
-npx wrangler d1 migrations list LVSM_AUDIENCE --local
+$cleanPersist = Join-Path ([System.IO.Path]::GetTempPath()) ("lvsm-audience-clean-" + [guid]::NewGuid())
+New-Item -ItemType Directory -Path $cleanPersist | Out-Null
+& npx.cmd wrangler d1 migrations apply LVSM_AUDIENCE --local -c wrangler.jsonc --persist-to $cleanPersist
+& npx.cmd wrangler d1 migrations list LVSM_AUDIENCE --local -c wrangler.jsonc --persist-to $cleanPersist
 node --experimental-vm-modules --test tests/audience-database.test.mjs
 ```
 
-Expected: first apply succeeds; list shows no pending migration; insertion tests PASS. Never run `--remote` in this task.
+Use a second disposable persistence directory, initialize it with the legacy schema and populated fixture, apply the migration, then run aggregate-only row-count and compatibility assertions. Expected: the clean apply succeeds; the list shows no pending migration; the populated rehearsal preserves every row; old/new/rollback writes succeed; insertion tests PASS. Never run `--remote` in this task and never print private row values.
 
 - [ ] **Step 6: Commit schema and deduplication**
 
@@ -328,7 +356,7 @@ git commit -m "fix: deduplicate audience events in D1"
 
 - [ ] **Step 1: Write failing boundary and query tests**
 
-Export `getPeriodBoundaries` for direct testing. Freeze `now` around an Azores midnight and assert the returned boundaries include `last30Start`. Use a recording D1 fake and assert every 30-day/top query includes `created_at>=?` bound to that value. Assert the response has `last30` and has neither `total` nor `activatedAt`.
+Export `getPeriodBoundaries` for direct testing. Freeze `now` around an Azores midnight and assert the returned boundaries include `last30Start` and `tomorrowStart`. Use a recording D1 fake and assert every 30-day/top query uses the half-open interval `created_at>=? AND created_at<?`; the top-camera bindings must be `[last30Start, tomorrowStart]`. Execute the query against a local SQLite row exactly at `tomorrowStart` and prove that future-boundary camera is excluded. Assert the response has `last30` and has neither `total` nor `activatedAt`.
 
 - [ ] **Step 2: Run and verify the old all-time shape fails**
 
@@ -337,7 +365,7 @@ Expected: FAIL because the current endpoint returns `total` and `activatedAt` an
 
 - [ ] **Step 3: Implement the 30-day boundary and response**
 
-Calculate the calendar day 29 days before today in `Atlantic/Azores`; bind its zoned midnight to both the visit count and top-camera queries. Remove the first-event query and all-time count. Return:
+Calculate the calendar day 29 days before today in `Atlantic/Azores`; bind its zoned midnight and the next-day midnight to both the visit count and top-camera queries. Remove the first-event query and all-time count. Return:
 
 ```js
 visits: {
@@ -462,9 +490,11 @@ http.host eq "www.livesantamaria.org"
 
 Require the operator to record: normal peak per IP, chosen requests/period, mitigation action/duration, observation start/end, false-positive result, owner, and review date. Do not prescribe a fabricated threshold; derive it from Security Analytics as Cloudflare recommends.
 
-- [ ] **Step 2: Document the retention deployment gate**
+- [ ] **Step 2: Document the staged migration, Pages, and retention deployment gate**
 
-Include commands that list migrations, create a private Time Travel bookmark record, apply migrations, dry-run then deploy the route-free Worker, inspect cron status, and verify one successful run. Mark every remote mutation as approval-gated and forbid printing secret values.
+Document this exact separately approved order: complete private preflight and record a private Time Travel bookmark; apply only the compatible nullable-column/partial-index migration; prove the still-active old Pages ingestion writes; deploy the reviewed new Pages commit; prove real browser visits, camera views, and retry deduplication; deploy the route-free retention Worker as a separate mutation; then observe its cron and one successful run. Record the tested old Pages rollback commit and Worker source/deployment target that remain compatible with the migrated schema.
+
+State explicitly that a final-constraint migration is not part of this rollout. Only a later, separately reviewed and approved change may add `NOT NULL` or stricter table constraints after every old Pages version is retired and remote aggregate evidence plus rollback compatibility have been reviewed. Mark every remote mutation as approval-gated and forbid printing secret values.
 
 - [ ] **Step 3: Preserve the mandatory privacy follow-up**
 
@@ -515,7 +545,7 @@ Expected: all suites and builds PASS; no remote upload occurs.
 
 - [ ] **Step 2: Re-run focused security validation**
 
-Validate source-to-sink behavior for oversized, malformed, duplicate, unknown-camera, and distinct-session requests using fakes/local D1 only. Confirm the first four do not consume new rows, while distinct valid sessions remain dependent on the mandatory WAF gate.
+Validate source-to-sink behavior for the real browser visit shape, oversized, malformed, duplicate, unknown-camera, and distinct-session requests using fakes/local D1 only. Confirm invalid inputs and duplicates do not consume new rows, while distinct valid sessions remain dependent on the mandatory WAF gate. Rehearse the migration on clean and populated disposable local D1 databases, compare aggregate before/after row counts, and prove the recorded old/new/rollback insert shapes against the migrated schema without exporting row values.
 
 - [ ] **Step 3: Confirm privacy properties**
 
