@@ -87,10 +87,10 @@ Rollout:
 
 1. inspect normal and peak request-rate analytics for this exact path;
 2. record the measured requests per period and create the rule with the threshold supported by the account plan;
-3. under a first explicit approval, use observation/log behavior when the plan exposes it, or a deliberately permissive measured threshold otherwise;
+3. under a first explicit approval, use observation/log behavior only when the plan exposes a non-enforcing action; otherwise save/create the measured rule disabled or document it without activation, and do not trigger an effective action;
 4. record plan-supported mitigation behavior and timeout; for a managed challenge without a duration control, record `N/A — challenge/throttling while the rule qualifies` rather than inventing a timeout;
-5. collect observation evidence and run a controlled authorized test that exceeds the threshold without using visitor traffic;
-6. under a second explicit approval, change to block or managed challenge only after the threshold is validated, and prove the effective action triggers;
+5. collect Security Analytics/observation evidence without deliberately triggering an effective action;
+6. under a second explicit approval, activate block or managed challenge only after the threshold is validated, then prove the effective action triggers with a controlled authorized test that does not use visitor traffic;
 7. document the final expression, IP characteristic, threshold, period, action/timeout, owner, review date, and false-positive result without exporting visitor identifiers. Later edits require separate approval.
 
 The release gate is not satisfied until an effective limiting action is enabled and tested. Application validation alone does not close the resource-consumption finding.
