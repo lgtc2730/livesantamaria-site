@@ -52,18 +52,34 @@ async function loadDatabase() {
 async function loadBrowserAudience(fetchImpl, initialStorage = {}) {
   const html = await readFile(new URL("index.html", projectRoot), "utf8");
   const start = html.indexOf('const AUDIENCE_SESSION_KEY = "lvsm-audience-session";');
-  const end = html.indexOf("function trackVisit()", start);
+  const end = html.indexOf('document.addEventListener("visibilitychange"', start);
   assert.notEqual(start, -1, "audience browser session code must exist");
-  assert.notEqual(end, -1, "audience visit tracker must follow the sender");
+  assert.notEqual(end, -1, "audience browser code must precede visibility handling");
 
   const stored = new Map(Object.entries(initialStorage));
   const storageOperations = [];
+  const elements = new Map();
+  for (const id of ["audienceConsentPanel", "audienceConsentAccept", "audienceConsentRefuse", "audiencePrivacySettings"]) {
+    elements.set(id, {
+      hidden: false,
+      listeners: new Map(),
+      addEventListener(type, listener) {
+        this.listeners.set(type, listener);
+      },
+      click() {
+        this.listeners.get("click")?.();
+      }
+    });
+  }
   const context = {
     console: { warn() {} },
     crypto: { randomUUID: () => validSession },
     Date,
     fetch: fetchImpl,
     JSON,
+    document: {
+      getElementById: id => elements.get(id) || null
+    },
     localStorage: {
       getItem: key => {
         storageOperations.push(["get", key]);
@@ -88,10 +104,11 @@ globalThis.__audience = {
   getAudienceConsent,
   setAudienceConsent,
   clearAudienceSession
+  ,initializeAudienceConsentControls
 };`,
     context
   );
-  return { ...context.__audience, stored, storageOperations };
+  return { ...context.__audience, stored, storageOperations, elements };
 }
 
 class DeduplicatingD1 {
@@ -204,6 +221,32 @@ test("withdrawing accepted consent clears the session and disables later events"
 
   assert.equal(requests, 1);
   assert.equal(browser.stored.has("lvsm-audience-session"), false);
+});
+
+test("consent controls keep choices optional and start metrics only after acceptance", async () => {
+  const payloads = [];
+  const browser = await loadBrowserAudience(async (_url, options) => {
+    payloads.push(JSON.parse(options.body));
+    return new Response(null, { status: 200 });
+  });
+
+  browser.initializeAudienceConsentControls();
+  const panel = browser.elements.get("audienceConsentPanel");
+
+  assert.equal(panel.hidden, false);
+  assert.deepEqual(payloads, []);
+
+  browser.elements.get("audienceConsentRefuse").click();
+  assert.equal(panel.hidden, true);
+  assert.deepEqual(payloads, []);
+
+  browser.elements.get("audiencePrivacySettings").click();
+  assert.equal(panel.hidden, false);
+
+  browser.elements.get("audienceConsentAccept").click();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(panel.hidden, true);
+  assert.deepEqual(payloads, [{ event: "visit", session: validSession }]);
 });
 
 test("loads LF and CRLF handler sources without redeclaring injected dependencies", async () => {

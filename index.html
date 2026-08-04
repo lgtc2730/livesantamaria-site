@@ -1798,6 +1798,64 @@
       font-size: .88rem;
     }
 
+    .footer-privacy-button {
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: var(--blue2);
+      font: inherit;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .audience-consent {
+      position: fixed;
+      z-index: 1000;
+      right: max(18px, env(safe-area-inset-right));
+      bottom: max(18px, env(safe-area-inset-bottom));
+      left: max(18px, env(safe-area-inset-left));
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 18px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 18px;
+      background: rgba(5,12,20,.97);
+      box-shadow: 0 18px 55px rgba(0,0,0,.55);
+      backdrop-filter: blur(18px);
+    }
+
+    .audience-consent h2 { margin: 0 0 8px; font-size: 1.05rem; }
+    .audience-consent p { margin: 0; color: var(--muted); line-height: 1.55; }
+
+    .audience-consent__actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .audience-consent__actions button {
+      min-height: 46px;
+      border: 1px solid var(--blue2);
+      border-radius: 12px;
+      padding: 10px 14px;
+      background: rgba(24,119,255,.14);
+      color: var(--text);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .audience-consent__actions button:focus-visible,
+    .footer-privacy-button:focus-visible {
+      outline: 3px solid var(--blue2);
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 520px) {
+      .audience-consent__actions { grid-template-columns: 1fr; }
+    }
+
     .hidden { display: none !important; }
 
     .view-actions {
@@ -2948,6 +3006,7 @@
 
     <div class="footer">
       © Live Santa Maria · v2 · Imagens em directo para apoio à observação meteorológica e marítima informal.
+      · <button class="footer-privacy-button" id="audiencePrivacySettings" type="button">Privacidade</button>
     </div>
   </div>
 
@@ -2959,6 +3018,15 @@
     <button data-section="about"><span>ℹ️</span>Sobre</button>
 
   </nav>
+
+  <section class="audience-consent" id="audienceConsentPanel" role="region" aria-labelledby="audienceConsentTitle" hidden>
+    <h2 id="audienceConsentTitle">Métricas de audiência opcionais</h2>
+    <p>Podemos contar visitas e câmaras públicas abertas através de uma sessão aleatória de 30 minutos. Os eventos brutos são eliminados após 30 dias e não são associados a uma conta identificada.</p>
+    <div class="audience-consent__actions">
+      <button id="audienceConsentAccept" type="button">Aceitar métricas</button>
+      <button id="audienceConsentRefuse" type="button">Recusar</button>
+    </div>
+  </section>
 
   <div class="tv-mode" id="tvMode">
     <div class="tv-stage" id="tvStage"></div>
@@ -5484,6 +5552,43 @@ function trackCameraView(cameraId) {
   sendAudienceEvent("camera_view", cameraId);
 }
 
+function initializeAudienceConsentControls() {
+  const panel = document.getElementById("audienceConsentPanel");
+  const acceptButton = document.getElementById("audienceConsentAccept");
+  const refuseButton = document.getElementById("audienceConsentRefuse");
+  const settingsButton = document.getElementById("audiencePrivacySettings");
+
+  if (!panel || !acceptButton || !refuseButton || !settingsButton) {
+    return;
+  }
+
+  const consent = getAudienceConsent();
+  panel.hidden = consent !== null;
+
+  acceptButton.addEventListener("click", () => {
+    if (!setAudienceConsent("accepted")) {
+      return;
+    }
+
+    panel.hidden = true;
+    trackVisit();
+  });
+
+  refuseButton.addEventListener("click", () => {
+    if (setAudienceConsent("refused")) {
+      panel.hidden = true;
+    }
+  });
+
+  settingsButton.addEventListener("click", () => {
+    panel.hidden = false;
+  });
+
+  if (consent === "accepted") {
+    trackVisit();
+  }
+}
+
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     clearTimeout(visibilityShutdownTimer);
@@ -5522,7 +5627,7 @@ setInterval(updateTidesCard, 30 * 60 * 1000);
 
 applyInitialUrlParams();
 
-trackVisit();
+initializeAudienceConsentControls();
 
 </script>
 
