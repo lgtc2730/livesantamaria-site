@@ -6,7 +6,7 @@ import vm from "node:vm";
 const projectRoot = new URL("../", import.meta.url);
 const validSession = "123e4567-e89b-42d3-a456-426614174000";
 
-async function loadEvent(insertEvent) {
+async function loadEvent(insertEvent, transformEventSource = source => source) {
   const [eventSource, validationSource, catalogSource] = await Promise.all([
     readFile(new URL("functions/api/audience/event.js", projectRoot), "utf8"),
     readFile(new URL("functions/api/audience/validation.js", projectRoot), "utf8"),
@@ -25,10 +25,10 @@ async function loadEvent(insertEvent) {
 
   const moduleSource = [
     "const { insertEvent, audienceCatalog, readAudienceRequest, validateAudiencePayload, console } = globalThis.__audienceEventTestDependencies;",
-    eventSource
-      .replace('import { insertEvent } from "./db.js";\n', "")
-      .replace('import audienceCatalog from "../../../audience.public.json" with { type: "json" };\n', "")
-      .replace('import { readAudienceRequest, validateAudiencePayload } from "./validation.js";\n', "")
+    transformEventSource(eventSource)
+      .replace(/^import \{ insertEvent \} from "\.\/db\.js";\r?\n/, "")
+      .replace(/^import audienceCatalog from "\.\.\/\.\.\/\.\.\/audience\.public\.json" with \{ type: "json" \};\r?\n/, "")
+      .replace(/^import \{ readAudienceRequest, validateAudiencePayload \} from "\.\/validation\.js";\r?\n/, "")
   ].join("\n");
   const eventUrl = `data:text/javascript;base64,${Buffer.from(moduleSource).toString("base64")}#${crypto.randomUUID()}`;
 
@@ -141,6 +141,27 @@ test("the real browser visit payload passes the handler and inserts once across 
   assert.deepEqual(statuses, [200, 200]);
   assert.equal(db.statements.length, 2);
   assert.equal(db.rows.length, 1);
+});
+
+test("loads LF and CRLF handler sources without redeclaring injected dependencies", async () => {
+  for (const lineEnding of ["\n", "\r\n"]) {
+    let sourceWasConverted = false;
+    const { onRequestPost } = await loadEvent(
+      async () => ({ success: true, meta: { changed_db: true } }),
+      eventSource => {
+        sourceWasConverted = true;
+        return eventSource.replace(/\r?\n/g, lineEnding);
+      }
+    );
+
+    assert.equal(sourceWasConverted, true, `source transformer must run for ${JSON.stringify(lineEnding)}`);
+    const response = await onRequestPost({
+      request: eventRequest({ event: "visit", session: validSession }),
+      env: { LVSM_AUDIENCE: {} }
+    });
+
+    assert.equal(response.status, 200, `handler must load with ${JSON.stringify(lineEnding)} source`);
+  }
 });
 
 test("stores a normalized allowed event and records only safe telemetry", async () => {
