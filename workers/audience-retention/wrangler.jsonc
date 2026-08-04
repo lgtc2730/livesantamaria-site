@@ -1,0 +1,19 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "livesantamaria-audience-retention",
+  "main": "src/index.js",
+  "compatibility_date": "2026-07-16",
+  "workers_dev": false,
+  "preview_urls": false,
+  "triggers": {
+    "crons": ["17 4 * * *"]
+  },
+  "d1_databases": [
+    {
+      "binding": "LVSM_AUDIENCE",
+      "database_name": "LVSM_AUDIENCE",
+      "database_id": "485db11f-d955-494b-a0b9-beb8eea28f44",
+      "migrations_dir": "../../database/migrations"
+    }
+  ]
+}
