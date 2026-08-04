@@ -189,16 +189,24 @@ Pare a promoção e informe o responsável de lançamento se a regra WAF bloquea
 Antes de promoção de produção, o responsável pelo projecto e a administração técnica têm de concluir e aprovar esta lista. A Política de Privacidade deve descrever o comportamento efectivamente publicado, não a implementação planeada nem uma versão anterior.
 
 - [x] Registar Luis Mesquita, em nome individual, como responsável pelo tratamento; Luis Carreiro, em nome individual, como responsável técnico e operacional (não Encarregado de Proteção de Dados); e `livesantamaria.project@gmail.com` como contacto público do projecto e de privacidade.
-- [ ] Descrever a finalidade específica das métricas de audiência.
-- [ ] Determinar e documentar a base de licitude aplicável.
+- [x] Descrever a finalidade específica das métricas de audiência no texto público em revisão e no registo interno.
+- [x] Documentar consentimento para métricas e interesse legítimo proposto para câmaras e segurança; estes dois últimos continuam sujeitos à aprovação de Luis Mesquita.
 - [x] Exigir consentimento prévio e explícito antes de ler/criar a sessão analítica de 30 minutos em `localStorage` ou enviar eventos; a recusa não limita o Site e a retirada apaga a sessão local e bloqueia eventos posteriores.
-- [ ] Rever Cloudflare como subcontratante e os respectivos subprocessadores/termos aplicáveis.
-- [ ] Publicar procedimento de exercício de direitos, incluindo contacto, verificação e resposta a objecções.
-- [ ] Divulgar claramente a retenção de eventos brutos por 30 dias.
-- [ ] Rever retenção e mascaramento de logs, consola e evidência operacional.
-- [ ] Indicar o proprietário da política, data de publicação e versão.
+- [x] Preparar revisão pública preliminar de Cloudflare, Google/Gmail, jsDelivr, Open-Meteo e SpotAzores, marcando explicitamente o que não foi verificado.
+- [ ] Confirmar na conta/contrato os termos, subprocessadores, regiões, transferências e retenções dos fornecedores realmente usados.
+- [x] Preparar procedimento de exercício de direitos, incluindo contacto, verificação proporcional e resposta a objecções.
+- [x] Divulgar no texto em revisão a retenção de eventos brutos por 30 dias.
+- [x] Documentar minimização e retenção máxima de 14 dias para logs controlados pelo projecto.
+- [ ] Aplicar e verificar tecnicamente os 14 dias em todos os logs controlados pelo projecto e rever os logs dos fornecedores.
+- [ ] Aplicar nos nós Timelapse e verificar por contagens a retenção de 3 dias de capturas, 10 vídeos diários e 4 semanais.
+- [x] Preparar os testes de ponderação de câmaras/Timelapse e segurança/operação.
+- [ ] Concluir a verificação individual de todas as câmaras e obter aprovação explícita e datada das duas ponderações por Luis Mesquita.
+- [x] Ligar o rodapé e o painel de consentimento à Política no código do ambiente de teste.
+- [ ] Publicar no ambiente de teste e validar os links, a âncora `#metricas`, desktop, mobile e teclado.
+- [ ] Substituir o rótulo de revisão por versão e data efetivas apenas após aprovação explícita e datada de Luis Mesquita.
+- [ ] Obter aprovação explícita e datada de Luis Mesquita sobre responsabilidade, finalidades, fundamentos, retenções e texto público.
 
-Enquanto qualquer item estiver incompleto, não publique texto de privacidade, não faça alegações de anonimato ou de dispensa de consentimento e não promova o lançamento.
+Enquanto qualquer item estiver incompleto, a Política permanece um texto de revisão; não faça alegações de anonimato ou de dispensa de consentimento e não promova o lançamento para produção. Migration D1, publicação Pages, Worker de retenção e alterações WAF mantêm as aprovações remotas independentes descritas neste runbook.
 
 ### Prova imediata do consentimento antes da promoção
 
