@@ -103,8 +103,8 @@ globalThis.__audience = {
   sendAudienceEvent,
   getAudienceConsent,
   setAudienceConsent,
-  clearAudienceSession
-  ,initializeAudienceConsentControls
+  clearAudienceSession,
+  initializeAudienceConsentControls
 };`,
     context
   );
