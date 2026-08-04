@@ -6,6 +6,16 @@ import vm from "node:vm";
 const projectRoot = new URL("../", import.meta.url);
 const validSession = "123e4567-e89b-42d3-a456-426614174000";
 
+test("Pages Functions source avoids unsupported JSON import attributes", async () => {
+  const source = await readFile(
+    new URL("functions/api/audience/event.js", projectRoot),
+    "utf8"
+  );
+
+  assert.match(source, /import audienceCatalog from "\.\.\/\.\.\/\.\.\/audience\.public\.json";/);
+  assert.doesNotMatch(source, /\bwith\s*\{\s*type\s*:\s*["']json["']\s*\}/);
+});
+
 async function loadEvent(insertEvent, transformEventSource = source => source) {
   const [eventSource, validationSource, catalogSource] = await Promise.all([
     readFile(new URL("functions/api/audience/event.js", projectRoot), "utf8"),
@@ -27,7 +37,7 @@ async function loadEvent(insertEvent, transformEventSource = source => source) {
     "const { insertEvent, audienceCatalog, readAudienceRequest, validateAudiencePayload, console } = globalThis.__audienceEventTestDependencies;",
     transformEventSource(eventSource)
       .replace(/^import \{ insertEvent \} from "\.\/db\.js";\r?\n/, "")
-      .replace(/^import audienceCatalog from "\.\.\/\.\.\/\.\.\/audience\.public\.json" with \{ type: "json" \};\r?\n/, "")
+      .replace(/^import audienceCatalog from "\.\.\/\.\.\/\.\.\/audience\.public\.json";\r?\n/, "")
       .replace(/^import \{ readAudienceRequest, validateAudiencePayload \} from "\.\/validation\.js";\r?\n/, "")
   ].join("\n");
   const eventUrl = `data:text/javascript;base64,${Buffer.from(moduleSource).toString("base64")}#${crypto.randomUUID()}`;

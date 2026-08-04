@@ -1,5 +1,5 @@
 import { insertEvent } from "./db.js";
-import audienceCatalog from "../../../audience.public.json" with { type: "json" };
+import audienceCatalog from "../../../audience.public.json";
 import { readAudienceRequest, validateAudiencePayload } from "./validation.js";
 
 function logAudienceEvent(eventType, camera, outcome) {
