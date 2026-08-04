@@ -32,9 +32,15 @@ Registo privado de medição e decisão (obrigatório):
 - resultado do teste de falsos positivos para navegação normal e abertura de várias câmaras;
 - responsável, data de revisão e ligação privada para a evidência de Analytics.
 
-**[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA — mutação remota]** Crie/edite a regra na consola Cloudflare com a expressão acima. Se o plano permitir observação/registo, comece nessa modalidade; caso contrário, use um limiar deliberadamente permissivo baseado na medição. Após observação, active uma ação eficaz de `block` ou `managed challenge` com a duração medida e volte a testar os fluxos normais.
+Configure a característica de contagem da Rate Limiting Rule como **IP (`ip.src`)**. Registe no mesmo registo privado os pedidos medidos por período que sustentam o limiar, a característica `IP`/`ip.src`, o comportamento da ação disponível no plano e o respectivo timeout/duração. Para `block`, registe a duração de mitigação efectivamente suportada pelo plano. Para `managed challenge`, se a consola não disponibilizar duração, registe `N/A — challenge/throttling enquanto a regra se qualificar`; se disponibilizar duração, registe o valor apresentado. Nunca invente timeout, duração ou limiar.
 
-O lançamento fica bloqueado até que o registo privado mostre o limiar medido, a ação eficaz activa e o teste sem falso positivo. Validação da aplicação, deduplicação e um modo apenas de observação não satisfazem este gate.
+**[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA 1 — mutação remota inicial WAF]** Crie a regra com a expressão e contagem acima em observação/registo quando o plano o permitir; se não permitir, use o limiar permissivo medido e registe o comportamento disponível. Esta aprovação só autoriza a criação inicial, não autoriza a ativação de uma ação eficaz.
+
+Recolha evidência de observação suficiente: janela UTC, pedidos normais/pico por período, resultado de falsos positivos e comportamento da regra. Execute também um teste controlado, autorizado e limitado que ultrapasse o limiar a partir de uma origem de teste, e registe se a ação configurada é realmente accionada; não use tráfego de visitantes nem guarde o IP da origem na evidência.
+
+**[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA 2 — mutação remota para ação eficaz WAF]** Só depois de anexar a evidência de observação e do teste controlado, obtenha nova aprovação para mudar para `block` ou `managed challenge` com o comportamento/timeout suportado pelo plano. Repita o teste controlado para provar que a ação eficaz é accionada e volte a testar navegação normal e abertura de várias câmaras. Cada edição posterior de expressão, limiar, característica de contagem, ação ou duração exige nova aprovação explícita separada.
+
+O lançamento fica bloqueado até que o registo privado mostre o limiar medido, `IP`/`ip.src`, a ação eficaz activa, o teste controlado que a accionou e o teste sem falso positivo. Validação da aplicação, deduplicação e um modo apenas de observação não satisfazem este gate.
 
 ## Gate de migrations e retenção
 
@@ -59,7 +65,7 @@ Aceitação local: a suite passa, o dry-run constrói o Worker agendado sem rota
 & npx.cmd wrangler d1 migrations list LVSM_AUDIENCE --remote -c wrangler.jsonc
 ```
 
-**[LEITURA REMOTA — sem mutação; registo privado obrigatório]** Obtenha o bookmark Time Travel actual e crie no registo privado de alteração uma entrada com data/hora UTC, operador, ambiente, resultado da consulta e o bookmark devolvido. Cloudflare cria os bookmarks automaticamente; esta etapa preserva a referência de recuperação, não cria uma cópia nem executa um restauro.
+**[LEITURA REMOTA — sem mutação; registo privado obrigatório]** Imediatamente antes de aplicar a migration, depois da última pré-verificação, obtenha o bookmark Time Travel actual e crie no registo privado de alteração uma entrada com data/hora UTC, operador, ambiente, resultado da consulta e o bookmark devolvido. Cloudflare cria os bookmarks automaticamente; esta etapa preserva a referência de recuperação, não cria uma cópia nem executa um restauro.
 
 ```powershell
 & npx.cmd wrangler d1 time-travel info LVSM_AUDIENCE -c wrangler.jsonc
@@ -103,13 +109,15 @@ Espere pela próxima execução agendada. **[LEITURA REMOTA — sem mutação]**
 
 Evidência mínima de retenção, em registo privado: hora UTC da execução, resultado `outcome: "ok"`, `deletedCount`, `durationMs`, responsável e confirmação de que o log não contém linhas, sessões, chaves de evento ou credenciais. Não cole o fluxo integral de logs no pedido de alteração.
 
-Após a execução, **[LEITURA REMOTA — sem mutação]** confirme apenas a contagem agregada de eventos expirados:
+O teste local de fronteira é obrigatório antes desta prova: `node --experimental-vm-modules --test tests/audience-retention.test.mjs` tem de demonstrar, com o cutoff fixo `2026-07-05T12:00:00.000Z`, que `2026-07-05T11:59:59.999Z` é apagado, que o valor exactamente no cutoff é retido, e que a query do Worker usa estritamente `created_at < ?`.
+
+Após a execução, **[LEITURA REMOTA — sem mutação]** confirme apenas a contagem agregada de eventos expirados. Use comparação de instantes analisados por SQLite, não comparação lexical de texto ISO:
 
 ```powershell
-& npx.cmd wrangler d1 execute LVSM_AUDIENCE --remote -c wrangler.jsonc --command "SELECT COUNT(*) AS expired_event_count FROM events WHERE created_at < datetime('now', '-30 days');"
+& npx.cmd wrangler d1 execute LVSM_AUDIENCE --remote -c wrangler.jsonc --command "WITH cutoff AS (SELECT julianday('now', '-30 days') AS cutoff_jd) SELECT COUNT(*) AS expired_event_count FROM events, cutoff WHERE julianday(created_at) < cutoff.cutoff_jd;"
 ```
 
-Aceitação: a consulta agregada devolve zero eventos expirados. Se a execução falhar, faltar, ou a contagem não for zero, pare a promoção, registe a falha e use o procedimento de rollback abaixo; não oculte a falha com uma execução manual não aprovada.
+Registe também a hora UTC de início da query e a prova local de fronteira acima; a primeira demonstra a semântica exacta `<` no cutoff e a segunda impede que uma formatação textual diferente faça a contagem remota parecer falsamente zero. Aceitação: a consulta agregada devolve zero eventos expirados. Se a execução falhar, faltar, ou a contagem não for zero, pare a promoção, registe a falha e use o procedimento de rollback abaixo; não oculte a falha com uma execução manual não aprovada.
 
 ## Evidência de lançamento
 
@@ -117,10 +125,10 @@ O responsável de lançamento só pode aprovar promoção depois de verificar e 
 
 - resultados do teste local, dry-run e ensaio local de migrations;
 - revisão da migration pendente antes de a aplicar e confirmação de aplicada depois;
-- bookmark Time Travel, janela de recuperação e operador;
+- bookmark Time Travel criado imediatamente antes da migration, janela de recuperação e operador;
 - configuração publicada sem rota, cron confirmado e uma execução bem-sucedida;
 - contagem agregada zero para eventos com mais de 30 dias;
-- registo WAF completo, com limiar medido, ação eficaz e teste de falsos positivos;
+- registo WAF completo, com `IP`/`ip.src`, pedidos medidos por período, ação/timeout suportados pelo plano, duas aprovações separadas, teste controlado de ação eficaz e teste de falsos positivos;
 - confirmação de que a Política de Privacidade abaixo descreve o comportamento realmente publicado.
 
 Não trate uma captura de configuração, uma aprovação verbal, uma compilação local ou uma regra em observação como autorização de lançamento.
@@ -130,8 +138,8 @@ Não trate uma captura de configuração, uma aprovação verbal, uma compilaç�
 Pare a promoção e informe o responsável de lançamento se a regra WAF bloquear tráfego legítimo, se a migration falhar, se o cron não estiver activo, se não houver execução `ok`, ou se a prova de retenção falhar.
 
 - **WAF:** **[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA — mutação remota]** corrija a expressão ou volte a uma observação temporária/limiar mais alto baseado em medição. Registe a nova decisão, prazo e responsável. Desactivar o controlo eficaz reabre a falha de consumo de recursos e bloqueia a aceitação do lançamento.
-- **Código/Worker:** reverta para o commit conhecido anterior e, antes de qualquer publicação correctiva, obtenha aprovação explícita separada. **[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA — mutação remota]** desactivar o Worker só é permitido com procedimento temporário de retenção, duração, evidência e responsável documentados; a interrupção não pode prolongar silenciosamente a retenção.
-- **Dados:** a alteração de schema é forward-compatible e não deve ser removida de forma destrutiva. Não há rollback que recupere eventos já apagados pela retenção aprovada. **[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA — mutação remota e destrutiva]** um restauro Time Travel exige incidente aprovado, bookmark privado identificado, confirmação do impacto e procedimento de validação pós-restauro; nunca o execute como tentativa de rotina.
+- **Código/Worker:** antes do lançamento, registe privadamente um commit Pages e um alvo de deployment/versão do Worker que tenham sido testados e sejam compatíveis com o schema depois da migration. **[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA — mutação remota]** um rollback só pode publicar esses alvos identificados, nunca um “commit anterior” não especificado. Se não existir versão anterior do Worker compatível, obtenha aprovação separada para o procedimento temporário de retenção e para desactivar o Worker, com duração, evidência e responsável documentados; a interrupção não pode prolongar silenciosamente a retenção.
+- **Dados:** a alteração de schema é forward-compatible e não deve ser removida de forma destrutiva. **[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA — mutação remota e destrutiva]** um restauro Time Travel exige incidente aprovado, o bookmark privado imediatamente anterior à migration, confirmação de que o commit Pages e a versão Worker a reabrir são compatíveis com o schema restaurado, e validação pós-restauro. O restauro pode ressuscitar eventos expirados/apagados, perder escritas posteriores e restaurar um schema incompatível. Depois do restauro, obtenha aprovação explícita separada para executar a limpeza de retenção pelo Worker revisto (sem SQL ad hoc), prove com a query `julianday` acima que há zero eventos expirados, e só então reabra o serviço.
 
 ## Bloqueio obrigatório: Política de Privacidade e RGPD
 

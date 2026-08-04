@@ -81,16 +81,17 @@ Deduplication limits accidental retries and repeated browser submissions. It doe
 
 ## Edge abuse control
 
-A Cloudflare WAF rate-limiting rule targets only the canonical production `POST /api/audience/event` path and counts by Cloudflare's edge characteristic rather than writing client-network identifiers to D1.
+A Cloudflare WAF rate-limiting rule targets only the canonical production `POST /api/audience/event` path and uses the Cloudflare Rate Limiting Rule IP counting characteristic (`ip.src`), rather than writing client-network identifiers to D1.
 
 Rollout:
 
 1. inspect normal and peak request-rate analytics for this exact path;
-2. create the rule with the threshold supported by the account plan;
-3. use observation/log behavior first when the plan exposes it, or a deliberately permissive threshold otherwise;
-4. verify that normal browsing and multiple camera openings are unaffected;
-5. change to block or managed challenge only after the threshold is validated;
-6. document the final expression, threshold, period, mitigation action, owner, and review date without exporting visitor identifiers.
+2. record the measured requests per period and create the rule with the threshold supported by the account plan;
+3. under a first explicit approval, use observation/log behavior when the plan exposes it, or a deliberately permissive measured threshold otherwise;
+4. record plan-supported mitigation behavior and timeout; for a managed challenge without a duration control, record `N/A — challenge/throttling while the rule qualifies` rather than inventing a timeout;
+5. collect observation evidence and run a controlled authorized test that exceeds the threshold without using visitor traffic;
+6. under a second explicit approval, change to block or managed challenge only after the threshold is validated, and prove the effective action triggers;
+7. document the final expression, IP characteristic, threshold, period, action/timeout, owner, review date, and false-positive result without exporting visitor identifiers. Later edits require separate approval.
 
 The release gate is not satisfied until an effective limiting action is enabled and tested. Application validation alone does not close the resource-consumption finding.
 
@@ -160,14 +161,14 @@ Release validation also requires:
 - a clean D1 migration rehearsal on a disposable database;
 - a read-only review of WAF rule scope and effective action;
 - evidence of one successful scheduled cleanup;
-- confirmation that events older than 30 days are absent;
+- confirmation through a parsed-timestamp (`julianday`) aggregate query that events older than 30 days are absent, backed by an exact cutoff-boundary test;
 - confirmation that normal visitor and camera-view flows are not rate-limited.
 
 ## Rollback
 
-Code can be reverted to the preceding known commit, but the unique schema addition remains forward-compatible and is not destructively removed. The scheduled Worker can be disabled only together with an explicit temporary retention procedure and owner. The WAF rule can return to observation or a higher threshold if it blocks legitimate traffic, but disabling effective abuse control reopens the security finding and blocks release acceptance.
+Before release, privately record tested, schema-compatible Pages commit and Worker deployment/version rollback targets; never roll back to an unspecified preceding commit. If no compatible prior Worker exists, its disablement requires a separately approved temporary-retention procedure with an owner. The unique schema addition remains forward-compatible and is not destructively removed. The WAF rule can return to observation or a higher threshold only with separate approval and measured evidence; disabling effective abuse control reopens the security finding and blocks release acceptance.
 
-No rollback restores events already removed by the approved retention process.
+Time Travel restore is destructive: it can resurrect events deleted since the bookmark, lose later writes, and restore a schema incompatible with the current code. Capture a private bookmark immediately before the migration. Before an approved restore, validate the Pages commit and Worker version against the target schema. After restoring, separately approve and run the reviewed retention cleanup, prove with the parsed-timestamp aggregate that zero expired rows remain, and only then reopen service.
 
 ## Explicit follow-up: privacy policy and related records
 
