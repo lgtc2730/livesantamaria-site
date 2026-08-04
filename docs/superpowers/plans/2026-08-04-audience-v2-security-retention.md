@@ -12,7 +12,8 @@
 
 - Keep the Control API LAB-only; the retention Worker belongs to Site analytics and has no public route.
 - Accept only `visit` and `camera_view`; the daily retention job deletes every raw event older than 30 days at execution time.
-- Do not intentionally store or log IP, user agent, email, Access identity, session ID, event key, cookies, JWTs, tokens, request bodies, or SQL bound values.
+- Do not intentionally store IP, user agent, email, Access identity, cookies, JWTs, tokens, request bodies, or SQL bound values.
+- `session_id` and `event_key` may be stored only in the audience D1 for deduplication until the daily retention job deletes rows older than 30 days; never log, return, summarize, export, or join them to identity data.
 - Keep telemetry failure non-blocking for the public Site and camera playback.
 - Preserve the 30-minute browser session and one visit/one view-per-camera behavior.
 - Replace all-time summary semantics with today, yesterday, last 7 days, and last 30 days.
