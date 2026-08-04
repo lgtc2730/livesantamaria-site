@@ -26,7 +26,6 @@ function zonedMidnightUtc(year, month, day) {
 
   for (let i = 0; i < 2; i++) {
     const actual = getZonedParts(new Date(guess));
-
     const actualAsUtc = Date.UTC(
       actual.year,
       actual.month - 1,
@@ -52,7 +51,7 @@ function addCalendarDays(year, month, day, amount) {
   };
 }
 
-function getPeriodBoundaries(now = new Date()) {
+export function getPeriodBoundaries(now = new Date()) {
 
   const local = getZonedParts(now);
 
@@ -74,6 +73,13 @@ function getPeriodBoundaries(now = new Date()) {
     today.month,
     today.day,
     -6
+  );
+
+  const last30 = addCalendarDays(
+    today.year,
+    today.month,
+    today.day,
+    -29
   );
 
   const tomorrow = addCalendarDays(
@@ -111,10 +117,16 @@ function getPeriodBoundaries(now = new Date()) {
         last7.year,
         last7.month,
         last7.day
+      ).toISOString(),
+
+    last30Start:
+      zonedMidnightUtc(
+        last30.year,
+        last30.month,
+        last30.day
       ).toISOString()
 
   };
-
 }
 
 export async function onRequestGet(context) {
@@ -127,9 +139,8 @@ export async function onRequestGet(context) {
     todayResult,
     yesterdayResult,
     last7Result,
-    totalResult,
-    topResult,
-    firstResult
+    last30Result,
+    topResult
   ] = await db.batch([
 
     db.prepare(`
@@ -169,7 +180,12 @@ export async function onRequestGet(context) {
       SELECT COUNT(*) AS count
       FROM events
       WHERE event_type='visit'
-    `),
+        AND created_at>=?
+        AND created_at<?
+    `).bind(
+      periods.last30Start,
+      periods.tomorrowStart
+    ),
 
     db.prepare(`
       SELECT camera_id AS camera,
@@ -177,16 +193,13 @@ export async function onRequestGet(context) {
       FROM events
       WHERE event_type='camera_view'
         AND camera_id IS NOT NULL
+        AND created_at>=?
       GROUP BY camera_id
       ORDER BY count DESC,camera_id ASC
       LIMIT 5
-    `),
-
-    db.prepare(`
-      SELECT MIN(created_at) AS activatedAt
-      FROM events
-      WHERE event_type='visit'
-    `)
+    `).bind(
+      periods.last30Start
+    )
 
   ]);
 
@@ -194,10 +207,8 @@ export async function onRequestGet(context) {
     apiVersion: 1,
     generatedAt: new Date().toISOString(),
 
-    activatedAt:
-      firstResult.results[0]?.activatedAt ?? null,
-
     visits: {
+
       today:
         todayResult.results[0]?.count ?? 0,
 
@@ -207,8 +218,8 @@ export async function onRequestGet(context) {
       last7:
         last7Result.results[0]?.count ?? 0,
 
-      total:
-        totalResult.results[0]?.count ?? 0
+      last30:
+        last30Result.results[0]?.count ?? 0
     },
 
     top:
@@ -223,5 +234,4 @@ export async function onRequestGet(context) {
       "Access-Control-Allow-Origin": "*"
     }
   });
-
 }
