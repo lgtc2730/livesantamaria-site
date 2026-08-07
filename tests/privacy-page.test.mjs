@@ -43,3 +43,13 @@ test("public site links to privacy information without treating navigation as co
   assert.match(html, /<a[^>]+href="\.\/privacidade\.html#metricas"[^>]*>Saber mais na Política de Privacidade<\/a>/);
   assert.match(html, /id="audiencePrivacySettings"[^>]*>Definições de métricas<\/button>/);
 });
+
+test("mobile layout keeps the footer privacy controls available", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+
+  assert.doesNotMatch(
+    html,
+    /\.footer\s*\{\s*display:\s*none;\s*\}/,
+    "the mobile breakpoint must not hide the footer containing privacy controls"
+  );
+});
