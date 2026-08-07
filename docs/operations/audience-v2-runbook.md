@@ -202,11 +202,21 @@ Antes de promoção de produção, o responsável pelo projecto e a administraç
 - [x] Preparar os testes de ponderação de câmaras/Timelapse e segurança/operação.
 - [ ] Concluir a verificação individual de todas as câmaras e obter aprovação explícita e datada das duas ponderações por Luis Mesquita.
 - [x] Ligar o rodapé e o painel de consentimento à Política no código do ambiente de teste.
-- [ ] Publicar no ambiente de teste e validar os links, a âncora `#metricas`, desktop, mobile e teclado.
+- [x] Publicar o SHA `22003c7` no ambiente de teste e validar em desktop os links, a âncora `#metricas`, recusa, aceitação, retirada, refresh e abertura de câmaras.
+- [ ] Validar a Política e o consentimento em mobile e com navegação completa por teclado.
 - [ ] Substituir o rótulo de revisão por versão e data efetivas apenas após aprovação explícita e datada de Luis Mesquita.
 - [ ] Obter aprovação explícita e datada de Luis Mesquita sobre responsabilidade, finalidades, fundamentos, retenções e texto público.
 
 Enquanto qualquer item estiver incompleto, a Política permanece um texto de revisão; não faça alegações de anonimato ou de dispensa de consentimento e não promova o lançamento para produção. Migration D1, publicação Pages, Worker de retenção e alterações WAF mantêm as aprovações remotas independentes descritas neste runbook.
+
+### Evidência do ambiente de teste — 2026-08-07
+
+- O branch `lab`, SHA `22003c7`, foi publicado e o check `Cloudflare Pages: livesantamaria-teste-v2` concluiu com sucesso.
+- Com sessão Cloudflare Access, foi confirmado em desktop que o Site abre, o rodapé apresenta `Privacidade`, a Política permanece identificada como `Versão para revisão` e o link informativo abre diretamente `#metricas` sem alterar a escolha.
+- Foram confirmados os percursos de recusa, aceitação, refresh e retirada; em todos eles o Site e as câmaras continuaram funcionais e o painel não reapareceu indevidamente.
+- Com o filtro `audience` na rede do navegador, aceitar, recarregar e abrir várias câmaras não produziu pedidos no domínio de teste, conforme o bloqueio de métricas previsto para esse ambiente.
+- Esta verificação não inspecionou valores de `localStorage`, não validou deduplicação remota — deliberadamente inexistente em teste — e não substitui os testes ainda pendentes em mobile e por teclado.
+- Nenhuma promoção de produção, migration D1, publicação de Worker, alteração WAF ou aplicação nos nós Timelapse foi autorizada por esta evidência.
 
 ### Prova imediata do consentimento antes da promoção
 
