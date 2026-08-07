@@ -203,7 +203,7 @@ Antes de promoção de produção, o responsável pelo projecto e a administraç
 - [ ] Concluir a verificação individual de todas as câmaras e obter aprovação explícita e datada das duas ponderações por Luis Mesquita.
 - [x] Ligar o rodapé e o painel de consentimento à Política no código do ambiente de teste.
 - [x] Publicar o SHA `22003c7` no ambiente de teste e validar em desktop os links, a âncora `#metricas`, recusa, aceitação, retirada, refresh e abertura de câmaras.
-- [ ] Validar a Política e o consentimento em mobile e com navegação completa por teclado.
+- [x] Validar a Política e o consentimento em mobile e por teclado no SHA `1b8eab0`, incluindo fecho sem decisão e contenção/restauro do foco.
 - [ ] Substituir o rótulo de revisão por versão e data efetivas apenas após aprovação explícita e datada de Luis Mesquita.
 - [ ] Obter aprovação explícita e datada de Luis Mesquita sobre responsabilidade, finalidades, fundamentos, retenções e texto público.
 
@@ -215,7 +215,9 @@ Enquanto qualquer item estiver incompleto, a Política permanece um texto de rev
 - Com sessão Cloudflare Access, foi confirmado em desktop que o Site abre, o rodapé apresenta `Privacidade`, a Política permanece identificada como `Versão para revisão` e o link informativo abre diretamente `#metricas` sem alterar a escolha.
 - Foram confirmados os percursos de recusa, aceitação, refresh e retirada; em todos eles o Site e as câmaras continuaram funcionais e o painel não reapareceu indevidamente.
 - Com o filtro `audience` na rede do navegador, aceitar, recarregar e abrir várias câmaras não produziu pedidos no domínio de teste, conforme o bloqueio de métricas previsto para esse ambiente.
-- Esta verificação não inspecionou valores de `localStorage`, não validou deduplicação remota — deliberadamente inexistente em teste — e não substitui os testes ainda pendentes em mobile e por teclado.
+- O SHA `1b8eab0` foi depois publicado com sucesso no projeto de teste. Foram validados por teclado o foco inicial em **Fechar**, o ciclo **Fechar → Saber mais → Aceitar → Recusar → Fechar**, o percurso inverso com `Shift+Tab`, o fecho por `Escape` e pelo botão visível e o regresso do foco a **Definições de métricas**.
+- Em viewport mobile aproximado de `390 × 844`, foram confirmados o botão **Fechar** sem sobreposição do título, a legibilidade e utilização de todos os controlos, o fecho sem alteração da preferência e o funcionamento posterior do Site.
+- Esta verificação não inspecionou valores de `localStorage` e não validou deduplicação remota, deliberadamente inexistente em teste.
 - Nenhuma promoção de produção, migration D1, publicação de Worker, alteração WAF ou aplicação nos nós Timelapse foi autorizada por esta evidência.
 
 ### Prova imediata do consentimento antes da promoção
