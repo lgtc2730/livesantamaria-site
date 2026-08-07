@@ -69,8 +69,10 @@ async function loadBrowserAudience(fetchImpl, initialStorage = {}) {
   const stored = new Map(Object.entries(initialStorage));
   const storageOperations = [];
   const elements = new Map();
-  for (const id of ["audienceConsentPanel", "audienceConsentAccept", "audienceConsentRefuse", "audiencePrivacySettings"]) {
+  let activeElement = null;
+  for (const id of ["audienceConsentPanel", "audienceConsentClose", "audienceConsentMore", "audienceConsentAccept", "audienceConsentRefuse", "audiencePrivacySettings"]) {
     elements.set(id, {
+      id,
       hidden: false,
       listeners: new Map(),
       addEventListener(type, listener) {
@@ -78,18 +80,38 @@ async function loadBrowserAudience(fetchImpl, initialStorage = {}) {
       },
       click() {
         this.listeners.get("click")?.();
+      },
+      dispatch(type, event = {}) {
+        this.listeners.get(type)?.(event);
+      },
+      focus() {
+        activeElement = this;
       }
     });
   }
+  const panel = elements.get("audienceConsentPanel");
+  const focusableElements = [
+    elements.get("audienceConsentClose"),
+    elements.get("audienceConsentMore"),
+    elements.get("audienceConsentAccept"),
+    elements.get("audienceConsentRefuse")
+  ];
+  panel.querySelectorAll = () => focusableElements;
+  panel.contains = element => focusableElements.includes(element);
+  const document = {
+    get activeElement() {
+      return activeElement;
+    },
+    getElementById: id => elements.get(id) || null,
+    contains: element => [...elements.values()].includes(element)
+  };
   const context = {
     console: { warn() {} },
     crypto: { randomUUID: () => validSession },
     Date,
     fetch: fetchImpl,
     JSON,
-    document: {
-      getElementById: id => elements.get(id) || null
-    },
+    document,
     localStorage: {
       getItem: key => {
         storageOperations.push(["get", key]);
@@ -118,7 +140,7 @@ globalThis.__audience = {
 };`,
     context
   );
-  return { ...context.__audience, stored, storageOperations, elements };
+  return { ...context.__audience, stored, storageOperations, elements, document };
 }
 
 class DeduplicatingD1 {
@@ -257,6 +279,65 @@ test("consent controls keep choices optional and start metrics only after accept
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(panel.hidden, true);
   assert.deepEqual(payloads, [{ event: "visit", session: validSession }]);
+});
+
+test("consent dialog closes without choosing and restores its trigger", async () => {
+  const payloads = [];
+  const browser = await loadBrowserAudience(async (_url, options) => {
+    payloads.push(JSON.parse(options.body));
+    return new Response(null, { status: 200 });
+  });
+  const settings = browser.elements.get("audiencePrivacySettings");
+  const close = browser.elements.get("audienceConsentClose");
+  const panel = browser.elements.get("audienceConsentPanel");
+
+  settings.focus();
+  browser.initializeAudienceConsentControls();
+  assert.equal(browser.document.activeElement, close);
+
+  close.click();
+  assert.equal(panel.hidden, true);
+  assert.equal(browser.document.activeElement, settings);
+  assert.equal(browser.stored.has("lvsm-audience-consent-v1"), false);
+  assert.deepEqual(payloads, []);
+
+  settings.click();
+  let prevented = 0;
+  panel.dispatch("keydown", {
+    key: "Escape",
+    preventDefault() { prevented += 1; }
+  });
+  assert.equal(prevented, 1);
+  assert.equal(panel.hidden, true);
+  assert.equal(browser.document.activeElement, settings);
+  assert.equal(browser.stored.has("lvsm-audience-consent-v1"), false);
+  assert.deepEqual(payloads, []);
+});
+
+test("consent dialog traps forward and reverse keyboard focus", async () => {
+  const browser = await loadBrowserAudience(async () => new Response(null, { status: 200 }));
+  const panel = browser.elements.get("audienceConsentPanel");
+  const close = browser.elements.get("audienceConsentClose");
+  const refuse = browser.elements.get("audienceConsentRefuse");
+  browser.initializeAudienceConsentControls();
+
+  let prevented = 0;
+  refuse.focus();
+  panel.dispatch("keydown", {
+    key: "Tab",
+    shiftKey: false,
+    preventDefault() { prevented += 1; }
+  });
+  assert.equal(browser.document.activeElement, close);
+
+  close.focus();
+  panel.dispatch("keydown", {
+    key: "Tab",
+    shiftKey: true,
+    preventDefault() { prevented += 1; }
+  });
+  assert.equal(browser.document.activeElement, refuse);
+  assert.equal(prevented, 2);
 });
 
 test("loads LF and CRLF handler sources without redeclaring injected dependencies", async () => {

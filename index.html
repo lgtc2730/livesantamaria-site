@@ -1831,8 +1831,32 @@
       backdrop-filter: blur(18px);
     }
 
-    .audience-consent h2 { margin: 0 0 8px; font-size: 1.05rem; }
+    .audience-consent h2 {
+      margin: 0 0 8px;
+      padding-right: 48px;
+      font-size: 1.05rem;
+    }
     .audience-consent p { margin: 0; color: var(--muted); line-height: 1.55; }
+
+    .audience-consent__close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 1.55rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .audience-consent__close:hover {
+      color: var(--text);
+      background: rgba(255,255,255,.08);
+    }
 
     .audience-consent__actions {
       display: grid;
@@ -1854,6 +1878,8 @@
     }
 
     .audience-consent__actions button:focus-visible,
+    .audience-consent__more:focus-visible,
+    .audience-consent__close:focus-visible,
     .footer-privacy-button:focus-visible {
       outline: 3px solid var(--blue2);
       outline-offset: 3px;
@@ -3023,9 +3049,10 @@
 
   </nav>
 
-  <section class="audience-consent" id="audienceConsentPanel" role="region" aria-labelledby="audienceConsentTitle" hidden>
+  <section class="audience-consent" id="audienceConsentPanel" role="dialog" aria-modal="true" aria-labelledby="audienceConsentTitle" aria-describedby="audienceConsentDescription" hidden>
+    <button class="audience-consent__close" id="audienceConsentClose" type="button" aria-label="Fechar definições de métricas">×</button>
     <h2 id="audienceConsentTitle">Métricas de audiência opcionais</h2>
-    <p>Podemos contar visitas e câmaras públicas abertas através de uma sessão aleatória de 30 minutos. Os eventos brutos são eliminados após 30 dias e não são associados a uma conta identificada.</p>
+    <p id="audienceConsentDescription">Podemos contar visitas e câmaras públicas abertas através de uma sessão aleatória de 30 minutos. Os eventos brutos são eliminados após 30 dias e não são associados a uma conta identificada.</p>
     <a class="audience-consent__more" href="./privacidade.html#metricas">Saber mais na Política de Privacidade</a>
     <div class="audience-consent__actions">
       <button id="audienceConsentAccept" type="button">Aceitar métricas</button>
@@ -5559,34 +5586,86 @@ function trackCameraView(cameraId) {
 
 function initializeAudienceConsentControls() {
   const panel = document.getElementById("audienceConsentPanel");
+  const closeButton = document.getElementById("audienceConsentClose");
   const acceptButton = document.getElementById("audienceConsentAccept");
   const refuseButton = document.getElementById("audienceConsentRefuse");
   const settingsButton = document.getElementById("audiencePrivacySettings");
 
-  if (!panel || !acceptButton || !refuseButton || !settingsButton) {
+  if (!panel || !closeButton || !acceptButton || !refuseButton || !settingsButton) {
     return;
   }
 
+  let returnFocus = null;
+  const focusableSelector = 'a[href], button:not([disabled])';
+
+  const openPanel = trigger => {
+    returnFocus = trigger && !panel.contains(trigger) ? trigger : null;
+    panel.hidden = false;
+    closeButton.focus();
+  };
+
+  const closePanel = () => {
+    panel.hidden = true;
+    const focusTarget = returnFocus;
+    returnFocus = null;
+    if (focusTarget && document.contains(focusTarget)) {
+      focusTarget.focus();
+    }
+  };
+
   const consent = getAudienceConsent();
-  panel.hidden = consent !== null;
+  if (consent === null) {
+    openPanel(document.activeElement);
+  } else {
+    panel.hidden = true;
+  }
+
+  closeButton.addEventListener("click", closePanel);
+
+  panel.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closePanel();
+      return;
+    }
+
+    if (event.key !== "Tab") {
+      return;
+    }
+
+    const focusable = Array.from(panel.querySelectorAll(focusableSelector));
+    if (!focusable.length) {
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
 
   acceptButton.addEventListener("click", () => {
     if (!setAudienceConsent("accepted")) {
       return;
     }
 
-    panel.hidden = true;
+    closePanel();
     trackVisit();
   });
 
   refuseButton.addEventListener("click", () => {
     if (setAudienceConsent("refused")) {
-      panel.hidden = true;
+      closePanel();
     }
   });
 
   settingsButton.addEventListener("click", () => {
-    panel.hidden = false;
+    openPanel(settingsButton);
   });
 
   if (consent === "accepted") {

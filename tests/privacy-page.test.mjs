@@ -53,3 +53,11 @@ test("mobile layout keeps the footer privacy controls available", async () => {
     "the mobile breakpoint must not hide the footer containing privacy controls"
   );
 });
+
+test("audience consent markup exposes an accessible modal dialog", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+
+  assert.match(html, /id="audienceConsentPanel"[^>]+role="dialog"[^>]+aria-modal="true"/);
+  assert.match(html, /aria-describedby="audienceConsentDescription"/);
+  assert.match(html, /id="audienceConsentClose"[^>]+aria-label="Fechar definições de métricas"/);
+});
