@@ -21,9 +21,11 @@ Usar antes de implementar ou publicar qualquer alteração. A aprovação técni
 - [ ] Definir retenção e eliminação na configuração/código, incluindo fornecedor e backups.
 - [ ] Atualizar o registo de tratamentos, a revisão de fornecedores e o procedimento afetado.
 - [ ] Atualizar a Política de Privacidade antes ou simultaneamente ao efeito da mudança.
+- [ ] Confirmar que `lab-control` e o Control de produção lêem apenas o resumo público de produção e que `visits.total` é apresentado como `Últimos 30 dias`, sem total vitalício, rollup ou histórico acumulado.
 - [ ] Criar/atualizar testes e provar em `lab` que comportamento e texto coincidem.
 - [ ] Definir ordem de promoção, teste imediato e rollback sem expor segredos/dados pessoais.
-- [ ] Obter aprovação explícita e datada de Luis Mesquita; obter aprovação remota separada para cada publicação/configuração.
+- [ ] Registar privadamente o bookmark Time Travel e as contagens agregadas antes/depois da migration D1; nunca guardar ou divulgar o bookmark, linhas de eventos, sessões, chaves de evento ou segredos.
+- [ ] Obter aprovação explícita e datada de Luis Mesquita; obter aprovação remota separada para a migration D1, publicação Pages e publicação do Worker de retenção.
 - [ ] Registar versão/data e rever após publicação; eliminar evidência temporária.
 
 Se algum item não estiver comprovado: **Pendente de aprovação do responsável — não publicar em produção**.

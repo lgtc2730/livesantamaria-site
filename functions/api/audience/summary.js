@@ -262,6 +262,9 @@ export async function onRequestGet(context) {
         last7Result.results[0]?.count ?? 0,
 
       last30:
+        last30Result.results[0]?.count ?? 0,
+
+      total:
         last30Result.results[0]?.count ?? 0
     },
 

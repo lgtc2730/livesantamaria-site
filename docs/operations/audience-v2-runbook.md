@@ -11,6 +11,14 @@ Só o responsável de lançamento pode dar aprovação explícita, registada no 
 
 Use credenciais de privilégio mínimo já fornecidas pelo mecanismo de autenticação aprovado. Não passe credenciais na linha de comando, não use ficheiros de variáveis na evidência de lançamento, e não exporte linhas de eventos, identificadores de sessão ou chaves de deduplicação.
 
+## Semântica pública do resumo e Control
+
+Os dois Controls — `lab-control` e o Control de produção — lêem exclusivamente o resumo público de audiência de produção; `lab-control` não lê uma base de audiência própria. O contrato compatível mantém `visits.total`, apresentado no Control como **Últimos 30 dias**. Este valor conta apenas eventos `visit` no intervalo já usado pelo resumo, de `last30Start` (inclusive) a `tomorrowStart` (exclusivo).
+
+O Worker elimina eventos brutos com mais de 30 dias. Não há rollup, tabela de resumo, histórico acumulado nem campo de total vitalício. Por isso, uma descida de `visits.total` depois de eventos expirarem é esperada e não é por si só um incidente. O resumo público devolve apenas agregados; não exponha bookmarks Time Travel, linhas de eventos, sessões, chaves de evento ou segredos em Control, evidência, repositório ou canais públicos.
+
+**[GATE DE PRIVACIDADE — APROVAÇÃO EXPLÍCITA E DATADA]** Antes de qualquer promoção para produção, Luis Mesquita tem de aprovar explicitamente e por escrito a finalidade, fundamento, retenção de 30 dias e texto público das métricas. A aprovação técnica não a substitui; se faltar, a promoção fica bloqueada.
+
 ## Gate WAF: medir antes de limitar
 
 A regra tem de corresponder exatamente a este âmbito; não o alargue a outras rotas ou hosts:
@@ -78,6 +86,8 @@ Aceitação local: a suite passa, o dry-run constrói o Worker agendado sem rota
 
 Não publique o bookmark no repositório nem em canais públicos. Confirme no resultado que Time Travel é suportado e que a janela de recuperação disponível é suficiente para a mudança. Se não for, pare e peça orientação ao responsável de lançamento.
 
+**[LEITURA REMOTA — sem mutação; registo privado obrigatório]** Antes de aplicar a migration, registe apenas a contagem agregada de eventos. Depois de a migration ficar aplicada, repita a mesma contagem e exija igualdade exacta antes de avançar. A evidência privada pode conter os dois números e as horas UTC, mas nunca o bookmark, linhas, identificadores de sessão, chaves de evento ou segredos. Se as contagens divergirem, pare a promoção e siga o procedimento de incidente; não tente reconciliar dados por SQL ad hoc.
+
 ### Sequência obrigatória: migration compatível, Pages e Worker
 
 Esta ordem é obrigatória e cada mutação remota requer aprovação separada. Não avance por inferência:
@@ -95,13 +105,13 @@ O alvo de rollback Pages e o alvo de versão/deployment do Worker têm de ser re
 
 #### 2. Aplicar a migration compatível
 
-**[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA — mutação remota]** Só depois das pré-verificações, da revisão da migration e do registo privado do bookmark, aplique as migrations:
+**[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA — mutação remota D1]** Só depois das pré-verificações, da revisão da migration, do registo privado do bookmark e da contagem agregada anterior, aplique as migrations:
 
 ```powershell
 & npx.cmd wrangler d1 migrations apply LVSM_AUDIENCE --remote -c wrangler.jsonc
 ```
 
-Registe de forma privada apenas o estado aplicado e a hora UTC. Não execute SQL ad hoc, não faça exportação de linhas e não tente uma migration inversa destrutiva.
+Registe de forma privada apenas o estado aplicado, a hora UTC e as contagens agregadas iguais antes/depois. Não execute SQL ad hoc, não faça exportação de linhas e não tente uma migration inversa destrutiva.
 
 Confirme em modo de leitura que `event_key` é nullable e que o índice único é parcial para `event_key IS NOT NULL`. Não imponha `NOT NULL`, checks de tipo/evento ou normalização de linhas nesta janela.
 
@@ -119,7 +129,7 @@ Numa sessão controlada, prove por respostas e diferenças de contagens agregada
 
 #### 6. Publicar o Worker separadamente
 
-**[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA — mutação remota]** Só depois de concluir com sucesso as provas Pages das etapas 3–5, publique o Worker de retenção:
+**[APROVAÇÃO EXPLÍCITA OBRIGATÓRIA — mutação remota do Worker, separada]** Só depois de concluir com sucesso as provas Pages das etapas 3–5, publique o Worker de retenção. Esta aprovação é independente da aprovação de privacidade, da migration D1 e da publicação Pages:
 
 ```powershell
 & npx.cmd wrangler deploy --config workers/audience-retention/wrangler.jsonc

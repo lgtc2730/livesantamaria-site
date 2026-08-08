@@ -118,17 +118,19 @@ test("limits visits and top cameras to the retained 30-day window", async () => 
 
   const response = await onRequestGet({ env: { LVSM_AUDIENCE: db }, now });
   const body = await response.json();
-  const last30Statement = db.statements.find(statement =>
+  const retainedVisitStatements = db.statements.filter(statement =>
     statement.sql.includes("event_type='visit'") &&
-    statement.values.includes(last30Start)
+    JSON.stringify(statement.values) === JSON.stringify([last30Start, tomorrowStart])
   );
   const topStatement = db.statements.find(statement =>
     statement.sql.includes("event_type='camera_view'")
   );
 
-  assert.ok(last30Statement);
-  assert.match(last30Statement.sql, /created_at>=\?/);
-  assert.deepEqual(last30Statement.values, [last30Start, tomorrowStart]);
+  assert.equal(retainedVisitStatements.length, 1);
+  for (const statement of retainedVisitStatements) {
+    assert.match(statement.sql, /created_at>=\?/);
+    assert.deepEqual(statement.values, [last30Start, tomorrowStart]);
+  }
   assert.ok(topStatement);
   assert.match(topStatement.sql, /created_at>=\?/);
   assert.match(topStatement.sql, /created_at<\?/);
@@ -138,11 +140,30 @@ test("limits visits and top cameras to the retained 30-day window", async () => 
     today: 1,
     yesterday: 2,
     last7: 3,
-    last30: 4
+    last30: 4,
+    total: 4
   });
-  assert.equal("total" in body.visits, false);
   assert.equal("activatedAt" in body, false);
   assert.doesNotMatch(JSON.stringify(body), /session_id|event_key/i);
+});
+
+test("counts only retained-window visits in total because long-term rollups do not exist", async () => {
+  const { onRequestGet } = await loadSummary();
+  const db = new SqliteD1([
+    { created_at: "2026-07-05T23:59:59.999Z", event_type: "visit" },
+    { created_at: "2026-07-06T00:00:00.000Z", event_type: "visit" },
+    { created_at: "2026-07-20T10:00:00.000Z", event_type: "visit" },
+    { created_at: "2026-08-05T00:00:00.000Z", event_type: "visit" }
+  ]);
+
+  const response = await onRequestGet({
+    env: { LVSM_AUDIENCE: db },
+    now: new Date("2026-08-04T12:00:00.000Z")
+  });
+  const body = await response.json();
+
+  assert.equal(body.visits.total, 2);
+  assert.equal(body.visits.last30, 2);
 });
 
 test("excludes a top-camera row at the future tomorrow boundary", async () => {
