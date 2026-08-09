@@ -11,7 +11,8 @@
     {
       "binding": "LVSM_AUDIENCE",
       "database_name": "LVSM_AUDIENCE",
-      "database_id": "485db11f-d955-494b-a0b9-beb8eea28f44"
+      "database_id": "485db11f-d955-494b-a0b9-beb8eea28f44",
+      "migrations_dir": "database/migrations"
     }
   ]
 }

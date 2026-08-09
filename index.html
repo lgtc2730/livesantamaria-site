@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Live Santa Maria</title>
 
-  <script src="./cameras.public.js?v=20260713-220724"></script>
+  <script src="./cameras.public.js?v=bd5f1b59e591"></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.16/dist/hls.min.js"></script>
 
   <style>
@@ -577,8 +577,25 @@
       filter: saturate(1.04);
     }
 
+    .promo-card-activation {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      border: 0;
+      border-radius: inherit;
+      background: transparent;
+    }
+
+    .promo-card-activation:focus-visible {
+      outline: 3px solid rgba(126,215,255,.92);
+      outline-offset: -4px;
+    }
+
     .camera-card video,
-    .camera-card img {
+    .camera-card img:not(.camera-partner-logo) {
       width: 100%;
       height: 100%;
       display: block;
@@ -586,6 +603,11 @@
       background: #02070d;
       pointer-events: none;
       transform: scale(1.012);
+    }
+
+    .camera-card[data-type="promo"] .live-media {
+      object-fit: contain;
+      transform: none;
     }
 
     .camera-card::after {
@@ -636,6 +658,12 @@
     .status-badge.offline {
       background: rgba(60, 12, 22, .78);
       border-color: rgba(255,107,130,.32);
+    }
+
+    .status-badge.maintenance {
+      background: rgba(74, 48, 8, .88);
+      border-color: rgba(251,191,36,.42);
+      color: #fff4d6;
     }
 
     .camera-info {
@@ -817,59 +845,64 @@
 
     .camera-sponsor {
       margin-top: 12px;
-
       display: grid;
       gap: 2px;
     }
 
     .camera-sponsor span {
       font-size: .52rem;
-
       letter-spacing: .16em;
       text-transform: uppercase;
-
       color: rgba(255,255,255,.48);
-
       font-weight: 800;
     }
 
-    .camera-sponsor strong {
+    .camera-sponsor strong,
+    .camera-sponsor a {
       font-size: .78rem;
-
       color: rgba(255,255,255,.88);
-
       font-weight: 650;
-        }
+    }
 
-    .camera-sponsor-logo {
+    .camera-support {
+      margin-top: 8px;
+      padding-left: 9px;
+      border-left: 2px solid rgba(66,183,255,.34);
+      display: grid;
+      gap: 2px;
+    }
+
+    .camera-support span {
+      color: rgba(126,215,255,.72);
+      font-size: .5rem;
+      font-weight: 850;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .camera-support strong,
+    .camera-support a {
+      color: rgba(255,255,255,.78);
+      font-size: .72rem;
+      font-weight: 650;
+    }
+
+    .camera-partner-logo {
       position: absolute;
       right: 5px;
       bottom: 5px;
       z-index: 4;
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      padding: 3px 6px;
-      max-width: 150px;
-      max-height: 55px;
-
-      background: transparent;
-      opacity: .75;
-
-      pointer-events: none;
-    }
-
-    .camera-sponsor-logo img {
       display: block;
-      max-width: 100%;
-      max-height: 28px;
       width: auto;
       height: auto;
+      max-width: 110px;
+      max-height: 40px;
       object-fit: contain;
-
+      opacity: .75;
+      background: transparent;
+      transform: none;
       filter: drop-shadow(0 2px 5px rgba(0,0,0,.55));
+      pointer-events: none;
     }
 
     .camera-state {
@@ -965,9 +998,19 @@
       background: #f59e0b;
     }
 
+    .map-camera.testing .map-dot {
+      background: #42b7ff;
+    }
+
     .map-camera.offline .map-dot {
       background: #e11d48;
     }
+
+    .map-camera.maintenance .map-dot {
+      background: #fbbf24;
+      box-shadow: 0 0 14px rgba(251,191,36,.7);
+    }
+
     .map-label {
       position: absolute;
       left: var(--label-x, 16px);
@@ -1564,11 +1607,40 @@
 
     .tv-mode.show { display: block; }
 
+    .promo-image-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: grid;
+      place-items: center;
+      padding: clamp(12px, 3vw, 36px);
+      background: rgba(0, 0, 0, .94);
+    }
+
+    .promo-image-lightbox[hidden] { display: none; }
+
+    .promo-image-lightbox__stage {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+    }
+
+    .promo-image-lightbox__image {
+      display: block;
+      max-width: min(100%, 760px);
+      max-height: min(100%, 760px);
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+
     .tv-stage,
     .fullscreen-stage {
       width: 100%;
       height: 100%;
       position: relative;
+      overflow: hidden;
     }
 
     .tv-stage > video,
@@ -1584,9 +1656,6 @@
     .tv-info,
     .fullscreen-info {
       position: absolute;
-      left: 28px;
-      right: 28px;
-      bottom: 24px;
       z-index: 3;
       display: flex;
       justify-content: space-between;
@@ -1596,11 +1665,24 @@
       text-shadow: 0 3px 18px rgba(0,0,0,.7);
     }
 
+    .tv-info {
+      left: 28px;
+      right: 28px;
+      bottom: 24px;
+    }
+
+    .fullscreen-info {
+      left: 28px;
+      right: 84px;
+      top: 24px;
+      align-items: flex-start;
+    }
+
     .fullscreen-sponsor-logo {
       position: absolute;
 
       right: 24px;
-      bottom: 0;
+      bottom: 24px;
 
       display: flex;
       align-items: center;
@@ -1634,11 +1716,19 @@
       position: fixed;
       left: 0;
       right: 0;
-      bottom: 0;
       height: 34vh;
-      background: linear-gradient(0deg, rgba(0,0,0,.72), transparent);
       z-index: -1;
       pointer-events: none;
+    }
+
+    .tv-info::before {
+      bottom: 0;
+      background: linear-gradient(0deg, rgba(0,0,0,.72), transparent);
+    }
+
+    .fullscreen-info::before {
+      top: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,.72), transparent);
     }
 
     .tv-name {
@@ -1706,6 +1796,97 @@
       color: var(--soft);
       text-align: center;
       font-size: .88rem;
+    }
+
+    .footer-privacy-button {
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: var(--blue2);
+      font: inherit;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .audience-consent__more {
+      display: inline-block;
+      margin-top: 10px;
+      color: var(--blue2);
+      text-decoration: underline;
+    }
+
+    .audience-consent {
+      position: fixed;
+      z-index: 1000;
+      right: max(18px, env(safe-area-inset-right));
+      bottom: max(18px, env(safe-area-inset-bottom));
+      left: max(18px, env(safe-area-inset-left));
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 18px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 18px;
+      background: rgba(5,12,20,.97);
+      box-shadow: 0 18px 55px rgba(0,0,0,.55);
+      backdrop-filter: blur(18px);
+    }
+
+    .audience-consent h2 {
+      margin: 0 0 8px;
+      padding-right: 48px;
+      font-size: 1.05rem;
+    }
+    .audience-consent p { margin: 0; color: var(--muted); line-height: 1.55; }
+
+    .audience-consent__close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 1.55rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .audience-consent__close:hover {
+      color: var(--text);
+      background: rgba(255,255,255,.08);
+    }
+
+    .audience-consent__actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .audience-consent__actions button {
+      min-height: 46px;
+      border: 1px solid var(--blue2);
+      border-radius: 12px;
+      padding: 10px 14px;
+      background: rgba(24,119,255,.14);
+      color: var(--text);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .audience-consent__actions button:focus-visible,
+    .audience-consent__more:focus-visible,
+    .audience-consent__close:focus-visible,
+    .footer-privacy-button:focus-visible {
+      outline: 3px solid var(--blue2);
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 520px) {
+      .audience-consent__actions { grid-template-columns: 1fr; }
     }
 
     .hidden { display: none !important; }
@@ -2066,7 +2247,7 @@
       }
 
       .camera-card:not(.featured-card).compact-mobile:not(.expanded-mobile) video,
-      .camera-card:not(.featured-card).compact-mobile:not(.expanded-mobile) img {
+      .camera-card:not(.featured-card).compact-mobile:not(.expanded-mobile) img:not(.camera-partner-logo) {
         height: 92px;
       }
 
@@ -2105,12 +2286,16 @@
       }
 
       .camera-card.compact-mobile.expanded-mobile video,
-      .camera-card.compact-mobile.expanded-mobile img {
+      .camera-card.compact-mobile.expanded-mobile img:not(.camera-partner-logo) {
         height: 100%;
       }
 
       .camera-card.compact-mobile .camera-info {
         pointer-events: none;
+      }
+
+      .camera-card.compact-mobile[data-type="promo"] .camera-info {
+        pointer-events: auto;
       }
 
       .camera-card.compact-mobile.expanded-mobile .camera-info {
@@ -2153,10 +2338,6 @@
 
       .bottom-nav {
         display: grid;
-      }
-
-      .footer {
-        display: none;
       }
 
       .map-popup {
@@ -2205,18 +2386,26 @@
       }
 
       .camera-card:not(.featured-card).compact-mobile:not(.expanded-mobile) video,
-      .camera-card:not(.featured-card).compact-mobile:not(.expanded-mobile) img {
+      .camera-card:not(.featured-card).compact-mobile:not(.expanded-mobile) img:not(.camera-partner-logo) {
         height: 86px;
       }
 
       .camera-card.compact-mobile.expanded-mobile video,
-      .camera-card.compact-mobile.expanded-mobile img {
+      .camera-card.compact-mobile.expanded-mobile img:not(.camera-partner-logo) {
         width: 100%;
         height: 100%;
       }
     }
 
     @media (max-width: 680px) and (orientation: portrait) {
+      .camera-card.compact-mobile.expanded-mobile::after,
+      .camera-card.compact-mobile.expanded-mobile .status-badge,
+      .camera-card.compact-mobile.expanded-mobile .camera-info,
+      .camera-card.compact-mobile.expanded-mobile .camera-partner-logo,
+      .camera-card.compact-mobile.expanded-mobile .viewer-count {
+        display: none;
+      }
+
       .timelapse-dashboard-card {
         overflow: hidden;
       }
@@ -2845,7 +3034,9 @@
     </main>
 
     <div class="footer">
-      © Live Santa Maria · v1.0.0-dev · Imagens em directo para apoio à observação meteorológica e marítima informal.
+      © Live Santa Maria · v2 · Imagens em directo para apoio à observação meteorológica e marítima informal.
+      · <a class="footer-privacy-button" href="./privacidade.html">Privacidade</a>
+      · <button class="footer-privacy-button" id="audiencePrivacySettings" type="button">Definições de métricas</button>
     </div>
   </div>
 
@@ -2858,6 +3049,17 @@
 
   </nav>
 
+  <section class="audience-consent" id="audienceConsentPanel" role="dialog" aria-modal="true" aria-labelledby="audienceConsentTitle" aria-describedby="audienceConsentDescription" hidden>
+    <button class="audience-consent__close" id="audienceConsentClose" type="button" aria-label="Fechar definições de métricas">×</button>
+    <h2 id="audienceConsentTitle">Métricas de audiência opcionais</h2>
+    <p id="audienceConsentDescription">Podemos contar visitas e câmaras públicas abertas através de uma sessão aleatória de 30 minutos. Os eventos brutos são eliminados após 30 dias e não são associados a uma conta identificada.</p>
+    <a class="audience-consent__more" href="./privacidade.html#metricas">Saber mais na Política de Privacidade</a>
+    <div class="audience-consent__actions">
+      <button id="audienceConsentAccept" type="button">Aceitar métricas</button>
+      <button id="audienceConsentRefuse" type="button">Recusar</button>
+    </div>
+  </section>
+
   <div class="tv-mode" id="tvMode">
     <div class="tv-stage" id="tvStage"></div>
     <button class="close-button" id="tvCloseButton" aria-label="Fechar">×</button>
@@ -2866,6 +3068,11 @@
   <div class="tv-mode" id="fullscreenMode">
     <div class="fullscreen-stage" id="fullscreenStage"></div>
     <button class="close-button" id="fullscreenCloseButton" aria-label="Fechar">×</button>
+  </div>
+
+  <div class="promo-image-lightbox" id="promoImageLightbox" role="dialog" aria-modal="true" aria-label="Imagem promocional ampliada" hidden>
+    <div class="promo-image-lightbox__stage" id="promoImageLightboxStage"></div>
+    <button class="close-button" id="promoImageLightboxClose" type="button" aria-label="Fechar imagem ampliada">×</button>
   </div>
 
 <script>
@@ -2881,13 +3088,26 @@ function getOperationalState(cam) {
   return state === "future" ? "preparing" : state;
 }
 
+function getPublicMedia(cam) {
+  if (cam?.publicMedia === "preview" || cam?.publicMedia === "stream") {
+    return cam.publicMedia;
+  }
+  if (cam?.publicMedia !== undefined) return "preview";
+  return getOperationalState(cam) === "preparing" ? "preview" : "stream";
+}
+
 function getCameraPresentation(cam) {
   const state = getOperationalState(cam);
 
-  if (state === "not-installed") {
+  if (
+    state === "not-installed" ||
+    cam?.publicVisibility === "hidden" ||
+    cam?.publicVisibility === "staging"
+  ) {
     return {
       visible: false,
       useFallback: true,
+      allowStream: false,
       badge: "hidden",
       label: "Não instalada"
     };
@@ -2897,9 +3117,21 @@ function getCameraPresentation(cam) {
     return {
         visible: true,
         useFallback: true,
+        allowStream: false,
         badge: "future",
         badgeDot: false,
         label: "Em preparação"
+    };
+  }
+
+  if (getPublicMedia(cam) === "preview" && state !== "maintenance") {
+    return {
+      visible: true,
+      useFallback: true,
+      allowStream: false,
+      badge: "future",
+      badgeDot: false,
+      label: "Em prepara\u00e7\u00e3o"
     };
   }
 
@@ -2907,34 +3139,121 @@ function getCameraPresentation(cam) {
     return {
       visible: true,
       useFallback: false,
+      allowStream: true,
       badge: "testing",
-      label: "Em testes"
+      label: "Em teste"
+    };
+  }
+
+  if (state === "maintenance") {
+    return {
+      visible: true,
+      useFallback: true,
+      allowStream: false,
+      badge: "maintenance",
+      badgeDot: false,
+      label: "Em manutenção"
     };
   }
 
   return {
     visible: true,
     useFallback: false,
+    allowStream: true,
     badge: "live",
     label: "LIVE"
   };
 }
 
+function normalizeDigitalZoom(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const { factor, x, y } = value;
+  if (![factor, x, y].every(Number.isFinite)) return null;
+  return {
+    factor: Math.max(1, factor),
+    x: Math.min(100, Math.max(0, x)),
+    y: Math.min(100, Math.max(0, y))
+  };
+}
+
+function applyDigitalZoom(media, cam) {
+  if (media?.tagName !== "VIDEO" || cam?.type !== "hls") return false;
+  const zoom = normalizeDigitalZoom(cam.digitalZoom);
+  if (!zoom) return false;
+  media.style.transform = `scale(${zoom.factor})`;
+  media.style.transformOrigin = `${zoom.x}% ${zoom.y}%`;
+  return true;
+}
+
 const PUBLIC_CAMERAS = (window.LVSM_CAMERAS || []).filter(cam =>
   cam.enabled !== false &&
-  getOperationalState(cam) !== "not-installed"
+  (cam.type === "promo" || cam.publicVisibility === "public") &&
+  getCameraPresentation(cam).visible
 );
 
+function getPublicCameraGroup(cam) {
+  if (cam.type === "promo") return 3;
+  return getCameraPresentation(cam).allowStream ? 1 : 2;
+}
+
+function isValidPublicCameraOrder(value) {
+  return Number.isSafeInteger(value) && value > 0;
+}
+
+const publicCameraSourceIndexes = new WeakMap();
+const publicCameraOrderCounts = new Map();
+
+PUBLIC_CAMERAS.forEach((cam, sourceIndex) => {
+  publicCameraSourceIndexes.set(cam, sourceIndex);
+
+  if (!isValidPublicCameraOrder(cam.publicOrder)) return;
+
+  const group = getPublicCameraGroup(cam);
+  const groupOrderCounts = publicCameraOrderCounts.get(group) || new Map();
+  groupOrderCounts.set(
+    cam.publicOrder,
+    (groupOrderCounts.get(cam.publicOrder) || 0) + 1
+  );
+  publicCameraOrderCounts.set(group, groupOrderCounts);
+});
+
+function comparePublicCameras(left, right) {
+  const leftGroup = getPublicCameraGroup(left);
+  const rightGroup = getPublicCameraGroup(right);
+
+  if (leftGroup !== rightGroup) return leftGroup - rightGroup;
+
+  const leftOrderIsValid =
+    isValidPublicCameraOrder(left.publicOrder) &&
+    publicCameraOrderCounts.get(leftGroup)?.get(left.publicOrder) === 1;
+  const rightOrderIsValid =
+    isValidPublicCameraOrder(right.publicOrder) &&
+    publicCameraOrderCounts.get(rightGroup)?.get(right.publicOrder) === 1;
+
+  if (leftOrderIsValid && rightOrderIsValid && left.publicOrder !== right.publicOrder) {
+    return left.publicOrder - right.publicOrder;
+  }
+  if (leftOrderIsValid !== rightOrderIsValid) return leftOrderIsValid ? -1 : 1;
+
+  return (
+    (publicCameraSourceIndexes.get(left) ?? Number.MAX_SAFE_INTEGER) -
+    (publicCameraSourceIndexes.get(right) ?? Number.MAX_SAFE_INTEGER)
+  );
+}
+
 const liveCameras = PUBLIC_CAMERAS.filter(cam =>
-  ["hls", "snapshot"].includes(cam.type) && cam.url
+  ["hls", "snapshot"].includes(cam.type) &&
+  cam.url &&
+  getCameraPresentation(cam).allowStream
 );
 const expandedMobileCards = new Set();
 const cameraRuntimeStatus = new Map();
 
 PUBLIC_CAMERAS.forEach(cam => {
+  const presentation = getCameraPresentation(cam);
   cameraRuntimeStatus.set(
     cam.id,
-    cam.type === "future" ? "future" : "checking"
+    presentation.badge === "future" ? "future" : "checking"
   );
 });
 
@@ -2945,6 +3264,8 @@ let tvIndex = 0;
 let tvTimer = null;
 let tvHls = null;
 let fullscreenHls = null;
+let promoImageLightboxTrigger = null;
+let promoImageLightboxPreviousOverflow = "";
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -2953,6 +3274,76 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function safeHttpsUrl(value) {
+  const candidate = String(value ?? "").trim();
+  if (!candidate) return "";
+
+  try {
+    const parsed = new URL(candidate);
+    return parsed.protocol === "https:" ? parsed.href : "";
+  } catch {
+    return "";
+  }
+}
+
+function safeAttributionLogoUrl(value) {
+  const candidate = String(value ?? "").trim();
+  if (/^(?:\.\/|\/)assets\/[a-z0-9_./-]+$/i.test(candidate)) {
+    const relativePath = candidate.replace(/^(?:\.\/|\/)/, "");
+    const pathSegments = relativePath.split("/");
+    if (!pathSegments.includes(".") && !pathSegments.includes("..")) {
+      return candidate;
+    }
+  }
+  return safeHttpsUrl(candidate);
+}
+
+function renderCameraAttribution(
+  entity,
+  { defaultLabel, className, showLogo = true }
+) {
+  if (!entity?.name) return "";
+
+  const safeClass = /^[a-z][a-z0-9_-]*$/i.test(className)
+    ? className
+    : "camera-attribution";
+  const label = entity.label || defaultLabel;
+  const url = safeHttpsUrl(entity.url);
+  const logo = safeAttributionLogoUrl(entity.logo);
+  const name = escapeHtml(entity.name);
+  const identity = url
+    ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${name} ↗</a>`
+    : `<strong>${name}</strong>`;
+  const logoMarkup = showLogo && logo
+    ? `<img class="${safeClass}-logo" src="${escapeHtml(logo)}" alt="${name}">`
+    : "";
+
+  return `
+    <div class="${safeClass}">
+      <span>${escapeHtml(label)}</span>
+      ${identity}
+      ${logoMarkup}
+    </div>
+  `;
+}
+
+function selectCameraCardPartner(cam) {
+  if (cam?.sponsor?.name && safeAttributionLogoUrl(cam.sponsor.logo)) {
+    return cam.sponsor;
+  }
+  if (cam?.support?.name && safeAttributionLogoUrl(cam.support.logo)) {
+    return cam.support;
+  }
+  return null;
+}
+
+function renderCameraCardPartnerLogo(cam) {
+  const entity = selectCameraCardPartner(cam);
+  if (!entity) return "";
+  const logo = safeAttributionLogoUrl(entity.logo);
+  return `<img class="camera-partner-logo" src="${escapeHtml(logo)}" alt="${escapeHtml(entity.name)}">`;
 }
 
 function addCacheBuster(url) {
@@ -2968,6 +3359,72 @@ function getPreview(cam) {
   return cam.preview || cam.fallbackImage || "./assets/previews/lvsm-love-sma.jpg";
 }
 
+function getEditorialPreview(cam) {
+  return cam.preview || "./assets/previews/lvsm-love-sma.jpg";
+}
+
+function getHeroImage(cam) {
+  return getCameraPresentation(cam).allowStream
+    ? getPreview(cam)
+    : getEditorialPreview(cam);
+}
+
+function getOfflineImage(cam) {
+  return cam?.fallbackImage || getPreview(cam);
+}
+
+function getRuntimeBadge(cam, runtimeState) {
+  if (getOperationalState(cam) === "maintenance") {
+    return {
+      className: "status-badge maintenance",
+      text: "EM MANUTENÇÃO",
+      dotOk: false
+    };
+  }
+
+  if (!getCameraPresentation(cam).allowStream) {
+    return {
+      className: "status-badge future",
+      text: "EM PREPARA\u00c7\u00c3O",
+      dotOk: false
+    };
+  }
+
+  const testing =
+    getOperationalState(cam) === "testing" &&
+    getCameraPresentation(cam).allowStream;
+
+  if (testing) {
+    return {
+      className: "status-badge",
+      text: "EM TESTE",
+      dotOk: runtimeState === "live"
+    };
+  }
+
+  if (runtimeState === "offline") {
+    return {
+      className: "status-badge offline",
+      text: "OFFLINE",
+      dotOk: false
+    };
+  }
+
+  if (runtimeState === "live") {
+    return {
+      className: "status-badge",
+      text: "LIVE",
+      dotOk: true
+    };
+  }
+
+  return {
+    className: "status-badge",
+    text: "A VERIFICAR",
+    dotOk: false
+  };
+}
+
 function viewerCount(cam, index) {
   const seed = Array.from(cam.id).reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
   return 11 + ((seed + index * 7) % 23);
@@ -2975,19 +3432,42 @@ function viewerCount(cam, index) {
 
 function cameraMatchesFilter(cam) {
   const presentation = getCameraPresentation(cam);
+  const state = getOperationalState(cam);
 
+  if (!presentation.visible) return false;
   if (activeFilter === "all") return true;
-  if (activeFilter === "live") return !presentation.useFallback;
-  if (activeFilter === "future") return presentation.useFallback;
+  if (activeFilter === "live") return state !== "maintenance" && presentation.allowStream;
+  if (activeFilter === "future") return presentation.badge === "future";
 
   return true;
 }
 
+function getMapPopupStatus(cam) {
+  const presentation = getCameraPresentation(cam);
+  if (
+    presentation.badge === "maintenance" ||
+    presentation.badge === "future" ||
+    presentation.badge === "testing"
+  ) {
+    return presentation.label;
+  }
+  return isOffline(cam) ? "Offline" : "Em directo";
+}
+
+function getMapStatus(cam, runtimeStatus) {
+  const presentation = getCameraPresentation(cam);
+  if (presentation.badge === "maintenance") return "maintenance";
+  if (presentation.badge === "future") return "future";
+  if (presentation.badge === "testing") return "testing";
+  if (runtimeStatus === "offline" || isOffline(cam)) return "offline";
+  return "live";
+}
+
 function setHeroBackground() {
   const hero = document.getElementById("hero");
-  const first = liveCameras.find(cam => cam.fallbackImage) || PUBLIC_CAMERAS.find(cam => getPreview(cam));
+  const first = liveCameras.find(cam => cam.fallbackImage) || PUBLIC_CAMERAS.find(cam => getHeroImage(cam));
   if (hero && first) {
-    hero.style.setProperty("--hero-image", `url("${getPreview(first)}")`);
+    hero.style.setProperty("--hero-image", `url("${getHeroImage(first)}")`);
   }
 }
 
@@ -3184,7 +3664,7 @@ function updateCounts() {
   ).length;
 
   const future = PUBLIC_CAMERAS.filter(
-    cam => getCameraPresentation(cam).useFallback
+    cam => getCameraPresentation(cam).badge === "future"
   ).length;
 
   setText(
@@ -3215,7 +3695,7 @@ function setMapStatus(cam, status) {
 
   if (!marker) return;
 
-  marker.classList.remove("live", "future", "offline");
+  marker.classList.remove("live", "future", "testing", "maintenance", "offline");
   marker.classList.add(status);
 }
 
@@ -3223,16 +3703,17 @@ function setCardLive(block) {
   const badge = block.querySelector(".status-badge");
   const badgeDot = badge?.querySelector(".dot");
   const badgeText = badge?.querySelector("span:last-child");
+  const badgeModel = getRuntimeBadge(block._cam, "live");
   if (!badge || !badgeText) return;
 
-  badge.className = "status-badge";
-  badgeDot?.classList.add("ok");
-  badgeText.textContent = "LIVE";
+  badge.className = badgeModel.className;
+  badgeDot?.classList.toggle("ok", badgeModel.dotOk);
+  badgeText.textContent = badgeModel.text;
 
   block.classList.remove("has-fallback-active");
   cameraRuntimeStatus.set(block._cam.id, "live");
   updateCounts();
-  setMapStatus(block._cam, "live");
+  setMapStatus(block._cam, getMapStatus(block._cam, "live"));
 }
 
 function setCardOffline(block) {
@@ -3241,38 +3722,47 @@ function setCardOffline(block) {
   const badgeText = badge?.querySelector("span:last-child");
   const fallback = block.querySelector(".fallback-media");
   const cam = block._cam;
+  const offlineImage = getOfflineImage(cam);
+  const badgeModel = getRuntimeBadge(cam, "offline");
 
   if (!badge || !badgeText) return;
 
-  badge.className = "status-badge offline";
-  badgeDot?.classList.remove("ok");
-  badgeText.textContent = "OFFLINE";
+  badge.className = badgeModel.className;
+  badgeDot?.classList.toggle("ok", badgeModel.dotOk);
+  badgeText.textContent = badgeModel.text;
 
-  if (fallback && cam?.fallbackImage) {
-    fallback.src = cam.fallbackImage;
+  if (fallback && offlineImage) {
+    fallback.src = offlineImage;
     block.classList.add("has-fallback-active");
   }
 
   cameraRuntimeStatus.set(block._cam.id, "offline");
   updateCounts();
-  setMapStatus(block._cam, "offline");
+  setMapStatus(block._cam, getMapStatus(block._cam, "offline"));
 }
 
 function setCardChecking(block) {
   const badge = block.querySelector(".status-badge");
   const badgeDot = badge?.querySelector(".dot");
   const badgeText = badge?.querySelector("span:last-child");
+  const badgeModel = getRuntimeBadge(block._cam, "checking");
   if (!badge || !badgeText) return;
 
-  if (!badge.classList.contains("offline")) {
-    badge.className = "status-badge";
-    badgeDot?.classList.remove("ok");
-    badgeText.textContent = "A VERIFICAR";
-  }
+  badge.className = badgeModel.className;
+  badgeDot?.classList.toggle("ok", badgeModel.dotOk);
+  badgeText.textContent = badgeModel.text;
 }
 
 function isOffline(cam) {
   return cam.status === "OFFLINE";
+}
+
+function activatePromoCard(cam, card) {
+  if (cam.promoAction === "expand-image") {
+    openPromoImageLightbox(cam, card);
+  } else {
+    window.open(cam.url, "_blank", "noopener,noreferrer");
+  }
 }
 
 function createCameraCard(cam, index) {
@@ -3299,13 +3789,13 @@ function createCameraCard(cam, index) {
     mediaHtml = `
       <img class="live-media" src="${escapeHtml(getPreview(cam))}" alt="${escapeHtml(cam.name)}">
     `;
+  } else if (!presentation.allowStream) {
+    mediaHtml = `<img class="live-media" src="${escapeHtml(getEditorialPreview(cam))}" alt="${escapeHtml(cam.name)}">`;
   } else if (cam.type === "snapshot") {
     mediaHtml = `
       <img class="live-media" alt="${escapeHtml(cam.name)}">
       <img class="fallback-media" src="${escapeHtml(cam.fallbackImage || getPreview(cam))}" alt="${escapeHtml(cam.name)}">
     `;
-  } else if (presentation.useFallback) {
-    mediaHtml = `<img class="live-media" src="${escapeHtml(cam.fallbackImage || getPreview(cam))}" alt="${escapeHtml(cam.name)}">`;
   } else {
     mediaHtml = `
       <video autoplay muted playsinline></video>
@@ -3325,7 +3815,11 @@ function createCameraCard(cam, index) {
         break;
 
       case "testing":
-        statusText = "EM TESTES";
+        statusText = "EM TESTE";
+        break;
+
+      case "maintenance":
+        statusText = "EM MANUTENÇÃO";
         break;
 
       case "live":
@@ -3337,11 +3831,30 @@ function createCameraCard(cam, index) {
     }
   }
         
+  const promoActivationMarkup = cam.type === "promo"
+    ? `
+      <button
+        class="promo-card-activation"
+        type="button"
+        aria-label="${escapeHtml(
+          cam.promoAction === "expand-image"
+            ? `Ampliar imagem promocional: ${cam.name}`
+            : `Abrir promoção: ${cam.name}`
+        )}"
+      ></button>
+    `
+    : "";
+
   card.innerHTML = `
+    ${promoActivationMarkup}
     ${mediaHtml}
     <div class="status-badge ${
       presentation.badge === "future"
         ? "future"
+        : presentation.badge === "testing"
+          ? ""
+        : presentation.badge === "maintenance"
+          ? "maintenance"
         : isOffline(cam)
           ? "offline"
           : "live"
@@ -3370,47 +3883,37 @@ function createCameraCard(cam, index) {
               : ""
         }
 
-        ${
-          cam.sponsor?.name
-            ? `
-              <div class="camera-sponsor">
-                <span>${escapeHtml(cam.sponsor.label || "Sponsor")}</span>
+        ${renderCameraAttribution(
+          cam.sponsor,
+          {
+            defaultLabel: "Sponsor",
+            className: "camera-sponsor",
+            showLogo: false
+          }
+        )}
+        ${renderCameraAttribution(
+          cam.support,
+          {
+            defaultLabel: "Apoio",
+            className: "camera-support",
+            showLogo: false
+          }
+        )}
 
-                ${
-                  cam.sponsor.url
-                    ? `
-                      <a
-                        href="${escapeHtml(cam.sponsor.url)}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        ${escapeHtml(cam.sponsor.name)} ↗
-                      </a>
-                    `
-                    : `
-                      <strong>${escapeHtml(cam.sponsor.name)}</strong>
-                    `
-                }
-              </div>
-            `
-            : ""
-        }
-
-        ${
-          cam.sponsor?.logo
-            ? `
-              <div class="camera-sponsor-logo">
-                <img
-                  src="${escapeHtml(cam.sponsor.logo)}"
-                  alt="${escapeHtml(cam.sponsor.name || "Sponsor")}"
-                >
-              </div>
-            `
-            : ""
-        }        
       </div>
     </div>
+    ${renderCameraCardPartnerLogo(cam)}
   `;
+
+  const liveVideo = card.querySelector("video");
+  if (liveVideo) applyDigitalZoom(liveVideo, cam);
+
+  const promoActivationButton = card.querySelector(".promo-card-activation");
+  if (promoActivationButton) {
+    promoActivationButton.addEventListener("click", () => {
+      activatePromoCard(cam, card);
+    });
+  }
 
   let pointerStartX = 0;
   let pointerStartY = 0;
@@ -3440,7 +3943,7 @@ function createCameraCard(cam, index) {
 
     if (cam.type === "promo") {
       if (e.pointerType === "touch" && pointerMoved) return;
-      window.open(cam.url, "_blank", "noopener,noreferrer");
+      activatePromoCard(cam, card);
       return;
     }
 
@@ -3465,6 +3968,7 @@ function createCameraCard(cam, index) {
 }
 
 function loadSnapshot(card, cam) {
+  if (!getCameraPresentation(cam).allowStream) return;
   const img = card.querySelector(".live-media");
   let loadedOnce = false;
   let initialTimer = null;
@@ -3495,6 +3999,7 @@ function loadSnapshot(card, cam) {
 }
 
 function loadHls(card, cam) {
+  if (!getCameraPresentation(cam).allowStream) return;
   const video = card.querySelector("video");
   let hasPlayedOnce = false;
   let offlineTimer = null;
@@ -3662,7 +4167,7 @@ const LazyHlsManager = {
         const card = entry.target;
         const cam = card._cam;
 
-        if (!cam || card.dataset.hlsStarted === "true") return;
+        if (!cam || !getCameraPresentation(cam).allowStream || card.dataset.hlsStarted === "true") return;
 
         card.dataset.hlsStarted = "true";
         console.log("[LVSM lazy] arrancar HLS:", cam.id, cam.name);
@@ -3680,7 +4185,7 @@ const LazyHlsManager = {
 
     if (!this.observer) {
       const cam = card._cam;
-      if (cam && card.dataset.hlsStarted !== "true") {
+      if (cam && getCameraPresentation(cam).allowStream && card.dataset.hlsStarted !== "true") {
         card.dataset.hlsStarted = "true";
         console.log("[LVSM lazy] arrancar HLS:", cam.id, cam.name);
         loadHls(card, cam);
@@ -3695,19 +4200,10 @@ const LazyHlsManager = {
 function renderCameras() {
   container.innerHTML = "";
 
-  const typeOrder = {
-    hls: 1,
-    snapshot: 1,
-    future: 2,
-    promo: 3
-  };
-
   const visible = PUBLIC_CAMERAS
     .filter(cam => cam.type !== "promo")
     .filter(cameraMatchesFilter)
-    .sort((a, b) => {
-      return (typeOrder[a.type] || 99) - (typeOrder[b.type] || 99);
-    });
+    .sort(comparePublicCameras);
 
   container.classList.toggle("camera-list", listMode);
 
@@ -3715,8 +4211,12 @@ function renderCameras() {
     const card = createCameraCard(cam, index);
     container.appendChild(card);
 
+    if (!getCameraPresentation(cam).allowStream) return;
     if (cam.type === "snapshot") loadSnapshot(card, cam);
-    else if (cam.type === "hls") LazyHlsManager.observe(card);
+    else if (cam.type === "hls") {
+      LazyHlsManager.observe(card);
+    }
+
   });
 }
 
@@ -3769,15 +4269,11 @@ function showMapPopup(cam, pos) {
   popup.style.setProperty("--popup-tx", tx);
   popup.style.setProperty("--popup-ty", ty);  
 
-  const status =
-    cam.type === "future"
-      ? "Em preparação"
-      : isOffline(cam)
-        ? "Offline"
-        : "Em directo";
+  const presentation = getCameraPresentation(cam);
+  const status = getMapPopupStatus(cam);
 
   popup.innerHTML = `
-    <img src="${escapeHtml(getPreview(cam))}" alt="${escapeHtml(cam.name)}">
+    <img src="${escapeHtml(presentation.allowStream ? getPreview(cam) : getEditorialPreview(cam))}" alt="${escapeHtml(cam.name)}">
 
     <div class="map-popup-body">
       <div class="map-popup-title">${escapeHtml(cam.name)}</div>
@@ -3829,16 +4325,7 @@ function renderCameraMap() {
 
     const runtimeStatus = cameraRuntimeStatus.get(cam.id);
 
-    const mapStatus =
-      cam.type === "future"
-        ? "future"
-        : runtimeStatus === "offline"
-          ? "offline"
-          : isOffline(cam)
-            ? "offline"
-            : runtimeStatus === "live"
-              ? "live"
-              : "live";
+    const mapStatus = getMapStatus(cam, runtimeStatus);
 
     item.className = `map-camera ${mapStatus}`;
     item.dataset.cameraId = cam.id;
@@ -3899,7 +4386,7 @@ function setMapStatus(cam, status) {
 
   if (!marker) return;
 
-  marker.classList.remove("live", "future", "offline");
+  marker.classList.remove("live", "future", "testing", "maintenance", "offline");
   marker.classList.add(status);
 }
 
@@ -3916,21 +4403,29 @@ function destroyMediaInstance(instanceName) {
 }
 
 function attachMediaToElement(media, cam, instanceName) {
+  if (getOperationalState(cam) === "maintenance") {
+    media.src = getOfflineImage(cam);
+    return;
+  }
+
+  const presentation = getCameraPresentation(cam);
+
+  if (!presentation.allowStream) {
+    media.src = getEditorialPreview(cam);
+    return;
+  }
+
   if (cam.type === "snapshot") {
     media.src = addCacheBuster(cam.url);
     return;
   }
 
-  const presentation = getCameraPresentation(cam);
+  applyDigitalZoom(media, cam);
+
   const streamUrl =
     instanceName === "fullscreen" || instanceName === "tv"
       ? (cam.streamUrl || cam.url)
       : (cam.previewStreamUrl || cam.streamUrl || cam.url);  
-
-  if (presentation.useFallback) {
-    media.src = cam.fallbackImage || getPreview(cam);
-    return;
-  }
 
   media.autoplay = true;
   media.muted = true;
@@ -3958,6 +4453,7 @@ function attachMediaToElement(media, cam, instanceName) {
 }
 
 function openCameraFullscreen(cam) {
+  if (getOperationalState(cam) === "maintenance") return;
   trackCameraView(cam.id);
   
   const fsMode = document.getElementById("fullscreenMode");
@@ -3968,14 +4464,14 @@ function openCameraFullscreen(cam) {
 
   const presentation = getCameraPresentation(cam);
 
-  const media = cam.type === "snapshot" || presentation.useFallback
+  const media = cam.type === "snapshot" || !presentation.allowStream
     ? document.createElement("img")
     : document.createElement("video");
 
   attachMediaToElement(media, cam, "fullscreen");
 
   media.addEventListener("error", () => {
-    if (cam.fallbackImage) {
+    if (presentation.allowStream && cam.fallbackImage) {
       media.replaceWith(Object.assign(document.createElement("img"), {
         src: cam.fallbackImage,
         alt: cam.name
@@ -3992,6 +4488,9 @@ function openCameraFullscreen(cam) {
     </div>
   `;
 
+  fsStage.appendChild(media);
+  fsStage.appendChild(info);
+
   if (cam.sponsor?.logo) {
     const logo = document.createElement("div");
 
@@ -4003,10 +4502,8 @@ function openCameraFullscreen(cam) {
         alt="${escapeHtml(cam.sponsor.name || "Sponsor")}"
       >
     `;
-    info.appendChild(logo);
+    fsStage.appendChild(logo);
   }
-  fsStage.appendChild(media);
-  fsStage.appendChild(info);
   fsMode.classList.add("show");
 }
 
@@ -4018,6 +4515,53 @@ function closeFullscreenCamera() {
   fsMode.classList.remove("show");
 }
 
+function openPromoImageLightbox(cam, card) {
+  const cardPreview = card?.querySelector(".live-media");
+  const activation = card?.querySelector(".promo-card-activation");
+  if (!cam?.preview || !cardPreview?.complete || cardPreview.naturalWidth === 0) return;
+  const lightbox = document.getElementById("promoImageLightbox");
+  const stage = document.getElementById("promoImageLightboxStage");
+  const close = document.getElementById("promoImageLightboxClose");
+  const image = document.createElement("img");
+  image.className = "promo-image-lightbox__image";
+  image.src = cam.preview;
+  image.alt = cam.name;
+  image.addEventListener("error", closePromoImageLightbox, { once: true });
+  stage.replaceChildren(image);
+  promoImageLightboxTrigger = activation;
+  promoImageLightboxPreviousOverflow = document.body.style.overflow;
+  document.body.style.overflow = "hidden";
+  lightbox.hidden = false;
+  close.focus();
+}
+
+function closePromoImageLightbox() {
+  const lightbox = document.getElementById("promoImageLightbox");
+  document.getElementById("promoImageLightboxStage").replaceChildren();
+  lightbox.hidden = true;
+  document.body.style.overflow = promoImageLightboxPreviousOverflow;
+  promoImageLightboxTrigger?.focus();
+  promoImageLightboxTrigger = null;
+}
+
+function setupPromoImageLightboxInteractions() {
+  const lightbox = document.getElementById("promoImageLightbox");
+  const stage = document.getElementById("promoImageLightboxStage");
+  const close = document.getElementById("promoImageLightboxClose");
+
+  close.addEventListener("click", closePromoImageLightbox);
+  lightbox.addEventListener("click", event => {
+    if (event.target === lightbox || event.target === stage) {
+      closePromoImageLightbox();
+    }
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape" && !lightbox.hidden) {
+      closePromoImageLightbox();
+    }
+  });
+}
+
 function renderTvCamera(cam) {
 
   const tvStage = document.getElementById("tvStage");
@@ -4026,8 +4570,10 @@ function renderTvCamera(cam) {
 
   tvStage.innerHTML = "";
 
+  const presentation = getCameraPresentation(cam);
+
   const media =
-    cam.type === "snapshot"
+    cam.type === "snapshot" || !presentation.allowStream
       ? document.createElement("img")
       : document.createElement("video");
 
@@ -4035,7 +4581,7 @@ function renderTvCamera(cam) {
 
   media.addEventListener("error", () => {
 
-    if (cam.fallbackImage) {
+    if (presentation.allowStream && cam.fallbackImage) {
 
       const fallback = document.createElement("img");
 
@@ -4651,6 +5197,7 @@ document.getElementById("supportShortcut")
 
 document.getElementById("tvCloseButton")?.addEventListener("click", stopTvMode);
 document.getElementById("fullscreenCloseButton")?.addEventListener("click", closeFullscreenCamera);
+setupPromoImageLightboxInteractions();
 
 document.addEventListener("keydown", event => {
   if (event.key === "Escape") {
@@ -4873,9 +5420,51 @@ function stopGridHlsPlayers() {
 }
 
 const AUDIENCE_SESSION_KEY = "lvsm-audience-session";
+const AUDIENCE_CONSENT_KEY = "lvsm-audience-consent-v1";
 const AUDIENCE_SESSION_MS = 30 * 60 * 1000;
 
+function getAudienceConsent() {
+  try {
+    const consent = localStorage.getItem(AUDIENCE_CONSENT_KEY);
+    return consent === "accepted" || consent === "refused" ? consent : null;
+  } catch (error) {
+    console.warn("Preferência de métricas indisponível:", error);
+    return null;
+  }
+}
+
+function clearAudienceSession() {
+  try {
+    localStorage.removeItem(AUDIENCE_SESSION_KEY);
+  } catch (error) {
+    console.warn("Não foi possível limpar a sessão de métricas:", error);
+  }
+}
+
+function setAudienceConsent(consent) {
+  if (consent !== "accepted" && consent !== "refused") {
+    return false;
+  }
+
+  try {
+    localStorage.setItem(AUDIENCE_CONSENT_KEY, consent);
+  } catch (error) {
+    console.warn("Não foi possível guardar a preferência de métricas:", error);
+    return false;
+  }
+
+  if (consent === "refused") {
+    clearAudienceSession();
+  }
+
+  return true;
+}
+
 function getAudienceSession() {
+  if (getAudienceConsent() !== "accepted") {
+    return null;
+  }
+
   const now = Date.now();
 
   try {
@@ -4915,11 +5504,25 @@ function getAudienceSession() {
 }
 
 async function sendAudienceEvent(event, camera = null) {
-  if (location.hostname !== "www.livesantamaria.org") {
+  if (
+    location.hostname !== "www.livesantamaria.org" ||
+    getAudienceConsent() !== "accepted"
+  ) {
     return;
   }
 
   const session = getAudienceSession();
+  if (!session) {
+    return;
+  }
+  const payload = {
+    event,
+    session: session.id
+  };
+
+  if (camera !== null) {
+    payload.camera = camera;
+  }
 
   try {
     await fetch("/api/audience/event", {
@@ -4928,11 +5531,7 @@ async function sendAudienceEvent(event, camera = null) {
         "Content-Type": "application/json"
       },
       keepalive: true,
-      body: JSON.stringify({
-        event,
-        camera,
-        session: session.id
-      })
+      body: JSON.stringify(payload)
     });
   } catch (error) {
     console.warn("Audience indisponível:", error);
@@ -4942,7 +5541,7 @@ async function sendAudienceEvent(event, camera = null) {
 function trackVisit() {
   const session = getAudienceSession();
 
-  if (session.visitSent) {
+  if (!session || session.visitSent) {
     return;
   }
 
@@ -4963,6 +5562,9 @@ function trackCameraView(cameraId) {
   }
 
   const session = getAudienceSession();
+  if (!session) {
+    return;
+  }
   const viewedCameras = new Set(session.cameras || []);
 
   if (viewedCameras.has(cameraId)) {
@@ -4980,6 +5582,95 @@ function trackCameraView(cameraId) {
   );
 
   sendAudienceEvent("camera_view", cameraId);
+}
+
+function initializeAudienceConsentControls() {
+  const panel = document.getElementById("audienceConsentPanel");
+  const closeButton = document.getElementById("audienceConsentClose");
+  const acceptButton = document.getElementById("audienceConsentAccept");
+  const refuseButton = document.getElementById("audienceConsentRefuse");
+  const settingsButton = document.getElementById("audiencePrivacySettings");
+
+  if (!panel || !closeButton || !acceptButton || !refuseButton || !settingsButton) {
+    return;
+  }
+
+  let returnFocus = null;
+  const focusableSelector = 'a[href], button:not([disabled])';
+
+  const openPanel = trigger => {
+    returnFocus = trigger && !panel.contains(trigger) ? trigger : null;
+    panel.hidden = false;
+    closeButton.focus();
+  };
+
+  const closePanel = () => {
+    panel.hidden = true;
+    const focusTarget = returnFocus;
+    returnFocus = null;
+    if (focusTarget && document.contains(focusTarget)) {
+      focusTarget.focus();
+    }
+  };
+
+  const consent = getAudienceConsent();
+  if (consent === null) {
+    openPanel(document.activeElement);
+  } else {
+    panel.hidden = true;
+  }
+
+  closeButton.addEventListener("click", closePanel);
+
+  panel.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closePanel();
+      return;
+    }
+
+    if (event.key !== "Tab") {
+      return;
+    }
+
+    const focusable = Array.from(panel.querySelectorAll(focusableSelector));
+    if (!focusable.length) {
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  acceptButton.addEventListener("click", () => {
+    if (!setAudienceConsent("accepted")) {
+      return;
+    }
+
+    closePanel();
+    trackVisit();
+  });
+
+  refuseButton.addEventListener("click", () => {
+    if (setAudienceConsent("refused")) {
+      closePanel();
+    }
+  });
+
+  settingsButton.addEventListener("click", () => {
+    openPanel(settingsButton);
+  });
+
+  if (consent === "accepted") {
+    trackVisit();
+  }
 }
 
 document.addEventListener("visibilitychange", () => {
@@ -5020,7 +5711,7 @@ setInterval(updateTidesCard, 30 * 60 * 1000);
 
 applyInitialUrlParams();
 
-trackVisit();
+initializeAudienceConsentControls();
 
 </script>
 

@@ -26,7 +26,6 @@ function zonedMidnightUtc(year, month, day) {
 
   for (let i = 0; i < 2; i++) {
     const actual = getZonedParts(new Date(guess));
-
     const actualAsUtc = Date.UTC(
       actual.year,
       actual.month - 1,
@@ -39,7 +38,47 @@ function zonedMidnightUtc(year, month, day) {
     guess -= actualAsUtc - desiredAsUtc;
   }
 
-  return new Date(guess);
+  const resolved = new Date(guess);
+  const resolvedParts = getZonedParts(resolved);
+
+  if (
+    resolvedParts.year === year &&
+    resolvedParts.month === month &&
+    resolvedParts.day === day
+  ) {
+    return resolved;
+  }
+
+  let lower = desiredAsUtc - 36 * 60 * 60 * 1000;
+  let upper = desiredAsUtc + 36 * 60 * 60 * 1000;
+
+  while (lower < upper) {
+    const middle = lower + Math.floor((upper - lower) / 2);
+    const parts = getZonedParts(new Date(middle));
+    const isBeforeTarget =
+      parts.year < year ||
+      (parts.year === year && parts.month < month) ||
+      (parts.year === year && parts.month === month && parts.day < day);
+
+    if (isBeforeTarget) {
+      lower = middle + 1;
+    } else {
+      upper = middle;
+    }
+  }
+
+  const firstValidInstant = new Date(lower);
+  const firstValidParts = getZonedParts(firstValidInstant);
+
+  if (
+    firstValidParts.year !== year ||
+    firstValidParts.month !== month ||
+    firstValidParts.day !== day
+  ) {
+    throw new RangeError("Unable to resolve Atlantic/Azores calendar day");
+  }
+
+  return firstValidInstant;
 }
 
 function addCalendarDays(year, month, day, amount) {
@@ -52,7 +91,7 @@ function addCalendarDays(year, month, day, amount) {
   };
 }
 
-function getPeriodBoundaries(now = new Date()) {
+export function getPeriodBoundaries(now = new Date()) {
 
   const local = getZonedParts(now);
 
@@ -74,6 +113,13 @@ function getPeriodBoundaries(now = new Date()) {
     today.month,
     today.day,
     -6
+  );
+
+  const last30 = addCalendarDays(
+    today.year,
+    today.month,
+    today.day,
+    -29
   );
 
   const tomorrow = addCalendarDays(
@@ -111,25 +157,31 @@ function getPeriodBoundaries(now = new Date()) {
         last7.year,
         last7.month,
         last7.day
+      ).toISOString(),
+
+    last30Start:
+      zonedMidnightUtc(
+        last30.year,
+        last30.month,
+        last30.day
       ).toISOString()
 
   };
-
 }
 
 export async function onRequestGet(context) {
 
   const db = context.env.LVSM_AUDIENCE;
 
-  const periods = getPeriodBoundaries();
+  const now = context.now ?? new Date();
+  const periods = getPeriodBoundaries(now);
 
   const [
     todayResult,
     yesterdayResult,
     last7Result,
-    totalResult,
-    topResult,
-    firstResult
+    last30Result,
+    topResult
   ] = await db.batch([
 
     db.prepare(`
@@ -169,7 +221,12 @@ export async function onRequestGet(context) {
       SELECT COUNT(*) AS count
       FROM events
       WHERE event_type='visit'
-    `),
+        AND created_at>=?
+        AND created_at<?
+    `).bind(
+      periods.last30Start,
+      periods.tomorrowStart
+    ),
 
     db.prepare(`
       SELECT camera_id AS camera,
@@ -177,27 +234,24 @@ export async function onRequestGet(context) {
       FROM events
       WHERE event_type='camera_view'
         AND camera_id IS NOT NULL
+        AND created_at>=?
+        AND created_at<?
       GROUP BY camera_id
       ORDER BY count DESC,camera_id ASC
       LIMIT 5
-    `),
-
-    db.prepare(`
-      SELECT MIN(created_at) AS activatedAt
-      FROM events
-      WHERE event_type='visit'
-    `)
+    `).bind(
+      periods.last30Start,
+      periods.tomorrowStart
+    )
 
   ]);
 
   return Response.json({
     apiVersion: 1,
-    generatedAt: new Date().toISOString(),
-
-    activatedAt:
-      firstResult.results[0]?.activatedAt ?? null,
+    generatedAt: now.toISOString(),
 
     visits: {
+
       today:
         todayResult.results[0]?.count ?? 0,
 
@@ -207,8 +261,11 @@ export async function onRequestGet(context) {
       last7:
         last7Result.results[0]?.count ?? 0,
 
+      last30:
+        last30Result.results[0]?.count ?? 0,
+
       total:
-        totalResult.results[0]?.count ?? 0
+        last30Result.results[0]?.count ?? 0
     },
 
     top:
@@ -223,5 +280,4 @@ export async function onRequestGet(context) {
       "Access-Control-Allow-Origin": "*"
     }
   });
-
 }

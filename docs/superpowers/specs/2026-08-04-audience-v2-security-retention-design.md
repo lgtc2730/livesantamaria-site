@@ -1,0 +1,197 @@
+# Audience v2 security and retention design
+
+Date: 2026-08-04
+Status: approved
+Repository: `livesantamaria-site`
+Branch: `lab`
+
+## Purpose
+
+Preserve the audience metrics required for release v2 while bounding anonymous writes, minimizing pseudonymous data, and enforcing a 30-day retention period. This work remediates the validated finding that `POST /api/audience/event` permits unbounded D1 writes.
+
+The design does not create users, attach audience sessions to Control identities, or move the Control API into production.
+
+## Product contract
+
+The public site records only these events:
+
+- `visit`: once per 30-minute browser session;
+- `camera_view`: once per public camera during that session.
+
+The Control audience panel shows:
+
+- visits today;
+- visits yesterday;
+- visits during the last 7 days;
+- visits during the last 30 days;
+- the most-viewed cameras within the retained 30-day window.
+
+The existing all-time total and activation date are removed because their source events will not be retained indefinitely.
+
+## Data minimization
+
+The event store contains only:
+
+- creation timestamp;
+- allowed event type;
+- public camera identifier when required;
+- random, ephemeral session identifier;
+- canonical public host;
+- deterministic event key used for deduplication.
+
+It does not intentionally store IP address, user agent, email, Cloudflare Access identity, account identifier, free-form text, or arbitrary request fields. The session identifier is treated as pseudonymous data and never joined to another identity source.
+
+The browser session lasts 30 minutes after the most recent activity. Its local state contains only the random session identifier, last-activity timestamp, visit-sent flag, and public camera IDs already counted.
+
+## Ingestion validation
+
+`POST /api/audience/event` accepts JSON only from the canonical production host and enforces a small explicit request-size limit before parsing.
+
+The accepted object contains exactly:
+
+- `event`;
+- `session`;
+- optional `camera`.
+
+Rules:
+
+- `event` is exactly `visit` or `camera_view`;
+- `session` is a UUID produced by the browser and has a fixed maximum length;
+- `camera` is omitted for `visit`; the browser must emit that canonical shape rather than serializing `camera: null`;
+- `camera` is required for `camera_view`, follows the repository's safe public-ID pattern, has a fixed maximum length, and refers to a public camera known to the published catalog;
+- unknown fields, malformed JSON, invalid types, invalid identifiers, and inconsistent event/camera pairs are rejected;
+- a body beyond the limit returns `413`;
+- invalid content returns `400` without reflecting the payload;
+- D1 failures return a safe service error without SQL or internal details.
+
+The exact byte and identifier limits will be constants shared by validation and tests. They must comfortably accept the existing browser payload while rejecting arbitrary growth.
+
+## Deduplication and database shape
+
+Each accepted event receives a versioned, collision-safe deterministic key. Every variable field is encoded as uppercase hexadecimal UTF-8 before separators are added:
+
+- `v1:visit:<HEX_UTF8(session)>`;
+- `v1:camera_view:<HEX_UTF8(session)>:<HEX_UTF8(camera)>`.
+
+The first-stage D1 schema adds a nullable `event_key` and a partial unique index that covers only non-null keys. New ingestion supplies a key and uses uniqueness as the authoritative server-side deduplication boundary. A duplicate valid request returns success without adding another row. Legacy Pages code can continue inserting its five-column shape, including during rollback, because an omitted key remains null.
+
+The migration is additive and must preserve every existing row, ID, timestamp, event type, camera, session, and host value. It never rebuilds or drops the table and never deletes duplicate or incompatible history. For structurally compatible legacy tuples, it assigns the collision-safe key only to the lowest-ID row; exact duplicates remain present with a null key. Unsupported event types and inconsistent historical event/camera shapes remain present with a null key. Applied migrations are immutable, so this is a new additive migration.
+
+Final `NOT NULL`, host, event-type, or event/camera constraints are explicitly deferred. They require a later, separately reviewed and approved migration only after all old Pages versions are retired, remote aggregate evidence has been reviewed, and a schema-compatible rollback target has been recorded. They are not part of the audience v2 rollout.
+
+Deduplication limits accidental retries and repeated browser submissions. It does not replace edge rate limiting because a malicious client can generate distinct UUIDs.
+
+## Edge abuse control
+
+A Cloudflare WAF rate-limiting rule targets only the canonical production `POST /api/audience/event` path and uses the Cloudflare Rate Limiting Rule IP counting characteristic (`ip.src`), rather than writing client-network identifiers to D1.
+
+Rollout:
+
+1. inspect normal and peak request-rate analytics for this exact path;
+2. record the measured requests per period and create the rule with the threshold supported by the account plan;
+3. under a first explicit approval, use observation/log behavior only when the plan exposes a non-enforcing action; otherwise save/create the measured rule disabled or document it without activation, and do not trigger an effective action;
+4. record plan-supported mitigation behavior and timeout; for a managed challenge without a duration control, record `N/A — challenge/throttling while the rule qualifies` rather than inventing a timeout;
+5. collect Security Analytics/observation evidence without deliberately triggering an effective action;
+6. under a second explicit approval, activate block or managed challenge only after the threshold is validated, then prove the effective action triggers with a controlled authorized test that does not use visitor traffic;
+7. document the final expression, IP characteristic, threshold, period, action/timeout, owner, review date, and false-positive result without exporting visitor identifiers. Later edits require separate approval.
+
+The release gate is not satisfied until an effective limiting action is enabled and tested. Application validation alone does not close the resource-consumption finding.
+
+## Retention Worker
+
+A dedicated scheduled Worker belongs to the Site analytics boundary, not to the Control API. It has no public HTTP route and runs once daily.
+
+Its only data operation is a parameterized deletion of audience events whose `created_at` is older than 30 days relative to the execution time. It reports only execution status, timestamp, duration, and deleted-row count. It never logs event rows, session identifiers, camera-level payloads, IP addresses, or credentials.
+
+The Worker uses a dedicated D1 binding and least-privilege deployment credentials. Its name, schedule, binding, and deployment ownership are documented without secret values. Failure is visible to technical administration and does not silently extend the declared retention period: an alert or release-runbook check must identify a missed successful run.
+
+Retention tests verify the cutoff boundary, idempotent repeated runs, empty tables, database errors, and logs that contain counts but no row data.
+
+## Summaries and access
+
+All summary queries explicitly include the 30-day retained window. No endpoint returns event rows or session identifiers. For v2, the summary endpoint remains public and aggregate-only, while presentation through the Control UI remains subject to the Control's Cloudflare Access policy. The response contains no session-level data and this decision does not authorize exposing raw events. Restricting the aggregate endpoint can be reviewed later without changing the event-store contract.
+
+## Logging and failure handling
+
+Application logs must not contain:
+
+- session identifiers or event keys;
+- full request bodies;
+- cookies, IP addresses, JWTs, tokens, or Access identity;
+- SQL statements with bound values.
+
+Allowed operational fields are event type, sanitized public camera ID when needed for diagnosis, response category, duration, D1 result category, and aggregate affected-row count.
+
+Malformed and abusive requests produce bounded responses. A telemetry failure never prevents the public Site or camera playback from operating.
+
+## RGPD and privacy requirements
+
+The implementation follows data-minimization and storage-limitation principles. Technical implementation is not a legal determination and does not, by itself, establish every applicable RGPD obligation. For release v2, the approved conservative implementation requires prior, explicit consent before the browser reads or creates the audience session in `localStorage` or sends an audience event. Refusal leaves the Site fully operational, and withdrawal removes the local audience session and stops later events.
+
+The recorded project roles and contact are:
+
+- Luis Mesquita: responsible for the processing, acting in an individual capacity;
+- Luis Carreiro: technical and operational responsible, acting in an individual capacity; this does not designate him as Data Protection Officer;
+- `livesantamaria.project@gmail.com`: public project and privacy contact.
+
+Before production release, technical administration and the responsible project owner must record:
+
+- the controller, technical role, and privacy contact recorded above;
+- the precise analytics purpose;
+- the lawful basis selected for the processing;
+- the approved prior-consent behavior for the browser's `localStorage` identifier;
+- recipients/processors and relevant Cloudflare terms;
+- the 30-day raw-event retention period;
+- how data-subject rights and objections are handled;
+- whether a DPIA or other documented balancing/necessity assessment is required;
+- the operational owner for deletion and retention evidence.
+
+No claim such as “anonymous analytics”, “no cookies”, or “consent not required” may be published unless it has been legally and technically verified.
+
+## Testing and acceptance
+
+Automated tests cover:
+
+- accepted `visit` and `camera_view` payloads;
+- invalid event types, UUIDs, camera IDs, types, field combinations, extra fields, malformed JSON, and oversized bodies;
+- catalog validation for public cameras;
+- duplicate visits and camera views creating no additional row;
+- safe behavior under D1 failure;
+- summaries bounded to 30 days and removal of all-time semantics;
+- cleanup immediately before, at, and after the cutoff;
+- cleanup idempotency and error reporting;
+- absence of session identifiers and payloads from logs;
+- browser behavior remaining non-blocking when telemetry fails.
+
+Release validation also requires:
+
+- the full Site suite passing;
+- clean and populated-legacy D1 migration rehearsals on disposable databases, proving exact row preservation, collision-safe backfill, old-code writes, new-code writes/deduplication, and rollback writes;
+- a read-only review of WAF rule scope and effective action;
+- evidence of one successful scheduled cleanup;
+- confirmation through a parsed-timestamp (`julianday`) aggregate query that events older than 30 days are absent, backed by an exact cutoff-boundary test;
+- confirmation that normal visitor and camera-view flows are not rate-limited.
+
+## Rollback
+
+Before release, privately record tested, schema-compatible Pages commit and Worker deployment/version rollback targets; never roll back to an unspecified preceding commit. The compatible nullable/partial-index migration is applied while the old Pages version is still active, old ingestion is proved before deploying new Pages code, and the new visit/view/dedup flows are proved before the retention Worker is deployed separately. If no compatible prior Worker exists, its disablement requires a separately approved temporary-retention procedure with an owner. The additive schema remains forward-compatible and is not destructively removed. The WAF rule can return to observation or a higher threshold only with separate approval and measured evidence; disabling effective abuse control reopens the security finding and blocks release acceptance.
+
+Time Travel restore is destructive: it can resurrect events deleted since the bookmark, lose later writes, and restore a schema incompatible with the current code. Capture a private bookmark immediately before the migration. Before an approved restore, validate the Pages commit and Worker version against the target schema. After restoring, separately approve and run the reviewed retention cleanup, prove with the parsed-timestamp aggregate that zero expired rows remain, and only then reopen service.
+
+## Explicit follow-up: privacy policy and related records
+
+Immediately after the audience security/retention implementation, create and review the privacy documentation before production promotion. This is saved as required follow-up work, not an optional note.
+
+Deliverables:
+
+- public Privacy Policy in Portuguese, with an appropriate additional language only if required;
+- cookies/localStorage notice accurately describing the 30-minute audience session;
+- documented lawful-basis and consent assessment;
+- record of processing purpose, fields, recipients, access, and 30-day retention;
+- data-subject rights/contact procedure;
+- processor/subprocessor review for Cloudflare and hosting services;
+- internal retention/cleanup operating record and evidence checklist;
+- review of console/log retention and masking;
+- publication/versioning date and named policy owner.
+
+These documents must describe the final deployed behavior, not merely this design.
