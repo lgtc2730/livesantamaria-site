@@ -1,7 +1,7 @@
 # Revisão de fornecedores — 2026-08
 
-Data de consulta: 2026-08-04  
-Estado: revisão pública preliminar; **Pendente de aprovação do responsável — não publicar em produção**.
+Data de consulta: 2026-08-04
+Estado: revisão pública preliminar; **pendente de verificação conjunta — não publicar em produção**.
 
 Esta revisão não substitui a leitura dos termos efetivamente aceites pela conta, a configuração da consola nem aconselhamento jurídico. Uma política pública do fornecedor não prova, por si só, a função de subcontratante, a região ou o prazo aplicável ao projeto.
 
@@ -45,4 +45,4 @@ Esta revisão não substitui a leitura dos termos efetivamente aceites pela cont
 
 ## Decisão antes da produção
 
-Luis Mesquita deve confirmar os fornecedores realmente usados, os termos aplicáveis e se aceita os riscos/transferências documentados. Luis Carreiro deve confirmar a configuração técnica e remover do texto público qualquer fornecedor não usado. Enquanto subsistir uma afirmação factual não verificada, a Política deve usar linguagem limitada e não prometer localização, prazo externo ou ausência de IP.
+Luís Mesquita e Luís Carreiro devem confirmar conjuntamente os fornecedores realmente usados, os termos aplicáveis e a aceitação dos riscos/transferências documentados. Luís Carreiro confirma predominantemente a configuração técnica e remove do texto público qualquer fornecedor não usado. Enquanto subsistir uma afirmação factual não verificada, a Política deve usar linguagem limitada e não prometer localização, prazo externo ou ausência de IP.

@@ -1,8 +1,8 @@
 # Teste de ponderação — câmaras e Timelapse
 
-Data: 2026-08-04  
-Decisor: Luis Mesquita  
-Estado: **Pendente de aprovação do responsável — não publicar em produção**
+Data: 2026-08-04
+Decisores: Luís Mesquita e Luís Carreiro
+Estado: **Aprovado conjuntamente em 2026-08-09**, sujeito à verificação individual de cada câmara — ver `joint-controller-approval-record.md`.
 
 ## Interesse e finalidade
 
@@ -33,6 +33,6 @@ Registar privadamente: identificador público, responsável pela decisão, final
 
 ## Conclusão condicional
 
-O interesse pode prevalecer apenas quando a finalidade é real, o enquadramento minimiza identificação e todas as salvaguardas estão comprovadas por câmara. A conclusão não cobre automaticamente novas câmaras nem alterações de posição. O tratamento só avança para produção após aprovação explícita e datada de Luis Mesquita e conclusão das verificações de cada câmara.
+O interesse pode prevalecer apenas quando a finalidade é real, o enquadramento minimiza identificação e todas as salvaguardas estão comprovadas por câmara. A conclusão não cobre automaticamente novas câmaras nem alterações de posição. A aprovação conjunta foi registada em 2026-08-09; continuam obrigatórias as verificações de cada câmara antes da produção.
 
-Aprovação: ____________________  Data: __________  Assinatura/registo: ____________________
+Aprovação: Luís Mesquita e Luís Carreiro — 2026-08-09 — ver `joint-controller-approval-record.md`.

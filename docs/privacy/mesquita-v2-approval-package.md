@@ -2,7 +2,13 @@
 
 Preparado em: 2026-08-04  
 Destinatário: Luis Mesquita  
-Estado: **para revisão — não autoriza publicação**
+Estado: **documento histórico, substituído em 2026-08-09 — não autoriza publicação**
+
+> **Substituído:** o modelo individual descrito neste pacote foi substituído pelo
+> acordo de corresponsabilidade e pela Nota de Decisão aprovados e assinados por
+> Luís Mesquita e Luís Carreiro em 2026-08-09. O registo atual é
+> `joint-controller-approval-record.md`. O restante conteúdo conserva-se como
+> evidência histórica da proposta submetida em 2026-08-04.
 
 ## 1. O que está a ser pedido
 

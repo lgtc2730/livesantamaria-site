@@ -17,7 +17,7 @@ Os dois Controls — `lab-control` e o Control de produção — lêem exclusiva
 
 O Worker elimina eventos brutos com mais de 30 dias. Não há rollup, tabela de resumo, histórico acumulado nem campo de total vitalício. Por isso, uma descida de `visits.total` depois de eventos expirarem é esperada e não é por si só um incidente. O resumo público devolve apenas agregados; não exponha bookmarks Time Travel, linhas de eventos, sessões, chaves de evento ou segredos em Control, evidência, repositório ou canais públicos.
 
-**[GATE DE PRIVACIDADE — APROVAÇÃO EXPLÍCITA E DATADA]** Antes de qualquer promoção para produção, Luis Mesquita tem de aprovar explicitamente e por escrito a finalidade, fundamento, retenção de 30 dias e texto público das métricas. A aprovação técnica não a substitui; se faltar, a promoção fica bloqueada.
+**[GATE DE PRIVACIDADE — APROVAÇÃO CONJUNTA, EXPLÍCITA E DATADA]** Luís Mesquita e Luís Carreiro aprovaram conjuntamente em 2026-08-09 a finalidade, fundamento, retenção de 30 dias, texto público e modelo de corresponsabilidade. Ver `../privacy/joint-controller-approval-record.md`. Esta aprovação não autoriza qualquer mutação remota, que mantém gates separados.
 
 ## Gate WAF: medir antes de limitar
 
@@ -196,11 +196,11 @@ Pare a promoção e informe o responsável de lançamento se a regra WAF bloquea
 
 ## Bloqueio obrigatório: Política de Privacidade e RGPD
 
-Antes de promoção de produção, o responsável pelo projecto e a administração técnica têm de concluir e aprovar esta lista. A Política de Privacidade deve descrever o comportamento efectivamente publicado, não a implementação planeada nem uma versão anterior.
+Antes de promoção de produção, os corresponsáveis e a administração técnica têm de concluir esta lista. A Política de Privacidade deve descrever o comportamento efetivamente publicado, não a implementação planeada nem uma versão anterior.
 
-- [x] Registar Luis Mesquita, em nome individual, como responsável pelo tratamento; Luis Carreiro, em nome individual, como responsável técnico e operacional (não Encarregado de Proteção de Dados); e `livesantamaria.project@gmail.com` como contacto público do projecto e de privacidade.
-- [x] Descrever a finalidade específica das métricas de audiência no texto público em revisão e no registo interno.
-- [x] Documentar consentimento para métricas e interesse legítimo proposto para câmaras e segurança; estes dois últimos continuam sujeitos à aprovação de Luis Mesquita.
+- [x] Registar Luís Mesquita e Luís Carreiro, em nome individual, como corresponsáveis pelo tratamento; documentar as funções predominantes; e usar `livesantamaria.project@gmail.com` como ponto de contacto comum.
+- [x] Descrever a finalidade específica das métricas de audiência no texto público efetivo e no registo interno.
+- [x] Documentar consentimento para métricas e interesse legítimo para câmaras e segurança, aprovados conjuntamente em 2026-08-09.
 - [x] Exigir consentimento prévio e explícito antes de ler/criar a sessão analítica de 30 minutos em `localStorage` ou enviar eventos; a recusa não limita o Site e a retirada apaga a sessão local e bloqueia eventos posteriores.
 - [x] Preparar revisão pública preliminar de Cloudflare, Google/Gmail, jsDelivr, Open-Meteo e SpotAzores, marcando explicitamente o que não foi verificado.
 - [ ] Confirmar na conta/contrato os termos, subprocessadores, regiões, transferências e retenções dos fornecedores realmente usados.
@@ -210,14 +210,14 @@ Antes de promoção de produção, o responsável pelo projecto e a administraç
 - [ ] Aplicar e verificar tecnicamente os 14 dias em todos os logs controlados pelo projecto e rever os logs dos fornecedores.
 - [ ] Aplicar nos nós Timelapse e verificar por contagens a retenção de 3 dias de capturas, 10 vídeos diários e 4 semanais.
 - [x] Preparar os testes de ponderação de câmaras/Timelapse e segurança/operação.
-- [ ] Concluir a verificação individual de todas as câmaras e obter aprovação explícita e datada das duas ponderações por Luis Mesquita.
+- [ ] Concluir a verificação individual de todas as câmaras; a aprovação conjunta das duas ponderações foi registada em 2026-08-09.
 - [x] Ligar o rodapé e o painel de consentimento à Política no código do ambiente de teste.
 - [x] Publicar o SHA `22003c7` no ambiente de teste e validar em desktop os links, a âncora `#metricas`, recusa, aceitação, retirada, refresh e abertura de câmaras.
 - [x] Validar a Política e o consentimento em mobile e por teclado no SHA `1b8eab0`, incluindo fecho sem decisão e contenção/restauro do foco.
-- [ ] Substituir o rótulo de revisão por versão e data efetivas apenas após aprovação explícita e datada de Luis Mesquita.
-- [ ] Obter aprovação explícita e datada de Luis Mesquita sobre responsabilidade, finalidades, fundamentos, retenções e texto público.
+- [x] Substituir o rótulo de revisão por `Versão 2.0 — 2026-08-09` após aprovação conjunta e datada.
+- [x] Registar a aprovação conjunta e datada de Luís Mesquita e Luís Carreiro sobre responsabilidade, finalidades, fundamentos, retenções e texto público.
 
-Enquanto qualquer item estiver incompleto, a Política permanece um texto de revisão; não faça alegações de anonimato ou de dispensa de consentimento e não promova o lançamento para produção. Migration D1, publicação Pages, Worker de retenção e alterações WAF mantêm as aprovações remotas independentes descritas neste runbook.
+Enquanto qualquer gate técnico restante estiver incompleto, não promova o lançamento para produção. Não faça alegações de anonimato ou de dispensa de consentimento. Migration D1, publicação Pages, Worker de retenção e alterações WAF mantêm as aprovações remotas independentes descritas neste runbook.
 
 ### Evidência do ambiente de teste — 2026-08-07
 

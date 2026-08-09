@@ -1,8 +1,8 @@
 # Teste de ponderação — segurança e operação
 
-Data: 2026-08-04  
-Decisor: Luis Mesquita  
-Estado: **Pendente de aprovação do responsável — não publicar em produção**
+Data: 2026-08-04
+Decisores: Luís Mesquita e Luís Carreiro
+Estado: **Aprovado conjuntamente em 2026-08-09**, sujeito à verificação técnica dos prazos — ver `joint-controller-approval-record.md`.
 
 ## Interesse
 
@@ -28,6 +28,6 @@ Endereços de rede, horas e padrões de pedido podem relacionar-se com visitante
 
 ## Conclusão condicional
 
-O interesse pode prevalecer se os dados forem estritamente necessários, o prazo de 14 dias estiver tecnicamente aplicado aos logs sob controlo do projeto e os prazos externos forem transparentes. Qualquer logging adicional exige nova análise. **Pendente de aprovação do responsável — não publicar em produção**.
+O interesse pode prevalecer se os dados forem estritamente necessários, o prazo de 14 dias estiver tecnicamente aplicado aos logs sob controlo do projeto e os prazos externos forem transparentes. Qualquer logging adicional exige nova análise. A aprovação conjunta foi registada em 2026-08-09; a verificação técnica dos prazos continua obrigatória antes da produção.
 
-Aprovação: ____________________  Data: __________  Assinatura/registo: ____________________
+Aprovação: Luís Mesquita e Luís Carreiro — 2026-08-09 — ver `joint-controller-approval-record.md`.

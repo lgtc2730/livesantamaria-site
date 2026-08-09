@@ -1,6 +1,6 @@
 # Checklist de alteração com impacto em privacidade
 
-Usar antes de implementar ou publicar qualquer alteração. A aprovação técnica de Luis Carreiro não substitui a decisão de Luis Mesquita sobre finalidade, fundamento ou risco.
+Usar antes de implementar ou publicar qualquer alteração. Finalidade, fundamento, risco e alterações estruturais exigem decisão conjunta de Luís Mesquita e Luís Carreiro enquanto corresponsáveis.
 
 ## Gatilhos
 
@@ -25,7 +25,7 @@ Usar antes de implementar ou publicar qualquer alteração. A aprovação técni
 - [ ] Criar/atualizar testes e provar em `lab` que comportamento e texto coincidem.
 - [ ] Definir ordem de promoção, teste imediato e rollback sem expor segredos/dados pessoais.
 - [ ] Registar privadamente o bookmark Time Travel e as contagens agregadas antes/depois da migration D1; nunca guardar ou divulgar o bookmark, linhas de eventos, sessões, chaves de evento ou segredos.
-- [ ] Obter aprovação explícita e datada de Luis Mesquita; obter aprovação remota separada para a migration D1, publicação Pages e publicação do Worker de retenção.
+- [ ] Obter aprovação conjunta, explícita e datada dos corresponsáveis; obter aprovação remota separada para a migration D1, publicação Pages e publicação do Worker de retenção.
 - [ ] Registar versão/data e rever após publicação; eliminar evidência temporária.
 
-Se algum item não estiver comprovado: **Pendente de aprovação do responsável — não publicar em produção**.
+Se algum item não estiver comprovado: **Pendente de decisão ou verificação conjunta — não publicar em produção**.

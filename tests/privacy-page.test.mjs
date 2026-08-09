@@ -10,15 +10,15 @@ test("privacy page publishes the approved v2 transparency contract", async () =>
   assert.match(html, /<html lang="pt-PT">/);
   assert.equal((html.match(/<h1\b/g) || []).length, 1);
   for (const expected of [
-    "Responsável pelo tratamento",
+    "Corresponsáveis pelo Tratamento",
     "Câmaras e Timelapse",
     "Métricas e armazenamento local",
     "Contactos por email",
     "Fornecedores",
     "Conservação",
     "Os seus direitos",
-    "Luis Mesquita",
-    "Luis Carreiro",
+    "Luís Mesquita",
+    "Luís Carreiro",
     "livesantamaria.project@gmail.com",
     "3 dias",
     "10 vídeos diários",
@@ -31,7 +31,15 @@ test("privacy page publishes the approved v2 transparency contract", async () =>
   }
 
   assert.match(html, /id="metricas"/);
+  assert.match(html, /Versão 2\.0 — 2026-08-09/);
+  assert.match(html, /determinam conjuntamente as finalidades e os meios essenciais/);
+  assert.match(html, /acompanhamento institucional e de conformidade/);
+  assert.match(html, /implementação técnica, segurança, controlo de acessos e manutenção operacional/);
+  assert.match(html, /As decisões estruturais são tomadas conjuntamente/);
+  assert.match(html, /perante qualquer dos corresponsáveis/);
   assert.match(html, /href="https:\/\/www\.cnpd\.pt\//);
+  assert.doesNotMatch(html, /Versão para revisão|Documento para revisão/);
+  assert.doesNotMatch(html, /é responsável pelo tratamento e decide as finalidades/);
   assert.doesNotMatch(html, /audience\/event|hls\.min\.js|timelapse\.js/);
   assert.doesNotMatch(html, /dados anónimos|nenhum IP|conformidade garantida/i);
 });
