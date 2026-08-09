@@ -59,7 +59,11 @@ async function loadDatabase() {
   return import(sourceUrl);
 }
 
-async function loadBrowserAudience(fetchImpl, initialStorage = {}) {
+async function loadBrowserAudience(
+  fetchImpl,
+  initialStorage = {},
+  hostname = "www.livesantamaria.org"
+) {
   const html = await readFile(new URL("index.html", projectRoot), "utf8");
   const start = html.indexOf('const AUDIENCE_SESSION_KEY = "lvsm-audience-session";');
   const end = html.indexOf('document.addEventListener("visibilitychange"', start);
@@ -126,7 +130,7 @@ async function loadBrowserAudience(fetchImpl, initialStorage = {}) {
         stored.delete(key);
       }
     },
-    location: { hostname: "www.livesantamaria.org" }
+    location: { hostname }
   };
 
   vm.runInNewContext(
@@ -279,6 +283,27 @@ test("consent controls keep choices optional and start metrics only after accept
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(panel.hidden, true);
   assert.deepEqual(payloads, [{ event: "visit", session: validSession }]);
+});
+
+test("audience events are limited to both public hostnames", async () => {
+  for (const hostname of ["livesantamaria.org", "www.livesantamaria.org"]) {
+    let requests = 0;
+    const browser = await loadBrowserAudience(async () => {
+      requests += 1;
+      return new Response(null, { status: 200 });
+    }, { "lvsm-audience-consent-v1": "accepted" }, hostname);
+
+    await browser.sendAudienceEvent("visit");
+    assert.equal(requests, 1, hostname);
+  }
+
+  let previewRequests = 0;
+  const preview = await loadBrowserAudience(async () => {
+    previewRequests += 1;
+  }, { "lvsm-audience-consent-v1": "accepted" }, "preview.pages.dev");
+
+  await preview.sendAudienceEvent("visit");
+  assert.equal(previewRequests, 0);
 });
 
 test("consent dialog closes without choosing and restores its trigger", async () => {
