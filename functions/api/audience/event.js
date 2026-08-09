@@ -2,6 +2,11 @@ import { insertEvent } from "./db.js";
 import audienceCatalog from "../../../audience.public.json";
 import { readAudienceRequest, validateAudiencePayload } from "./validation.js";
 
+const PUBLIC_AUDIENCE_HOSTNAMES = new Set([
+  "livesantamaria.org",
+  "www.livesantamaria.org"
+]);
+
 function logAudienceEvent(eventType, camera, outcome) {
   try {
     console.log({ eventType, camera, outcome });
@@ -14,7 +19,7 @@ export async function onRequestPost(context) {
 
   const host = context.request.headers.get("host");
 
-  if (host !== "www.livesantamaria.org") {
+  if (!PUBLIC_AUDIENCE_HOSTNAMES.has(host)) {
     return new Response(null, {
       status: 204
     });

@@ -213,6 +213,33 @@ test("the real browser visit payload passes the handler and inserts once across 
   assert.equal(db.rows.length, 1);
 });
 
+test("the apex browser visit passes the real handler and reaches D1", async () => {
+  const { insertEvent } = await loadDatabase();
+  const { onRequestPost } = await loadEvent(insertEvent);
+  const db = new DeduplicatingD1();
+  const statuses = [];
+  const browser = await loadBrowserAudience(async (url, options) => {
+    const response = await onRequestPost({
+      request: new Request(new URL(url, "https://livesantamaria.org"), {
+        ...options,
+        headers: {
+          ...options.headers,
+          host: "livesantamaria.org"
+        }
+      }),
+      env: { LVSM_AUDIENCE: db }
+    });
+    statuses.push(response.status);
+    return response;
+  }, { "lvsm-audience-consent-v1": "accepted" }, "livesantamaria.org");
+
+  await browser.sendAudienceEvent("visit");
+
+  assert.deepEqual(statuses, [200]);
+  assert.equal(db.rows.length, 1);
+  assert.equal(db.rows[0].values[4], "livesantamaria.org");
+});
+
 test("pending consent neither touches the audience session nor sends an event", async () => {
   let requests = 0;
   const browser = await loadBrowserAudience(async () => {

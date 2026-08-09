@@ -35,7 +35,7 @@
 Parametrizar `loadBrowserAudience` com terceiro argumento, por omissão
 `"www.livesantamaria.org"`. Adicionar primeiro um teste integrado que encaminha
 o pedido do domínio raiz para `onRequestPost` e exige resposta 200 e uma linha
-D1; o comportamento atual deve devolver 403 e zero linhas. Manter também o
+D1; o comportamento atual deve devolver 204 e zero linhas. Manter também o
 teste de cliente para ambos os hostnames e para um preview bloqueado.
 
 ```js
@@ -69,7 +69,7 @@ Executar:
 node --test tests/audience-event.test.mjs
 ```
 
-Esperado: o teste integrado do domínio raiz falha com status 403 e zero linhas
+Esperado: o teste integrado do domínio raiz falha com status 204 e zero linhas
 na D1.
 
 - [ ] **Step 3: Implementar a alteração mínima**
@@ -95,7 +95,7 @@ if (
 ```
 
 Em `functions/api/audience/event.js`, substituir a igualdade única por uma
-allowlist dos mesmos dois valores e devolver 403 para qualquer outro host antes
+allowlist dos mesmos dois valores e devolver 204 para qualquer outro host antes
 de ler ou escrever dados.
 
 - [ ] **Step 4: Verificar GREEN e regressões**
