@@ -4,7 +4,7 @@
 
 **Goal:** Enviar métricas consentidas nos dois hostnames públicos e continuar a bloqueá-las em qualquer outro hostname.
 
-**Architecture:** O código de audiência do `index.html` passa a consultar uma allowlist imutável com os dois hostnames públicos antes de criar sessão ou fazer `fetch`. O teste existente executa esse código real em `vm` com um hostname parametrizável, cobrindo domínio raiz, `www` e hostname desconhecido.
+**Architecture:** O código de audiência do `index.html` e a função Pages consultam allowlists com os mesmos dois hostnames públicos. O teste existente executa o cliente real em `vm` e encaminha o pedido para o handler real, cobrindo domínio raiz, `www` e hostname desconhecido até à escrita D1.
 
 **Tech Stack:** HTML/JavaScript do Site, Node.js test runner, `node:vm`.
 
@@ -12,7 +12,8 @@
 
 - Permitir apenas `livesantamaria.org` e `www.livesantamaria.org`.
 - Manter previews Pages, LAB, localhost e hostnames desconhecidos sem eventos.
-- Não alterar consentimento, sessão de 30 minutos, deduplicação, API, D1 ou retenção de 30 dias.
+- Não alterar consentimento, sessão de 30 minutos, deduplicação, payload da API,
+  schema D1 ou retenção de 30 dias.
 - Publicar primeiro em `lab`; produção exige autorização própria posterior.
 
 ---
@@ -22,15 +23,20 @@
 **Files:**
 - Modify: `tests/audience-event.test.mjs`
 - Modify: `index.html`
+- Modify: `functions/api/audience/event.js`
 
 **Interfaces:**
 - Consumes: `loadBrowserAudience(fetchImpl, initialStorage, hostname)` no teste.
-- Produces: `PUBLIC_AUDIENCE_HOSTNAMES: ReadonlySet<string>` usado por `sendAudienceEvent(event, camera)`.
+- Produces: allowlists explícitas com os mesmos dois hostnames no cliente e no
+  handler, usadas antes do `fetch` e antes da escrita D1.
 
 - [ ] **Step 1: Escrever o teste de regressão**
 
 Parametrizar `loadBrowserAudience` com terceiro argumento, por omissão
-`"www.livesantamaria.org"`, e adicionar:
+`"www.livesantamaria.org"`. Adicionar primeiro um teste integrado que encaminha
+o pedido do domínio raiz para `onRequestPost` e exige resposta 200 e uma linha
+D1; o comportamento atual deve devolver 204 e zero linhas. Manter também o
+teste de cliente para ambos os hostnames e para um preview bloqueado.
 
 ```js
 test("audience events are limited to both public hostnames", async () => {
@@ -63,7 +69,8 @@ Executar:
 node --test tests/audience-event.test.mjs
 ```
 
-Esperado: falha apenas para `livesantamaria.org`, com zero pedidos em vez de um.
+Esperado: o teste integrado do domínio raiz falha com status 204 e zero linhas
+na D1.
 
 - [ ] **Step 3: Implementar a alteração mínima**
 
@@ -86,6 +93,10 @@ if (
   return;
 }
 ```
+
+Em `functions/api/audience/event.js`, substituir a igualdade única por uma
+allowlist dos mesmos dois valores e devolver 204 para qualquer outro host antes
+de ler ou escrever dados.
 
 - [ ] **Step 4: Verificar GREEN e regressões**
 

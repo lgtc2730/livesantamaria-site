@@ -9,7 +9,8 @@ raiz guarda a preferência local sem produzir o evento consentido esperado.
 
 ## Decisão
 
-O envio de métricas é permitido exclusivamente nos dois hostnames públicos:
+O envio e a aceitação de métricas são permitidos exclusivamente nos dois
+hostnames públicos, tanto no cliente como na função Pages:
 
 - `livesantamaria.org`;
 - `www.livesantamaria.org`.
@@ -20,10 +21,12 @@ enviar eventos. Não se altera o modelo de consentimento, a sessão aleatória d
 
 ## Implementação e testes
 
-A condição única de hostname será substituída por uma allowlist explícita e
-imutável. Um teste de regressão deve primeiro falhar demonstrando que o domínio
-raiz não envia o evento; depois deve passar para ambos os domínios públicos e
-confirmar que um hostname desconhecido permanece bloqueado.
+As condições únicas de hostname no cliente e em `/api/audience/event` serão
+substituídas por allowlists explícitas com os mesmos dois valores. Um teste de
+regressão integrado deve primeiro falhar demonstrando que um pedido real do
+domínio raiz é recusado pelo handler; depois deve passar até à escrita D1 para
+ambos os domínios públicos e confirmar que um hostname desconhecido permanece
+bloqueado.
 
 Após a alteração serão executados o teste dirigido, a suite completa do Site e
 `git diff --check`. A correção será publicada primeiro em `lab`, validada no
@@ -33,5 +36,6 @@ preview e só depois poderá receber uma autorização própria para produção.
 
 - redirecionamentos entre os dois domínios;
 - métricas em previews ou LAB;
-- alterações à API, à base D1, ao consentimento ou aos prazos de retenção;
+- alterações ao payload da API, à base D1, ao consentimento ou aos prazos de
+  retenção;
 - qualquer publicação em produção sem nova autorização.
