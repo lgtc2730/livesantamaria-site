@@ -5422,6 +5422,10 @@ function stopGridHlsPlayers() {
 const AUDIENCE_SESSION_KEY = "lvsm-audience-session";
 const AUDIENCE_CONSENT_KEY = "lvsm-audience-consent-v1";
 const AUDIENCE_SESSION_MS = 30 * 60 * 1000;
+const PUBLIC_AUDIENCE_HOSTNAMES = new Set([
+  "livesantamaria.org",
+  "www.livesantamaria.org"
+]);
 
 function getAudienceConsent() {
   try {
@@ -5505,7 +5509,7 @@ function getAudienceSession() {
 
 async function sendAudienceEvent(event, camera = null) {
   if (
-    location.hostname !== "www.livesantamaria.org" ||
+    !PUBLIC_AUDIENCE_HOSTNAMES.has(location.hostname) ||
     getAudienceConsent() !== "accepted"
   ) {
     return;
