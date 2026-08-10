@@ -80,7 +80,7 @@ window.LVSM_CAMERAS = [
     "streamUrl": "https://anjos-blues-cam.livesantamaria.org/cam1hq/index.m3u8",
     "previewStreamUrl": "https://anjos-blues-cam.livesantamaria.org/cam1/index.m3u8",
     "refresh": null,
-    "fallbackImage": "./assets/fallback/anjos-blues.jpg",
+    "fallbackImage": "./assets/fallback/anjos-blues.png",
     "preview": "./assets/previews/anjos-blues.jpg",
     "message": null,
     "status": null,
