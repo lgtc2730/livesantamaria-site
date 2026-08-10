@@ -248,7 +248,7 @@ window.LVSM_CAMERAS = [
     "streamUrl": "https://praia-poente-cam.livesantamaria.org/cam1hq/index.m3u8",
     "previewStreamUrl": "https://praia-poente-cam.livesantamaria.org/cam1/index.m3u8",
     "refresh": null,
-    "fallbackImage": "./assets/fallback/praia-poente.jpg",
+    "fallbackImage": "./assets/fallback/praia-poente.png",
     "preview": "./assets/previews/praia-poente.jpg",
     "message": null,
     "status": null,
