@@ -147,7 +147,7 @@ window.LVSM_CAMERAS = [
     "streamUrl": "https://slourenco-sul-cam.livesantamaria.org/cam1hq/index.m3u8",
     "previewStreamUrl": "https://slourenco-sul-cam.livesantamaria.org/cam1/index.m3u8",
     "refresh": null,
-    "fallbackImage": "./assets/fallback/slourenco-sul.jpg",
+    "fallbackImage": "./assets/fallback/slourenco-sul.png",
     "preview": null,
     "message": null,
     "status": null,
