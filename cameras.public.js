@@ -179,7 +179,7 @@ window.LVSM_CAMERAS = [
     "streamUrl": "https://maia-norte-cam.livesantamaria.org/cam1hq/index.m3u8",
     "previewStreamUrl": "https://maia-norte-cam.livesantamaria.org/cam1/index.m3u8",
     "refresh": null,
-    "fallbackImage": "./assets/fallback/maia-norte.jpeg",
+    "fallbackImage": "./assets/fallback/maia-norte.png",
     "preview": null,
     "message": null,
     "status": "operational",
