@@ -378,7 +378,7 @@ window.LVSM_CAMERAS = [
     "region": null,
     "type": "hls",
     "preview": "./assets/previews/malbusca-sunset.jpeg",
-    "fallbackImage": "./assets/previews/malbusca-sunset.jpeg",
+    "fallbackImage": "./assets/fallback/malbusca-sunset.jpg",
     "message": null,
     "status": null,
     "operationalState": "public",
