@@ -410,7 +410,7 @@ window.LVSM_CAMERAS = [
   },
   {
     "id": "praia-malbusca",
-    "name": "Praia Malbusca",
+    "name": "Praia-Malbusca",
     "region": null,
     "type": "hls",
     "preview": "./assets/previews/praia-malbusca.png",
