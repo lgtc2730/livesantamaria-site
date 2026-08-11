@@ -468,7 +468,7 @@ window.LVSM_CAMERAS = [
   },
   {
     "id": "farol-maia",
-    "name": "Maia-Farol",
+    "name": "Farol-Maia",
     "region": null,
     "type": "future",
     "preview": "./assets/previews/farol-maia.jpeg",
