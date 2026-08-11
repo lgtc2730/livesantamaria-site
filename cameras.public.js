@@ -494,7 +494,7 @@ window.LVSM_CAMERAS = [
   },
   {
     "id": "porto-do-castelo",
-    "name": "Porto Castelo",
+    "name": "Farol-Porto Castelo",
     "region": null,
     "type": "future",
     "preview": "./assets/previews/porto-do-castelo.jpeg",
