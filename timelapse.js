@@ -2,6 +2,10 @@ const TIMELAPSE_SOURCES = [
   {
     id: "anjos-porto",
     baseUrl: "https://anjos-timelapse.livesantamaria.org"
+  },
+  {
+    id: "malbusca-sunset",
+    baseUrl: "https://malbusca-sunset-timelapse.livesantamaria.org"
   }
 ];
 

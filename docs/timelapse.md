@@ -48,22 +48,28 @@ const TIMELAPSE_SOURCES = [
   {
     id: "anjos-porto",
     baseUrl: "https://anjos-timelapse.livesantamaria.org"
+  },
+  {
+    id: "malbusca-sunset",
+    baseUrl: "https://malbusca-sunset-timelapse.livesantamaria.org"
   }
 ];
 ```
 
 Cada entrada representa uma fonte/nó de Timelapse.
 
-Actualmente existe uma fonte activa:
+Actualmente existem duas fontes activas:
 
 ```text
 anjos-porto
+malbusca-sunset
 ```
 
 com base em:
 
 ```text
 https://anjos-timelapse.livesantamaria.org
+https://malbusca-sunset-timelapse.livesantamaria.org
 ```
 
 ---
@@ -385,7 +391,7 @@ Este modelo permite adicionar novos nós sem tornar o sistema global demasiado f
 
 A arquitectura permite adicionar mais nós Timelapse no array `TIMELAPSE_SOURCES`.
 
-Exemplo futuro:
+Configuração actual:
 
 ```js
 const TIMELAPSE_SOURCES = [
@@ -394,8 +400,8 @@ const TIMELAPSE_SOURCES = [
     baseUrl: "https://anjos-timelapse.livesantamaria.org"
   },
   {
-    id: "outro-no",
-    baseUrl: "https://outro-no-timelapse.livesantamaria.org"
+    id: "malbusca-sunset",
+    baseUrl: "https://malbusca-sunset-timelapse.livesantamaria.org"
   }
 ];
 ```
@@ -407,6 +413,11 @@ index.json
 ```
 
 com a lista de câmaras Timelapse que serve.
+
+Os nós devem autorizar por CORS o hostname em que o frontend é executado. Uma
+Pages Preview da branch `lab` pode, por isso, não conseguir carregar os índices
+mesmo quando o frontend e os nós estão operacionais. Esta limitação deve ser
+distinguida de uma falha da lógica de agregação do frontend.
 
 ---
 
@@ -561,13 +572,14 @@ Ou, na forma curta adoptada pelo projecto:
 Estado conhecido à data desta documentação:
 
 ```text
-Fonte Timelapse activa: anjos-porto
-Domínio: https://anjos-timelapse.livesantamaria.org
+Fontes Timelapse activas: anjos-porto, malbusca-sunset
+Domínios: https://anjos-timelapse.livesantamaria.org
+          https://malbusca-sunset-timelapse.livesantamaria.org
 Frontend: timelapse.js
 Consumo principal: /index.json
 ```
 
-O sistema encontra-se preparado para adicionar novas fontes Timelapse no futuro.
+O frontend agrega os índices dos dois nós e tolera a indisponibilidade parcial de uma fonte.
 
 ---
 
@@ -579,4 +591,3 @@ O sistema encontra-se preparado para adicionar novas fontes Timelapse no futuro.
 - melhorar mensagens de erro para distinguir falha de rede, falha CORS e índice vazio;
 - avaliar refresh automático do Timelapse;
 - decidir se o site deve mostrar hora local dos Açores em vez da hora local do browser;
-- preparar modelo para múltiplos nós Timelapse.
