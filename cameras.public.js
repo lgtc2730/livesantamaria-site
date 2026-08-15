@@ -179,7 +179,7 @@ window.LVSM_CAMERAS = [
     "streamUrl": "https://maia-norte-cam.livesantamaria.org/cam1hq/index.m3u8",
     "previewStreamUrl": "https://maia-norte-cam.livesantamaria.org/cam1/index.m3u8",
     "refresh": null,
-    "fallbackImage": "./assets/fallback/maia-norte.jpeg",
+    "fallbackImage": "./assets/fallback/maia-norte.png",
     "preview": null,
     "message": null,
     "status": "operational",
@@ -261,11 +261,6 @@ window.LVSM_CAMERAS = [
       "lon": -25.095411,
       "bearing": 270,
       "fov": 65
-    },
-    "digitalZoom": {
-      "factor": 1.35,
-      "x": 70,
-      "y": 35
     },
     "sponsor": {
       "name": "Apartamentos Mar e Sol",
@@ -378,7 +373,7 @@ window.LVSM_CAMERAS = [
     "region": null,
     "type": "hls",
     "preview": "./assets/previews/malbusca-sunset.jpeg",
-    "fallbackImage": "./assets/previews/malbusca-sunset.jpeg",
+    "fallbackImage": "./assets/fallback/malbusca-sunset.jpg",
     "message": null,
     "status": null,
     "operationalState": "public",
@@ -410,7 +405,7 @@ window.LVSM_CAMERAS = [
   },
   {
     "id": "praia-malbusca",
-    "name": "Praia Malbusca",
+    "name": "Praia-Malbusca",
     "region": null,
     "type": "hls",
     "preview": "./assets/previews/praia-malbusca.png",
@@ -494,7 +489,7 @@ window.LVSM_CAMERAS = [
   },
   {
     "id": "porto-do-castelo",
-    "name": "Porto Castelo",
+    "name": "Farol-Porto Castelo",
     "region": null,
     "type": "future",
     "preview": "./assets/previews/porto-do-castelo.jpeg",
