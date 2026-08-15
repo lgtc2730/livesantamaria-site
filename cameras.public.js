@@ -269,7 +269,12 @@ window.LVSM_CAMERAS = [
       "label": "Sponsor"
     },
     "support": null,
-    "enabled": true
+    "enabled": true,
+    "digitalZoom": {
+      "factor": 1.15,
+      "x": 99,
+      "y": 1
+    }
   },
   {
     "id": "maia-piscina",
