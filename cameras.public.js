@@ -613,28 +613,6 @@ window.LVSM_CAMERAS = [
     "enabled": true
   },
   {
-    "id": "teste-cam",
-    "name": "Teste",
-    "region": null,
-    "type": "future",
-    "preview": "./assets/previews/teste-cam.jpg",
-    "message": null,
-    "status": "Em preparação",
-    "operationalState": "future",
-    "publicVisibility": "public",
-    "publicMedia": "preview",
-    "commissioned": null,
-    "position": {
-      "lat": 37.58,
-      "lon": -25.1,
-      "bearing": 100,
-      "fov": 90
-    },
-    "sponsor": null,
-    "support": null,
-    "enabled": true
-  },
-  {
     "id": "promo-cultura-em-movimento",
     "name": "Cultura em Movimento",
     "region": null,
