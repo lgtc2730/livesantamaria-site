@@ -374,7 +374,7 @@ window.LVSM_CAMERAS = [
   },
   {
     "id": "malbusca-sunset",
-    "name": "Malbusca Sunset",
+    "name": "Malbusca - Sunset",
     "region": null,
     "type": "hls",
     "preview": "./assets/previews/malbusca-sunset.jpeg",
