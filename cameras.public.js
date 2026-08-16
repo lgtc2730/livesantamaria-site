@@ -613,6 +613,33 @@ window.LVSM_CAMERAS = [
     "enabled": true
   },
   {
+    "id": "teaser-e2e-20260816-01",
+    "name": "Teaser E2E LAB 2026-08-16",
+    "region": null,
+    "type": "future",
+    "preview": "./assets/previews/teaser-e2e-20260816-01.jpg",
+    "message": "Teste E2E temporário — não publicar em produção.",
+    "status": "Em preparação",
+    "operationalState": "future",
+    "publicVisibility": "public",
+    "publicMedia": "preview",
+    "commissioned": null,
+    "position": {
+      "lat": 36.98432,
+      "lon": -25.050211,
+      "bearing": 0,
+      "fov": 120
+    },
+    "sponsor": {
+      "name": "Clínica do Computador",
+      "logo": null,
+      "url": null,
+      "label": "Sponsor"
+    },
+    "support": null,
+    "enabled": true
+  },
+  {
     "id": "promo-cultura-em-movimento",
     "name": "Cultura em Movimento",
     "region": null,
