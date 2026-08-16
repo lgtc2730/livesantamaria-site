@@ -248,7 +248,7 @@ window.LVSM_CAMERAS = [
     "streamUrl": "https://praia-poente-cam.livesantamaria.org/cam1hq/index.m3u8",
     "previewStreamUrl": "https://praia-poente-cam.livesantamaria.org/cam1/index.m3u8",
     "refresh": null,
-    "fallbackImage": "./assets/fallback/praia-poente.png",
+    "fallbackImage": "./assets/fallback/praia-poente1.jpg",
     "preview": "./assets/previews/praia-poente.jpg",
     "message": null,
     "status": null,
@@ -269,7 +269,12 @@ window.LVSM_CAMERAS = [
       "label": "Sponsor"
     },
     "support": null,
-    "enabled": true
+    "enabled": true,
+    "digitalZoom": {
+      "factor": 1.15,
+      "x": 99,
+      "y": 1
+    }
   },
   {
     "id": "maia-piscina",
