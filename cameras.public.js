@@ -618,6 +618,33 @@ window.LVSM_CAMERAS = [
     "enabled": true
   },
   {
+    "id": "slourenco-norte1",
+    "name": "São Lourenço-Norte",
+    "region": null,
+    "type": "future",
+    "preview": "./assets/previews/slourenco-norte1.jpg",
+    "message": null,
+    "status": "Em preparação",
+    "operationalState": "future",
+    "publicVisibility": "public",
+    "publicMedia": "preview",
+    "commissioned": null,
+    "position": {
+      "lat": 36.98432,
+      "lon": -25.050211,
+      "bearing": 0,
+      "fov": 120
+    },
+    "sponsor": {
+      "name": "Clínica do Computador",
+      "logo": null,
+      "url": null,
+      "label": "Sponsor"
+    },
+    "support": null,
+    "enabled": true
+  },
+  {
     "id": "promo-cultura-em-movimento",
     "name": "Cultura em Movimento",
     "region": null,
