@@ -3193,7 +3193,7 @@ const PUBLIC_CAMERAS = (window.LVSM_CAMERAS || []).filter(cam =>
 
 function getPublicCameraGroup(cam) {
   if (cam.type === "promo") return 3;
-  return getCameraPresentation(cam).allowStream ? 1 : 2;
+  return getPublicMedia(cam) === "stream" ? 1 : 2;
 }
 
 function isValidPublicCameraOrder(value) {

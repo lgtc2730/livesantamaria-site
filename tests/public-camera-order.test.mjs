@@ -89,6 +89,23 @@ test("uses ascending unique positive safe publicOrder values within each group",
   );
 });
 
+test("keeps a maintenance camera at its persisted position among LIVE cameras", async () => {
+  const cameras = [
+    camera("live-a", { publicOrder: 1 }),
+    camera("maintenance-b", {
+      operationalState: "maintenance",
+      publicOrder: 2,
+      fallbackImage: "./assets/fallback/maintenance-b.jpg"
+    }),
+    camera("live-c", { publicOrder: 3 })
+  ];
+
+  assert.deepEqual(
+    await sortedIds(cameras),
+    ["live-a", "maintenance-b", "live-c"]
+  );
+});
+
 test("places invalid, absent, and duplicate publicOrder values after valid values in source order", async () => {
   const cameras = [
     camera("invalid-negative", { publicOrder: -1 }),
