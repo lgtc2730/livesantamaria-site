@@ -135,7 +135,8 @@ window.LVSM_CAMERAS = [
       "label": "Em parceria com"
     },
     "support": null,
-    "enabled": true
+    "enabled": true,
+    "publicOrder": 4
   },
   {
     "id": "slourenco-sul",
@@ -152,7 +153,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
-    "publicOrder": 4,
+    "publicOrder": 5,
     "commissioned": "2012",
     "position": {
       "lat": 36.9952,
@@ -185,7 +186,7 @@ window.LVSM_CAMERAS = [
     "commissioned": "2023",
     "publicVisibility": "public",
     "operationalState": "public",
-    "publicOrder": 5,
+    "publicOrder": 6,
     "position": {
       "lat": 36.94428,
       "lon": -25.016115,
@@ -221,7 +222,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
-    "publicOrder": 7,
+    "publicOrder": 8,
     "commissioned": "2023",
     "position": {
       "lat": 36.952592,
@@ -253,7 +254,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
-    "publicOrder": 8,
+    "publicOrder": 9,
     "commissioned": "2013",
     "position": {
       "lat": 36.950908,
@@ -382,7 +383,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "operationalState": "public",
     "publicVisibility": "public",
-    "publicOrder": 6,
+    "publicOrder": 7,
     "commissioned": "2026-07",
     "position": {
       "lat": 36.94324,
