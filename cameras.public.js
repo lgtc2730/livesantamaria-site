@@ -248,7 +248,7 @@ window.LVSM_CAMERAS = [
     "streamUrl": "https://praia-poente-cam.livesantamaria.org/cam1hq/index.m3u8",
     "previewStreamUrl": "https://praia-poente-cam.livesantamaria.org/cam1/index.m3u8",
     "refresh": null,
-    "fallbackImage": "./assets/fallback/praia-poente1.jpg",
+    "fallbackImage": "./assets/fallback/praia-poente.png",
     "preview": "./assets/previews/praia-poente.jpg",
     "message": null,
     "status": null,
@@ -269,12 +269,7 @@ window.LVSM_CAMERAS = [
       "label": "Sponsor"
     },
     "support": null,
-    "enabled": true,
-    "digitalZoom": {
-      "factor": 1.15,
-      "x": 99,
-      "y": 1
-    }
+    "enabled": true
   },
   {
     "id": "maia-piscina",
@@ -374,7 +369,7 @@ window.LVSM_CAMERAS = [
   },
   {
     "id": "malbusca-sunset",
-    "name": "Malbusca-Sunset",
+    "name": "Malbusca Sunset",
     "region": null,
     "type": "hls",
     "preview": "./assets/previews/malbusca-sunset.jpeg",
