@@ -18,6 +18,119 @@ function extractFunction(source, name) {
   assert.fail(`função ${name} incompleta`);
 }
 
+function renderCard(html, camera) {
+  const article = {
+    classList: { add() {}, contains() { return false; } },
+    dataset: {},
+    addEventListener() {},
+    querySelector() { return null; },
+    set innerHTML(value) { this.renderedHtml = value; },
+    get innerHTML() { return this.renderedHtml; }
+  };
+  const context = {
+    document: { createElement() { return article; } },
+    window: { matchMedia() { return { matches: false }; } },
+    expandedMobileCards: new Set(),
+    escapeHtml(value) { return String(value ?? ""); },
+    needsSponsor() { return false; },
+    renderCameraAttribution() { return ""; },
+    renderCameraCardPartnerLogo() { return ""; },
+    applyDigitalZoom() {},
+    openCameraFullscreen() {},
+    activatePromoCard() {}
+  };
+
+  vm.runInNewContext([
+    extractFunction(html, "getOperationalState"),
+    extractFunction(html, "getPublicMedia"),
+    extractFunction(html, "getCameraPresentation"),
+    extractFunction(html, "getPreview"),
+    extractFunction(html, "getEditorialPreview"),
+    extractFunction(html, "getOfflineImage"),
+    extractFunction(html, "isOffline"),
+    extractFunction(html, "createCameraCard"),
+    "result = createCameraCard;"
+  ].join("\n"), context);
+
+  return context.result(camera, 0).innerHTML;
+}
+
+test("snapshot em manutenção usa fallback sem carregar a origem", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const card = renderCard(html, {
+    id: "snapshot-maintenance",
+    name: "Snapshot Maintenance",
+    type: "snapshot",
+    url: "https://camera.example/current.jpg",
+    operationalState: "maintenance",
+    publicVisibility: "public",
+    fallbackImage: "./assets/fallback/snapshot.jpg",
+    preview: "./assets/previews/snapshot.jpg"
+  });
+
+  assert.match(card, /EM MANUTEN/);
+  assert.match(card, /src="\.\/assets\/fallback\/snapshot\.jpg"/);
+  assert.doesNotMatch(card, /camera\.example\/current\.jpg/);
+  assert.doesNotMatch(card, /class="fallback-media"/);
+});
+
+test("snapshot em manutenção usa preview e depois imagem neutra", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const base = {
+    id: "snapshot-maintenance",
+    name: "Snapshot Maintenance",
+    type: "snapshot",
+    operationalState: "maintenance",
+    publicVisibility: "public",
+    fallbackImage: null
+  };
+
+  assert.match(
+    renderCard(html, { ...base, preview: "./assets/previews/snapshot.jpg" }),
+    /src="\.\/assets\/previews\/snapshot\.jpg"/
+  );
+  assert.match(
+    renderCard(html, { ...base, preview: null }),
+    /src="\.\/assets\/previews\/lvsm-love-sma\.jpg"/
+  );
+});
+
+test("HLS em manutenção usa fallback e não cria video", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const card = renderCard(html, {
+    id: "hls-maintenance",
+    name: "HLS Maintenance",
+    type: "hls",
+    url: "https://camera.example/live.m3u8",
+    operationalState: "maintenance",
+    publicVisibility: "public",
+    fallbackImage: "./assets/fallback/hls.jpg",
+    preview: "./assets/previews/hls.jpg"
+  });
+
+  assert.match(card, /src="\.\/assets\/fallback\/hls\.jpg"/);
+  assert.doesNotMatch(card, /<video/);
+  assert.doesNotMatch(card, /camera\.example\/live\.m3u8/);
+});
+
+test("snapshot pública conserva o fluxo live atual", async () => {
+  const html = await readFile(new URL("index.html", projectRoot), "utf8");
+  const card = renderCard(html, {
+    id: "snapshot-public",
+    name: "Snapshot Public",
+    type: "snapshot",
+    url: "https://camera.example/current.jpg",
+    operationalState: "public",
+    publicVisibility: "public",
+    fallbackImage: "./assets/fallback/snapshot.jpg",
+    preview: null
+  });
+
+  assert.match(card, /class="live-media"/);
+  assert.match(card, /class="fallback-media"/);
+  assert.match(card, /src="\.\/assets\/fallback\/snapshot\.jpg"/);
+});
+
 test("manutenção prevalece sobre o runtime e usa imagem estática", async () => {
   const html = await readFile(new URL("index.html", projectRoot), "utf8");
   const context = {};

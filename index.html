@@ -3790,7 +3790,10 @@ function createCameraCard(cam, index) {
       <img class="live-media" src="${escapeHtml(getPreview(cam))}" alt="${escapeHtml(cam.name)}">
     `;
   } else if (!presentation.allowStream) {
-    mediaHtml = `<img class="live-media" src="${escapeHtml(getEditorialPreview(cam))}" alt="${escapeHtml(cam.name)}">`;
+    const staticImage = presentation.badge === "maintenance"
+      ? getOfflineImage(cam)
+      : getEditorialPreview(cam);
+    mediaHtml = `<img class="live-media" src="${escapeHtml(staticImage)}" alt="${escapeHtml(cam.name)}">`;
   } else if (cam.type === "snapshot") {
     mediaHtml = `
       <img class="live-media" alt="${escapeHtml(cam.name)}">
