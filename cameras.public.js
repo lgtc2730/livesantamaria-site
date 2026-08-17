@@ -640,6 +640,33 @@ window.LVSM_CAMERAS = [
     "enabled": true
   },
   {
+    "id": "teaser-retry-e2e-20260817-01",
+    "name": "Teaser Retry E2E LAB 2026-08-17",
+    "region": null,
+    "type": "future",
+    "preview": "./assets/previews/teaser-retry-e2e-20260817-01.jpg",
+    "message": "Teste E2E temporário — não promover para produção.",
+    "status": "Em preparação",
+    "operationalState": "future",
+    "publicVisibility": "public",
+    "publicMedia": "preview",
+    "commissioned": null,
+    "position": {
+      "lat": 36.98432,
+      "lon": -25.050211,
+      "bearing": 0,
+      "fov": 120
+    },
+    "sponsor": {
+      "name": "Teste E2E LAB",
+      "logo": null,
+      "url": null,
+      "label": "Sponsor"
+    },
+    "support": null,
+    "enabled": true
+  },
+  {
     "id": "promo-cultura-em-movimento",
     "name": "Cultura em Movimento",
     "region": null,
