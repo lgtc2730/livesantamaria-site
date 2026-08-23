@@ -117,10 +117,11 @@ window.LVSM_CAMERAS = [
     "refresh": 15000,
     "fallbackImage": "./assets/fallback/slourenco-norte.jpg",
     "preview": null,
-    "message": "Em manutenção",
-    "status": "Inoperativa",
+    "message": null,
+    "status": null,
     "publicVisibility": "public",
-    "operationalState": "maintenance",
+    "operationalState": "public",
+    "publicOrder": 4,
     "commissioned": "2023",
     "position": {
       "lat": 36.9843,
@@ -135,8 +136,7 @@ window.LVSM_CAMERAS = [
       "label": "Em parceria com"
     },
     "support": null,
-    "enabled": true,
-    "publicOrder": 4
+    "enabled": true
   },
   {
     "id": "slourenco-sul",
@@ -248,7 +248,7 @@ window.LVSM_CAMERAS = [
     "streamUrl": "https://praia-poente-cam.livesantamaria.org/cam1hq/index.m3u8",
     "previewStreamUrl": "https://praia-poente-cam.livesantamaria.org/cam1/index.m3u8",
     "refresh": null,
-    "fallbackImage": "./assets/fallback/praia-poente1.jpg",
+    "fallbackImage": "./assets/fallback/praia-poente.png",
     "preview": "./assets/previews/praia-poente.jpg",
     "message": null,
     "status": null,
@@ -269,12 +269,7 @@ window.LVSM_CAMERAS = [
       "label": "Sponsor"
     },
     "support": null,
-    "enabled": true,
-    "digitalZoom": {
-      "factor": 1.15,
-      "x": 99,
-      "y": 1
-    }
+    "enabled": true
   },
   {
     "id": "maia-piscina",
@@ -374,7 +369,7 @@ window.LVSM_CAMERAS = [
   },
   {
     "id": "malbusca-sunset",
-    "name": "Malbusca-Sunset",
+    "name": "Malbusca Sunset",
     "region": null,
     "type": "hls",
     "preview": "./assets/previews/malbusca-sunset.jpeg",
@@ -618,12 +613,12 @@ window.LVSM_CAMERAS = [
     "enabled": true
   },
   {
-    "id": "slourenco-norte1",
-    "name": "São Lourenço-Norte",
+    "id": "teaser-e2e-20260816-01",
+    "name": "Teaser E2E LAB 2026-08-16",
     "region": null,
     "type": "future",
-    "preview": "./assets/previews/slourenco-norte1.jpg",
-    "message": null,
+    "preview": "./assets/previews/teaser-e2e-20260816-01.jpg",
+    "message": "Teste E2E temporário — não publicar em produção.",
     "status": "Em preparação",
     "operationalState": "future",
     "publicVisibility": "public",
@@ -637,6 +632,33 @@ window.LVSM_CAMERAS = [
     },
     "sponsor": {
       "name": "Clínica do Computador",
+      "logo": null,
+      "url": null,
+      "label": "Sponsor"
+    },
+    "support": null,
+    "enabled": true
+  },
+  {
+    "id": "teaser-retry-e2e-20260817-01",
+    "name": "Teaser Retry E2E LAB 2026-08-17",
+    "region": null,
+    "type": "future",
+    "preview": "./assets/previews/teaser-retry-e2e-20260817-01.jpg",
+    "message": "Teste E2E temporário — não promover para produção.",
+    "status": "Em preparação",
+    "operationalState": "future",
+    "publicVisibility": "public",
+    "publicMedia": "preview",
+    "commissioned": null,
+    "position": {
+      "lat": 36.98432,
+      "lon": -25.050211,
+      "bearing": 0,
+      "fov": 120
+    },
+    "sponsor": {
+      "name": "Teste E2E LAB",
       "logo": null,
       "url": null,
       "label": "Sponsor"
