@@ -667,6 +667,33 @@ window.LVSM_CAMERAS = [
     "enabled": true
   },
   {
+    "id": "g2-live-acceptance-20260823-01",
+    "name": "G2 Live Acceptance LAB 2026-08-23",
+    "region": null,
+    "type": "future",
+    "preview": "./assets/previews/g2-live-acceptance-20260823-01.jpeg",
+    "message": "Synthetic G2 live acceptance candidate — LAB only; never promote to Production.",
+    "status": "Em preparação",
+    "operationalState": "future",
+    "publicVisibility": "public",
+    "publicMedia": "preview",
+    "commissioned": null,
+    "position": {
+      "lat": 36.98432,
+      "lon": -25.050211,
+      "bearing": 0,
+      "fov": 120
+    },
+    "sponsor": {
+      "name": "G2 Live Acceptance LAB",
+      "logo": null,
+      "url": null,
+      "label": "Sponsor"
+    },
+    "support": null,
+    "enabled": true
+  },
+  {
     "id": "promo-cultura-em-movimento",
     "name": "Cultura em Movimento",
     "region": null,
