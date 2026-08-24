@@ -155,7 +155,7 @@ test("camera attribution is optional and safely rendered", () => {
   assert.doesNotMatch(traversal, /<img/);
 });
 
-test("public data contains only the approved Support migration", () => {
+test("public data contains only the current approved Support attribution", () => {
   const window = {};
   new Function("window", publicDataSource)(window);
   const cameras = window.LVSM_CAMERAS;
@@ -167,14 +167,13 @@ test("public data contains only the approved Support migration", () => {
 
   assert.deepEqual(supportIds, [
     "anjos-blues",
-    "maia-norte",
-    "malbusca-sunset"
+    "maia-norte"
   ]);
   assert.equal(byId["anjos-blues"].sponsor.name, "Rui Chaves");
   assert.equal(byId["anjos-blues"].support.name, "Escravos da Cadeinha");
   assert.equal(byId["maia-norte"].message, null);
   assert.equal(byId["maia-norte"].support.name, "Carlos Andrade");
-  assert.equal(byId["malbusca-sunset"].support.name, "Maria Leonardo");
+  assert.equal(byId["malbusca-sunset"].support, null);
   assert.equal(byId["slourenco-norte"].sponsor.name, "SpotAzores");
   assert.equal(byId["praia-nascente"].sponsor.name, "SpotAzores");
 });
