@@ -397,12 +397,7 @@ window.LVSM_CAMERAS = [
       "url": null,
       "label": "Sponsor"
     },
-    "support": {
-      "name": "Maria Leonardo",
-      "logo": null,
-      "url": null,
-      "label": "Apoio"
-    },
+    "support": null,
     "enabled": true,
     "url": "https://malbusca-sunset-cam.livesantamaria.org/cam1/index.m3u8",
     "streamUrl": "https://malbusca-sunset-cam.livesantamaria.org/cam1hq/index.m3u8",
