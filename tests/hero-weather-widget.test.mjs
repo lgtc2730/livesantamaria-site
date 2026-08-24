@@ -77,12 +77,23 @@ test("o mobile reserva espaço entre título, cardinais, seta e velocidade", () 
 
   assert.match(mobileCss, /\.hero-title-block\s*\{[^}]*transform:\s*translateY\(-20px\)/s);
   assert.match(mobileCss, /\.hero-weather\s*\{[^}]*transform:\s*translateY\(-3px\)/s);
-  assert.match(mobileCss, /\.hero-wind-cardinal--n\s*\{[^}]*top:\s*-20px/s);
-  assert.match(mobileCss, /\.hero-wind-cardinal--e\s*\{[^}]*right:\s*-20px/s);
-  assert.match(mobileCss, /\.hero-wind-cardinal--s\s*\{[^}]*bottom:\s*-20px/s);
+  assert.match(mobileCss, /\.hero-wind-cardinal--n\s*\{[^}]*top:\s*-24px/s);
+  assert.match(mobileCss, /\.hero-wind-cardinal--e\s*\{[^}]*right:\s*-16px/s);
+  assert.match(mobileCss, /\.hero-wind-cardinal--s\s*\{[^}]*bottom:\s*-24px/s);
   assert.match(mobileCss, /\.hero-wind-cardinal--w\s*\{[^}]*left:\s*-20px/s);
   assert.match(mobileCss, /\.hero-wind-arrow\s*\{[^}]*inset:\s*-8px/s);
   assert.match(mobileCss, /\.hero-wind-speed\s*\{[^}]*right:\s*-22px[^}]*bottom:\s*-20px/s);
+});
+
+test("o desktop afasta cardinais, seta e velocidade da circunferência", () => {
+  const desktopCss = html.slice(0, html.indexOf("@media"));
+
+  assert.match(desktopCss, /\.hero-wind-cardinal--n\s*\{[^}]*top:\s*-24px/s);
+  assert.match(desktopCss, /\.hero-wind-cardinal--e\s*\{[^}]*right:\s*-16px/s);
+  assert.match(desktopCss, /\.hero-wind-cardinal--s\s*\{[^}]*bottom:\s*-24px/s);
+  assert.match(desktopCss, /\.hero-wind-cardinal--w\s*\{[^}]*left:\s*-20px/s);
+  assert.match(desktopCss, /\.hero-wind-arrow\s*\{[^}]*inset:\s*-8px/s);
+  assert.match(desktopCss, /\.hero-wind-speed\s*\{[^}]*right:\s*-22px[^}]*bottom:\s*-20px/s);
 });
 
 test("o widget roda a seta pelos graus exatos e apresenta apenas a velocidade", () => {
