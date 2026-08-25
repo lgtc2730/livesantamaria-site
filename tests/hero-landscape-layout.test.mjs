@@ -11,11 +11,12 @@ function compactLandscapeCss() {
   return html.slice(start, end === -1 ? undefined : end);
 }
 
-test("landscape intermédio contém header e grelha na largura útil da app", () => {
+test("landscape intermédio apresenta navegação compacta e contém a grelha", () => {
   const css = compactLandscapeCss();
 
-  assert.match(css, /\.nav\s*\{[^}]*display:\s*none/s);
-  assert.match(css, /\.camera-grid\s*\{[^}]*grid-template-columns:\s*1fr/s);
+  assert.match(css, /\.nav\s*\{[^}]*display:\s*flex[^}]*width:\s*100%/s);
+  assert.match(css, /\.nav button\s*\{[^}]*padding:\s*0 10px[^}]*font-size:\s*\.72rem/s);
+  assert.match(css, /\.camera-grid\s*\{[^}]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/s);
   assert.match(css, /\.camera-card\s*\{[^}]*min-height:\s*unset[^}]*aspect-ratio:\s*16\s*\/\s*11/s);
 });
 
@@ -25,7 +26,7 @@ test("landscape intermédio mantém Hero e header nos gutters compactos", () => 
   assert.match(css, /\.app\s*\{[^}]*padding:\s*10px 12px/s);
   assert.match(css, /\.topbar\s*\{[^}]*grid-template-columns:\s*1fr/s);
   assert.match(css, /\.hero\s*\{[^}]*min-height:\s*150px/s);
-  assert.match(css, /\.hero-live-overlay\s*\{[^}]*display:\s*grid[^}]*padding:\s*14px 14px 14px 58%/s);
+  assert.match(css, /\.hero-live-overlay\s*\{[^}]*display:\s*grid[^}]*grid-template-areas:\s*"title stats weather"[^}]*column-gap:\s*18px[^}]*padding:\s*14px 14px 14px 45%/s);
 });
 
 test("breakpoint landscape é cirúrgico e não substitui desktop ou portrait", () => {
