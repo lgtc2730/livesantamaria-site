@@ -1584,6 +1584,10 @@
       font-size: .98rem;
     }
 
+    .moon-card {
+      margin-top: 20px;
+    }
+
     .metar-raw {
       margin-top: 12px;
       padding: 12px;
@@ -3076,7 +3080,34 @@
                 <strong id="sunSource">Calculado</strong>
               </div>
             </div>
-          </div>          
+          </div>
+
+          <div class="sun-card moon-card">
+            <h3>🌙 Fases da Lua</h3>
+            <p>Informação lunar para Santa Maria.</p>
+
+            <div class="metar-grid">
+              <div class="metar-item">
+                <span>Fase atual</span>
+                <strong id="moonPhase">—</strong>
+              </div>
+
+              <div class="metar-item">
+                <span>Iluminação</span>
+                <strong id="moonIllumination">—</strong>
+              </div>
+
+              <div class="metar-item">
+                <span>Próxima Lua cheia</span>
+                <strong id="nextFullMoon">—</strong>
+              </div>
+
+              <div class="metar-item">
+                <span>Próxima Lua nova</span>
+                <strong id="nextNewMoon">—</strong>
+              </div>
+            </div>
+          </div>
 
         </div>
       </section>
@@ -3671,6 +3702,158 @@ function updateSunCard() {
   setText("sunsetTime", formatMinutesAsTime(times.sunset));
   setText("dayLength", formatDayLength(times.sunrise, times.sunset));
   setText("sunSource", "Calculado");
+}
+
+function normalizeDegrees(value) {
+  return ((value % 360) + 360) % 360;
+}
+
+function toJulianDate(date) {
+  return date.getTime() / 86400000 + 2440587.5;
+}
+
+// Cálculo astronómico aproximado: adequado para fase, iluminação e datas,
+// mas não deve ser usado como efeméride de precisão ou para publicar horas exatas.
+function lunarElongationDegrees(date) {
+  const radians = Math.PI / 180;
+  const days = toJulianDate(date) - 2451543.5;
+
+  const sunPerihelion = normalizeDegrees(282.9404 + 4.70935e-5 * days);
+  const sunEccentricity = 0.016709 - 1.151e-9 * days;
+  const sunMeanAnomaly = normalizeDegrees(356.047 + 0.9856002585 * days);
+  const sunEccentricAnomaly = sunMeanAnomaly +
+    (180 / Math.PI) * sunEccentricity * Math.sin(sunMeanAnomaly * radians) *
+    (1 + sunEccentricity * Math.cos(sunMeanAnomaly * radians));
+  const sunX = Math.cos(sunEccentricAnomaly * radians) - sunEccentricity;
+  const sunY = Math.sqrt(1 - sunEccentricity ** 2) *
+    Math.sin(sunEccentricAnomaly * radians);
+  const sunLongitude = normalizeDegrees(
+    Math.atan2(sunY, sunX) / radians + sunPerihelion
+  );
+
+  const moonNode = normalizeDegrees(125.1228 - 0.0529538083 * days);
+  const moonPerigee = normalizeDegrees(318.0634 + 0.1643573223 * days);
+  const moonMeanAnomaly = normalizeDegrees(115.3654 + 13.0649929509 * days);
+  const moonEccentricity = 0.0549;
+  const moonEccentricAnomaly = moonMeanAnomaly +
+    (180 / Math.PI) * moonEccentricity * Math.sin(moonMeanAnomaly * radians) *
+    (1 + moonEccentricity * Math.cos(moonMeanAnomaly * radians));
+  const moonX = Math.cos(moonEccentricAnomaly * radians) - moonEccentricity;
+  const moonY = Math.sqrt(1 - moonEccentricity ** 2) *
+    Math.sin(moonEccentricAnomaly * radians);
+  let moonLongitude = normalizeDegrees(
+    Math.atan2(moonY, moonX) / radians + moonPerigee + moonNode
+  );
+
+  const sunMeanLongitude = normalizeDegrees(sunMeanAnomaly + sunPerihelion);
+  const moonMeanLongitude = normalizeDegrees(moonMeanAnomaly + moonPerigee + moonNode);
+  const elongation = normalizeDegrees(moonMeanLongitude - sunMeanLongitude);
+  const argumentOfLatitude = normalizeDegrees(moonMeanLongitude - moonNode);
+  const sin = angle => Math.sin(angle * radians);
+
+  moonLongitude +=
+    -1.274 * sin(moonMeanAnomaly - 2 * elongation) +
+    0.658 * sin(2 * elongation) -
+    0.186 * sin(sunMeanAnomaly) -
+    0.059 * sin(2 * moonMeanAnomaly - 2 * elongation) -
+    0.057 * sin(moonMeanAnomaly - 2 * elongation + sunMeanAnomaly) +
+    0.053 * sin(moonMeanAnomaly + 2 * elongation) +
+    0.046 * sin(2 * elongation - sunMeanAnomaly) +
+    0.041 * sin(moonMeanAnomaly - sunMeanAnomaly) -
+    0.035 * sin(elongation) -
+    0.031 * sin(moonMeanAnomaly + sunMeanAnomaly) -
+    0.015 * sin(2 * argumentOfLatitude - 2 * elongation) +
+    0.011 * sin(moonMeanAnomaly - 4 * elongation);
+
+  return normalizeDegrees(moonLongitude - sunLongitude);
+}
+
+function getMoonData(date) {
+  const elongation = lunarElongationDegrees(date);
+  const phaseIndex = Math.floor((elongation + 22.5) / 45) % 8;
+  const phases = [
+    ["Lua nova", "🌑"],
+    ["Crescente inicial", "🌒"],
+    ["Quarto crescente", "🌓"],
+    ["Gibosa crescente", "🌔"],
+    ["Lua cheia", "🌕"],
+    ["Gibosa minguante", "🌖"],
+    ["Quarto minguante", "🌗"],
+    ["Minguante final", "🌘"]
+  ];
+  const illuminationPercent = Math.round(
+    50 * (1 - Math.cos(elongation * Math.PI / 180))
+  );
+
+  return {
+    phaseName: phases[phaseIndex][0],
+    phaseIcon: phases[phaseIndex][1],
+    illuminationPercent,
+    elongation
+  };
+}
+
+function findNextLunarPhase(fromDate, targetDegrees) {
+  const stepMs = 6 * 60 * 60 * 1000;
+  const startMs = fromDate.getTime() + 1000;
+  let previousMs = startMs;
+  let previousOffset = normalizeDegrees(
+    lunarElongationDegrees(new Date(previousMs)) - targetDegrees
+  );
+
+  for (let currentMs = startMs + stepMs; currentMs <= startMs + 35 * 86400000; currentMs += stepMs) {
+    const currentOffset = normalizeDegrees(
+      lunarElongationDegrees(new Date(currentMs)) - targetDegrees
+    );
+
+    if (currentOffset < previousOffset) {
+      let low = previousMs;
+      let high = currentMs;
+      for (let iteration = 0; iteration < 24; iteration += 1) {
+        const middle = (low + high) / 2;
+        const offset = normalizeDegrees(
+          lunarElongationDegrees(new Date(middle)) - targetDegrees
+        );
+        if (offset > 180) low = middle;
+        else high = middle;
+      }
+      return new Date((low + high) / 2);
+    }
+
+    previousMs = currentMs;
+    previousOffset = currentOffset;
+  }
+
+  return null;
+}
+
+function formatAzoresMoonDate(date) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "—";
+
+  const parts = new Intl.DateTimeFormat("pt-PT", {
+    timeZone: "Atlantic/Azores",
+    day: "numeric",
+    month: "numeric"
+  }).formatToParts(date);
+  const dayNumber = Number(parts.find(part => part.type === "day")?.value);
+  const monthNumber = Number(parts.find(part => part.type === "month")?.value);
+  const month = [
+    "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+    "Jul", "Ago", "Set", "Out", "Nov", "Dez"
+  ][monthNumber - 1];
+
+  return dayNumber && month ? `${dayNumber} ${month}` : "—";
+}
+
+function updateMoonCard(date = new Date()) {
+  const moon = getMoonData(date);
+  const nextFullMoon = findNextLunarPhase(date, 180);
+  const nextNewMoon = findNextLunarPhase(date, 0);
+
+  setText("moonPhase", `${moon.phaseIcon} ${moon.phaseName}`);
+  setText("moonIllumination", `${moon.illuminationPercent}%`);
+  setText("nextFullMoon", formatAzoresMoonDate(nextFullMoon));
+  setText("nextNewMoon", formatAzoresMoonDate(nextNewMoon));
 }
 
 async function updateTidesCard() {
@@ -5847,6 +6030,7 @@ renderPromos();
 
 updateWeather();
 updateSunCard();
+updateMoonCard();
 setInterval(updateCounts, 60 * 1000);
 setInterval(updateWeather, 10 * 60 * 1000);
 updateSeaState();
