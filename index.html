@@ -185,6 +185,25 @@
     .weather-mini strong { color: var(--text); font-size: 1.35rem; }
     .weather-mini small { display: block; font-size: .72rem; }
 
+    .marine-teaser { display: flex; align-items: center; justify-content: space-between; gap: .8rem; margin: 10px 0 0; padding: .62rem .9rem; border: 1px solid rgba(66,183,255,.25); border-radius: 13px; background: rgba(24,119,255,.09); color: var(--muted); font-size: .84rem; }
+    .marine-teaser strong { color: var(--text); }
+    .marine-module { margin-bottom: 1rem; padding: .9rem; border: 1px solid var(--line); border-radius: 18px; background: var(--card); }
+    .marine-module__header { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: .7rem; }
+    .marine-module__header h2 { margin: 0; font-size: 1.05rem; }
+    .marine-module__status, .marine-module__context { color: var(--muted); font-size: .78rem; }
+    .marine-locations { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .55rem; }
+    .marine-location { min-width: 0; padding: .65rem; border: 1px solid var(--line); border-radius: 12px; color: var(--text); background: rgba(255,255,255,.035); text-align: left; }
+    .marine-location[aria-pressed="true"] { border-color: var(--blue2); background: rgba(66,183,255,.09); }
+    .marine-location strong, .marine-location span, .marine-location small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .marine-location span { margin-top: .25rem; font-weight: 800; }
+    .marine-location small { margin-top: .2rem; color: var(--muted); }
+    .marine-detail { display: grid; grid-template-columns: auto minmax(0,1fr) minmax(0,1.5fr) auto; align-items: center; gap: .8rem; margin-top: .65rem; padding-top: .65rem; border-top: 1px solid var(--line); font-size: .8rem; }
+    .marine-detail span { color: var(--muted); }
+    .marine-detail a { color: var(--blue2); font-weight: 800; }
+    .marine-module__disclaimer { margin: .65rem 0 0; color: var(--soft); font-size: .72rem; }
+    .marine-module.is-unavailable .marine-locations, .marine-module.is-unavailable .marine-detail, .marine-module.is-unavailable .marine-module__context { display: none; }
+    @media (max-width: 680px) { .marine-teaser { flex-wrap: wrap; gap: .15rem .5rem; } .marine-locations { grid-template-columns: repeat(2, minmax(0, 1fr)); } .marine-detail { grid-template-columns: 1fr; gap: .35rem; } }
+
     .mobile-menu {
       display: none;
       width: 42px;
@@ -2798,6 +2817,11 @@
       </div>
     </section>
 
+    <a class="marine-teaser" id="marineTeaser" href="?section=forecast#marineRecommendations" hidden>
+      <strong>Escolha onde ir hoje. 🌊 Onde está melhor o mar?</strong>
+      <span class="marine-teaser__context">—</span>
+    </a>
+
     <main>
       <section id="camerasSection">
         <div class="section-head">
@@ -2830,6 +2854,15 @@
       </section>
 
       <section class="forecast-section" id="forecastSection">
+        <section class="marine-module" id="marineRecommendations" aria-labelledby="marineRecommendationsTitle" hidden>
+          <div class="marine-module__header">
+            <div><h2 id="marineRecommendationsTitle">Escolha onde ir hoje</h2><span class="marine-module__status">Onde está melhor o mar?</span></div>
+            <span class="marine-module__context">—</span>
+          </div>
+          <div class="marine-locations" id="marineLocations"></div>
+          <div class="marine-detail" id="marineLocationDetail" aria-live="polite"></div>
+          <p class="marine-module__disclaimer">Indicação baseada na previsão do mar e vento. Confirme sempre as condições no local.</p>
+        </section>
         <div class="panel-pad">
           <div class="metar-card" id="metarCard">
             <h3>🛫 Observação actual — METAR LPAZ</h3>
@@ -5723,6 +5756,7 @@ initializeAudienceConsentControls();
 </script>
 
 <script src="./timelapse.js?v=20260812-1"></script>
+<script type="module" src="./assets/marine-recommendations.mjs"></script>
 
 </body>
 </html>

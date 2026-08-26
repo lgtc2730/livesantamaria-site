@@ -1,0 +1,20 @@
+[
+  { "name": "protected weak sea", "profileId": "sao-lourenco", "scenario": { "direction": 270, "height": 0.4, "period": 6, "windDirection": 265, "wind": 5, "gusts": 10 } },
+  { "name": "exposed direction", "profileId": "praia-formosa", "scenario": { "direction": 190, "height": 0.4, "period": 6, "windDirection": 10, "wind": 5, "gusts": 10 } },
+  { "name": "boundary minus ten", "profileId": "sao-lourenco", "scenario": { "direction": 40, "height": 0.8, "period": 8, "windDirection": 265, "wind": 10, "gusts": 20 } },
+  { "name": "boundary midpoint", "profileId": "sao-lourenco", "scenario": { "direction": 50, "height": 0.8, "period": 8, "windDirection": 265, "wind": 10, "gusts": 20 } },
+  { "name": "boundary plus ten", "profileId": "sao-lourenco", "scenario": { "direction": 60, "height": 0.8, "period": 8, "windDirection": 265, "wind": 10, "gusts": 20 } },
+  { "name": "wraparound 350", "profileId": "sao-lourenco", "scenario": { "direction": 350, "height": 0.8, "period": 8, "windDirection": 265, "wind": 10, "gusts": 20 } },
+  { "name": "wraparound zero", "profileId": "sao-lourenco", "scenario": { "direction": 0, "height": 0.8, "period": 8, "windDirection": 265, "wind": 10, "gusts": 20 } },
+  { "name": "wraparound ten", "profileId": "sao-lourenco", "scenario": { "direction": 10, "height": 0.8, "period": 8, "windDirection": 265, "wind": 10, "gusts": 20 } },
+  { "name": "bay cap 69", "profileId": "sao-lourenco", "scenario": { "direction": 270, "height": 2.5, "period": 15, "windDirection": 265, "wind": 5, "gusts": 10 } },
+  { "name": "bay cap 49", "profileId": "sao-lourenco", "scenario": { "direction": 270, "height": 3, "period": 10, "windDirection": 265, "wind": 5, "gusts": 10 } },
+  { "name": "beach cap 69", "profileId": "praia-formosa", "scenario": { "direction": 20, "height": 2, "period": 14, "windDirection": 10, "wind": 5, "gusts": 10 } },
+  { "name": "beach cap 49", "profileId": "praia-formosa", "scenario": { "direction": 20, "height": 2.5, "period": 14, "windDirection": 10, "wind": 5, "gusts": 10 } },
+  { "name": "pool cap 69", "profileId": "maia", "scenario": { "direction": 270, "height": 1.5, "period": 14, "windDirection": 280, "wind": 5, "gusts": 10 } },
+  { "name": "pool cap 49", "profileId": "maia", "scenario": { "direction": 270, "height": 2, "period": 14, "windDirection": 280, "wind": 5, "gusts": 10 } },
+  { "name": "beach onshore gust cap", "profileId": "praia-formosa", "scenario": { "direction": 20, "height": 0.4, "period": 6, "windDirection": 190, "wind": 5, "gusts": 50 } },
+  { "name": "bay severe gust cap", "profileId": "sao-lourenco", "scenario": { "direction": 270, "height": 0.4, "period": 6, "windDirection": 265, "wind": 5, "gusts": 65 } },
+  { "name": "beach severe gust cap", "profileId": "praia-formosa", "scenario": { "direction": 20, "height": 0.4, "period": 6, "windDirection": 10, "wind": 5, "gusts": 60 } },
+  { "name": "pool severe gust cap", "profileId": "maia", "scenario": { "direction": 270, "height": 0.4, "period": 6, "windDirection": 280, "wind": 5, "gusts": 60 } }
+]

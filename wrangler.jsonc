@@ -7,6 +7,13 @@
 
   "pages_build_output_dir": ".",
 
+  "services": [
+    {
+      "binding": "MARINE_CONTROL",
+      "service": "livesantamaria-control-api"
+    }
+  ],
+
   "d1_databases": [
     {
       "binding": "LVSM_AUDIENCE",
