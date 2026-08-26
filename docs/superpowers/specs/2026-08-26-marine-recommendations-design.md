@@ -93,6 +93,21 @@ The word **recomendado** is only allowed for `excellent`.
 
 Use one common offshore point for Santa Maria in v0.1.
 
+### Normative offshore point v0.1
+
+The implementation MUST use the following common offshore reference point in v0.1:
+
+```json
+{
+  "latitude": 36.85,
+  "longitude": -25.20,
+  "offshorePointVersion": "0.1",
+  "confidence": "provisional"
+}
+```
+
+This is a deliberate operational baseline, not a claim that the point is the final oceanographic optimum. Changing it later is a source/configuration calibration, not an engine-algorithm change.
+
 Marine inputs:
 
 - swell direction
@@ -181,9 +196,82 @@ Directional scores:
 - `exposed`: 25
 - `very_exposed`: 0
 
-Transitions near sector boundaries must be smoothed/interpolated to avoid abrupt score jumps.
+### Normative directional smoothing v0.1
 
-Initial sector geometry remains provisional pending local validation.
+Use:
+
+```text
+directionTransitionHalfWidthDeg = 10
+```
+
+This means each sector boundary has a total 20° transition zone: ±10° around the boundary. Interpolate linearly between the score on one side and the score on the other side. Angular distance MUST be circular, so transitions across 0°/360° behave identically to all other boundaries.
+
+Example: for a boundary at 50° between scores 80 and 25, transition from 80 at 40° through the midpoint at 50° to 25 at 60°.
+
+## Normative initial profile geometry v0.1
+
+These values are the approved baseline for implementation and testing. They remain deliberately `provisional` pending local validation. Later changes to sectors or `coastFacingDeg` are local-profile calibration and MUST NOT require changes to the recommendation algorithm.
+
+### São Lourenço
+
+- `type`: `bay`
+- `cameraId`: `slourenco-sul`
+- `targetArea`: praia/zona balnear central
+- `coastFacingDeg`: `85`
+
+| From | To | Level |
+|---:|---:|---|
+| 210° | 330° | `very_sheltered` |
+| 330° | 20° | `sheltered` |
+| 20° | 50° | `partial` |
+| 50° | 120° | `exposed` |
+| 120° | 160° | `partial` |
+| 160° | 210° | `sheltered` |
+
+### Maia
+
+- `type`: `natural_pool`
+- `cameraId`: `maia-norte`
+- `targetArea`: zona balnear/piscina natural
+- `coastFacingDeg`: `100`
+
+| From | To | Level |
+|---:|---:|---|
+| 210° | 330° | `very_sheltered` |
+| 330° | 20° | `sheltered` |
+| 20° | 130° | `exposed` |
+| 130° | 180° | `partial` |
+| 180° | 210° | `sheltered` |
+
+### Praia Formosa
+
+- `type`: `beach`
+- `cameraId`: `praia-poente`
+- `targetArea`: praia/zona balnear central
+- `coastFacingDeg`: `190`
+
+| From | To | Level |
+|---:|---:|---|
+| 330° | 70° | `very_sheltered` |
+| 70° | 120° | `sheltered` |
+| 120° | 145° | `partial` |
+| 145° | 235° | `exposed` |
+| 235° | 280° | `partial` |
+| 280° | 330° | `sheltered` |
+
+### Anjos
+
+- `type`: `natural_pool`
+- `cameraId`: `anjos-porto`
+- `targetArea`: zona balnear/piscina natural
+- `coastFacingDeg`: `285`
+
+| From | To | Level |
+|---:|---:|---|
+| 30° | 150° | `very_sheltered` |
+| 150° | 190° | `partial` |
+| 190° | 330° | `exposed` |
+| 330° | 30° | `partial` |
 
 ## Base weights by location type
 
@@ -263,7 +351,7 @@ Clamp result to 0–100.
 
 Gusts are treated as exceptional penalties and may impose hard caps.
 
-Provisional coastline facing values may be stored per profile and refined later.
+The normative v0.1 coastline-facing values are defined in the initial profile geometry above and MUST be used for relative wind classification until changed through an approved profile calibration.
 
 ## Marine hard caps
 
@@ -409,9 +497,9 @@ Persist/return at least:
 
 Missing sea temperature alone does not disable recommendations.
 
-## Initial profile geometry
+## Initial profile geometry status
 
-The four initial profiles remain provisional until local validation. The implementation must keep geometry separate from engine logic so sector corrections require profile changes, not algorithm changes.
+The four normative v0.1 profiles above remain provisional until local validation. The implementation must keep geometry separate from engine logic so sector corrections require profile changes, not algorithm changes.
 
 Praia Formosa is explicitly tied to the central official bathing area and camera `praia-poente`.
 
@@ -436,9 +524,11 @@ Implementation should be test-driven and cover at minimum:
 
 - interpolation curves;
 - angular sector boundaries including wraparound at 0°;
-- smoothed directional transitions;
+- the normative ±10° directional smoothing transition;
+- normative profile sectors for all four locations;
+- normative `coastFacingDeg` values and relative wind classification;
+- normative offshore point configuration;
 - weight selection by type;
-- wind orientation classification;
 - marine hard caps;
 - wind hard caps;
 - hard-cap reason dominance;
