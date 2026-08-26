@@ -163,6 +163,7 @@ test("normal-user module never renders numeric score or internal jargon", async 
   assert.doesNotMatch(source, /\bhard cap\b|\bonshore\b|\bcross-shore\b/i);
   assert.match(source, /Ver câmara/);
   assert.match(source, /Recomendações temporariamente indisponíveis\./);
+  assert.doesNotMatch(source, /Ã|Â|â†|â€|â™/);
 });
 
 test("Pages configuration binds Marine to the LAB Control Worker without an Access URL", async () => {
@@ -172,5 +173,7 @@ test("Pages configuration binds Marine to the LAB Control Worker without an Acce
   assert.match(wrangler, /"service"\s*:\s*"livesantamaria-control-api"/);
   assert.doesNotMatch(wrangler, /MARINE_CONFIG_URL|api-lab-control\.livesantamaria\.org/);
   assert.match(route, /env\?\.MARINE_CONTROL/);
+  assert.match(route, /env\?\.MARINE_CACHE/);
+  assert.match(wrangler, /"binding"\s*:\s*"MARINE_CACHE"/);
   assert.doesNotMatch(route, /MARINE_CONFIG_URL/);
 });

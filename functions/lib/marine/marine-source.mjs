@@ -37,7 +37,7 @@ function nearestIndex(times, now) {
 
 function finite(value) { return Number.isFinite(value) ? value : null; }
 
-export async function fetchMarineConditions(fetchImpl = fetch, now = new Date()) {
+export async function fetchMarineConditions(fetchImpl = fetch, now = new Date(), clock = () => new Date()) {
   const marineUrl = requestUrl(MARINE_URL, [
     "swell_wave_direction", "swell_wave_height", "swell_wave_period", "wave_height", "sea_surface_temperature"
   ]);
@@ -53,10 +53,9 @@ export async function fetchMarineConditions(fetchImpl = fetch, now = new Date())
   const marineIndex = nearestIndex(marineTimes, now);
   const windIndex = nearestIndex(windTimes, now);
   if (marineIndex < 0 || windIndex < 0) throw new Error("marine_source_invalid");
-  const sourceUpdatedAt = asIso(marineTimes[marineIndex]);
   const conditions = {
-    sourceUpdatedAt,
-    validFor: sourceUpdatedAt,
+    sourceUpdatedAt: null,
+    validFor: asIso(marineTimes[marineIndex]),
     swellDirectionDeg: finite(marine.hourly.swell_wave_direction?.[marineIndex]),
     swellHeightM: finite(marine.hourly.swell_wave_height?.[marineIndex]),
     swellPeriodS: finite(marine.hourly.swell_wave_period?.[marineIndex]),
@@ -69,6 +68,7 @@ export async function fetchMarineConditions(fetchImpl = fetch, now = new Date())
   if (![conditions.swellDirectionDeg, conditions.swellHeightM, conditions.swellPeriodS].every(Number.isFinite)) {
     throw new Error("critical_marine_data_missing");
   }
+  conditions.sourceUpdatedAt = clock().toISOString();
   return conditions;
 }
 

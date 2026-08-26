@@ -85,7 +85,7 @@ export function renderMarineRecommendations(payload, { documentRef = document, n
   if (!root || !teaser) return;
   if (!payload || ["expired", "unavailable"].includes(payload.dataStatus) || !Array.isArray(payload.locations)) {
     teaser.hidden = !isBathingSeason(now);
-    text(teaser, ".marine-teaser__context", "RecomendaÃ§Ãµes temporariamente indisponÃ­veis. â†’");
+    text(teaser, ".marine-teaser__context", "Recomendações temporariamente indisponíveis. →");
     renderUnavailable(root);
     return;
   }
