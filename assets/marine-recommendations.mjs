@@ -43,12 +43,27 @@ function renderUnavailable(root) {
   if (status) status.textContent = "Recomendações temporariamente indisponíveis.";
 }
 
+export function activateMarineRecommendationsAnchor({
+  windowRef = window,
+  documentRef = document,
+  updateHistory = false
+} = {}) {
+  if (!updateHistory && windowRef.location?.hash !== "#marine-recommendations") return false;
+  const target = documentRef.getElementById("marine-recommendations");
+  if (!target) return false;
+  if (updateHistory) windowRef.history.pushState({}, "", "?section=forecast#marine-recommendations");
+  windowRef.setSection?.("forecast");
+  windowRef.requestAnimationFrame(() => target.scrollIntoView({ behavior: "smooth", block: "start" }));
+  return true;
+}
+
 export function renderMarineRecommendations(payload, { documentRef = document, now = new Date() } = {}) {
   const teaser = documentRef.querySelector("#marineTeaser");
-  const root = documentRef.querySelector("#marineRecommendations");
+  const root = documentRef.querySelector("#marine-recommendations");
   if (!root || !teaser) return;
   if (!payload || ["expired", "unavailable"].includes(payload.dataStatus) || !Array.isArray(payload.locations)) {
-    teaser.hidden = true;
+    teaser.hidden = !isBathingSeason(now);
+    text(teaser, ".marine-teaser__context", "RecomendaÃ§Ãµes temporariamente indisponÃ­veis. â†’");
     renderUnavailable(root);
     return;
   }
@@ -107,6 +122,11 @@ export function renderMarineRecommendations(payload, { documentRef = document, n
 }
 
 export async function initializeMarineRecommendations({ fetchImpl = fetch, documentRef = document } = {}) {
+  const teaser = documentRef.querySelector("#marineTeaser");
+  teaser?.addEventListener("click", event => {
+    event.preventDefault();
+    activateMarineRecommendationsAnchor({ documentRef, updateHistory: true });
+  });
   try {
     const response = await fetchImpl("/api/marine-recommendations", { cache: "no-store" });
     if (!response.ok) throw new Error("unavailable");
@@ -114,6 +134,7 @@ export async function initializeMarineRecommendations({ fetchImpl = fetch, docum
   } catch {
     renderMarineRecommendations({ dataStatus: "unavailable" }, { documentRef });
   }
+  activateMarineRecommendationsAnchor({ documentRef });
 }
 
 if (typeof document !== "undefined") void initializeMarineRecommendations();

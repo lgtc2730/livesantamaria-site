@@ -2,7 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-import { isBathingSeason, ratingPresentation } from "../assets/marine-recommendations.mjs";
+import {
+  activateMarineRecommendationsAnchor,
+  isBathingSeason,
+  ratingPresentation
+} from "../assets/marine-recommendations.mjs";
 
 const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
@@ -19,14 +23,36 @@ test("public rating labels and colors are presentation-only", () => {
 });
 
 test("homepage and forecast contain compact marine hosts and one shared detail", () => {
-  assert.match(html, /id="marineTeaser"[^>]*hidden/);
-  assert.match(html, /id="marineRecommendations"/);
+  assert.match(html, /id="marineTeaser"[^>]*href="\?section=forecast#marine-recommendations"[^>]*hidden/);
+  assert.match(html, /id="marine-recommendations"/);
   assert.match(html, /id="marineLocations"/);
   assert.match(html, /id="marineLocationDetail"/);
   assert.match(html, /Indicação baseada na previsão do mar e vento\. Confirme sempre as condições no local\./);
   assert.match(html, /grid-template-columns:\s*repeat\(4,/);
   assert.match(html, /@media[^}]*max-width:\s*680px[\s\S]*?\.marine-locations[^}]*repeat\(2,/);
   assert.match(html, /marine-recommendations\.mjs/);
+});
+
+test("marine teaser activates forecast before scrolling to the stable anchor", async () => {
+  const events = [];
+  const target = { scrollIntoView: options => events.push(["scroll", options]) };
+  const windowRef = {
+    location: { search: "", hash: "" },
+    history: { pushState: (_state, _title, url) => events.push(["history", url]) },
+    setSection: section => events.push(["section", section]),
+    requestAnimationFrame: callback => { events.push(["frame"]); callback(); }
+  };
+  const documentRef = { getElementById: id => id === "marine-recommendations" ? target : null };
+
+  const activated = await activateMarineRecommendationsAnchor({ windowRef, documentRef, updateHistory: true });
+
+  assert.equal(activated, true);
+  assert.deepEqual(events, [
+    ["history", "?section=forecast#marine-recommendations"],
+    ["section", "forecast"],
+    ["frame"],
+    ["scroll", { behavior: "smooth", block: "start" }]
+  ]);
 });
 
 test("normal-user module never renders numeric score or internal jargon", async () => {
