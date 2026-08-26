@@ -71,6 +71,7 @@ export function activateCameraDeepLink({ windowRef = window, documentRef = docum
     const target = documentRef.getElementById(`camera-${cameraId}`);
     if (target) {
       target.scrollIntoView({ behavior: "smooth", block: "start" });
+      windowRef.openCameraFullscreen(target._cam);
       return;
     }
     windowRef.history.replaceState({}, "", `${windowRef.location.pathname}${windowRef.location.search}`);

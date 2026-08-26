@@ -1,8 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import vm from "node:vm";
 
 import * as marine from "../assets/marine-recommendations.mjs";
+import { INITIAL_PROFILES } from "../functions/lib/marine/profiles.mjs";
 
 const { activateMarineRecommendationsAnchor, isBathingSeason, ratingPresentation } = marine;
 
@@ -62,12 +64,17 @@ test("marine camera links activate Cameras before scrolling to the rendered targ
   );
   const events = [];
   let frameCallback;
-  const target = { scrollIntoView: options => events.push(["scroll", options]) };
+  const camera = { id: "slourenco-sul" };
+  const target = {
+    _cam: camera,
+    scrollIntoView: options => events.push(["scroll", options])
+  };
   const windowRef = {
     location: { pathname: "/", search: "?section=cameras&camera=slourenco-sul", hash: "#camera-slourenco-sul" },
     history: { replaceState: (_state, _title, url) => events.push(["replace", url]) },
     setSection: section => events.push(["section", section]),
-    requestAnimationFrame: callback => { frameCallback = callback; events.push(["frame"]); }
+    requestAnimationFrame: callback => { frameCallback = callback; events.push(["frame"]); },
+    openCameraFullscreen: value => events.push(["fullscreen", value])
   };
   const documentRef = { getElementById: id => id === "camera-slourenco-sul" ? target : null };
 
@@ -77,8 +84,45 @@ test("marine camera links activate Cameras before scrolling to the rendered targ
   assert.deepEqual(events, [
     ["section", "cameras"],
     ["frame"],
-    ["scroll", { behavior: "smooth", block: "start" }]
+    ["scroll", { behavior: "smooth", block: "start" }],
+    ["fullscreen", camera]
   ]);
+});
+
+test("Marine camera IDs are canonical catalog IDs for all four locations", async () => {
+  const context = { window: {} };
+  vm.runInNewContext(await readFile(new URL("../cameras.public.js", import.meta.url), "utf8"), context);
+  const catalogIds = new Set(context.window.LVSM_CAMERAS.map(item => item.id));
+  assert.deepEqual(
+    INITIAL_PROFILES.map(({ id, cameraId }) => ({ id, cameraId })),
+    [
+      { id: "sao-lourenco", cameraId: "slourenco-sul" },
+      { id: "maia", cameraId: "maia-norte" },
+      { id: "praia-formosa", cameraId: "praia-poente" },
+      { id: "anjos", cameraId: "anjos-porto" }
+    ]
+  );
+  for (const { cameraId } of INITIAL_PROFILES) assert.equal(catalogIds.has(cameraId), true, cameraId);
+});
+
+test("Ver câmara opens fullscreen on mobile instead of using the card tap behavior", () => {
+  const camera = { id: "maia-norte" };
+  const opened = [];
+  const windowRef = {
+    location: { pathname: "/", search: "?section=cameras&camera=maia-norte", hash: "#camera-maia-norte" },
+    history: { replaceState() {} },
+    matchMedia: () => ({ matches: true }),
+    setSection() {},
+    requestAnimationFrame: callback => callback(),
+    openCameraFullscreen: value => opened.push(value)
+  };
+  const documentRef = {
+    getElementById: () => ({ _cam: camera, scrollIntoView() {} })
+  };
+
+  marine.activateCameraDeepLink({ windowRef, documentRef });
+
+  assert.deepEqual(opened, [camera]);
 });
 
 test("an unknown marine camera stays in Cameras and removes only the broken hash", () => {
@@ -88,7 +132,8 @@ test("an unknown marine camera stays in Cameras and removes only the broken hash
     location: { pathname: "/", search: "?section=cameras&camera=missing", hash: "#camera-missing" },
     history: { replaceState: (_state, _title, url) => events.push(["replace", url]) },
     setSection: section => events.push(["section", section]),
-    requestAnimationFrame: callback => callback()
+    requestAnimationFrame: callback => callback(),
+    openCameraFullscreen: value => events.push(["fullscreen", value])
   };
   const documentRef = { getElementById: () => null };
 
@@ -97,6 +142,14 @@ test("an unknown marine camera stays in Cameras and removes only the broken hash
     ["section", "cameras"],
     ["replace", "/?section=cameras&camera=missing"]
   ]);
+});
+
+test("Marine deep links reuse the fullscreen maintenance guard", () => {
+  const start = html.indexOf("function openCameraFullscreen(cam)");
+  const end = html.indexOf("\nfunction closeFullscreenCamera", start);
+  const openCameraFullscreen = html.slice(start, end);
+  assert.match(openCameraFullscreen, /if \(getOperationalState\(cam\) === "maintenance"\) return;\s*trackCameraView\(cam\.id\)/);
+  assert.doesNotMatch(openCameraFullscreen, /cameraId|URLSearchParams|location\.hash/);
 });
 
 test("camera query routing and card offset remain on the Cameras section", () => {
