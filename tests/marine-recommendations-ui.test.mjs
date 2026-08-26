@@ -10,6 +10,21 @@ const { activateMarineRecommendationsAnchor, isBathingSeason, ratingPresentation
 
 const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
+function seaDocument() {
+  const nodes = Object.fromEntries([
+    "seaWaveHeight", "seaCombinedWaveHeight", "seaWavePeriod", "seaWaveDirection", "seaTemperature"
+  ].map(id => [id, { textContent: "" }]));
+  return { nodes, documentRef: { getElementById: id => nodes[id] || null } };
+}
+
+const SEA_PAYLOAD = Object.freeze({
+  dataStatus: "fresh",
+  context: { waveHeightM: 0.64, waveDirectionLabel: "E", seaTemperatureC: 23.4 },
+  conditions: { swellHeightM: 0.64, swellPeriodS: 6.8, combinedWaveHeightM: 1.44 },
+  locations: [],
+  season: { start: "2026-06-01", end: "2026-09-30", timezone: "Atlantic/Azores" }
+});
+
 test("season is inclusive from 1 June through 30 September in Atlantic/Azores", () => {
   const season = { start: "2026-06-01", end: "2026-09-30", timezone: "Atlantic/Azores" };
   assert.equal(isBathingSeason(new Date("2026-06-01T00:30:00Z"), season), true);
@@ -31,6 +46,85 @@ test("homepage and forecast contain compact marine hosts and one shared detail",
   assert.match(html, /grid-template-columns:\s*repeat\(4,/);
   assert.match(html, /@media[^}]*max-width:\s*680px[\s\S]*?\.marine-locations[^}]*repeat\(2,/);
   assert.match(html, /marine-recommendations\.mjs/);
+});
+
+test("classic sea conditions render the canonical Marine payload without combined-wave divergence", () => {
+  const { nodes, documentRef } = seaDocument();
+
+  marine.renderMarineSeaConditions(SEA_PAYLOAD, { documentRef });
+
+  assert.deepEqual(Object.fromEntries(Object.entries(nodes).map(([id, node]) => [id, node.textContent])), {
+    seaWaveHeight: "0,6 m",
+    seaCombinedWaveHeight: "1,4 m",
+    seaWavePeriod: "7 s",
+    seaWaveDirection: "E",
+    seaTemperature: "23,4 °C"
+  });
+});
+
+test("classic sea conditions use dashes for unavailable or expired Marine data", () => {
+  for (const dataStatus of ["unavailable", "expired"]) {
+    const { nodes, documentRef } = seaDocument();
+    marine.renderMarineSeaConditions({ ...SEA_PAYLOAD, dataStatus }, { documentRef });
+    assert.deepEqual(new Set(Object.values(nodes).map(node => node.textContent)), new Set(["—"]));
+  }
+});
+
+test("classic sea conditions keep canonical values when Marine data is stale", () => {
+  const { nodes, documentRef } = seaDocument();
+
+  marine.renderMarineSeaConditions({ ...SEA_PAYLOAD, dataStatus: "stale" }, { documentRef });
+
+  assert.equal(nodes.seaWaveHeight.textContent, "0,6 m");
+  assert.equal(nodes.seaCombinedWaveHeight.textContent, "1,4 m");
+  assert.equal(nodes.seaWavePeriod.textContent, "7 s");
+  assert.equal(nodes.seaWaveDirection.textContent, "E");
+  assert.equal(nodes.seaTemperature.textContent, "23,4 °C");
+});
+
+test("one Marine refresh updates recommendations and classic sea conditions from one response", async () => {
+  const { nodes, documentRef: seaRef } = seaDocument();
+  const status = { textContent: "" };
+  const context = { textContent: "" };
+  const locations = { replaceChildren() {}, append() {} };
+  const detail = { replaceChildren() {} };
+  const root = {
+    hidden: true,
+    classList: { add() {}, remove() {} },
+    querySelector(selector) {
+      return ({ ".marine-module__status": status, ".marine-module__context": context,
+        "#marineLocations": locations, "#marineLocationDetail": detail })[selector] || null;
+    }
+  };
+  const teaserContext = { textContent: "" };
+  const teaser = {
+    hidden: true,
+    querySelector: selector => selector === ".marine-teaser__context" ? teaserContext : null
+  };
+  const documentRef = {
+    ...seaRef,
+    querySelector: selector => ({ "#marineTeaser": teaser, "#marine-recommendations": root })[selector] || null
+  };
+  let fetches = 0;
+
+  await marine.refreshMarineRecommendations({
+    documentRef,
+    fetchImpl: async () => { fetches += 1; return Response.json(SEA_PAYLOAD); },
+    now: new Date("2026-08-26T12:00:00.000Z")
+  });
+
+  assert.equal(fetches, 1);
+  assert.equal(status.textContent, "Onde está melhor o mar?");
+  assert.equal(nodes.seaWaveHeight.textContent, "0,6 m");
+  assert.equal(nodes.seaCombinedWaveHeight.textContent, "1,4 m");
+  assert.equal(nodes.seaWaveDirection.textContent, "E");
+});
+
+test("browser no longer fetches Open-Meteo separately for classic sea conditions", () => {
+  assert.match(html, /Condições do Mar/);
+  assert.match(html, /id="seaCombinedWaveHeight"/);
+  assert.doesNotMatch(html, /marine-api\.open-meteo\.com/);
+  assert.doesNotMatch(html, /updateSeaState/);
 });
 
 test("marine teaser activates forecast before scrolling to the stable anchor", async () => {

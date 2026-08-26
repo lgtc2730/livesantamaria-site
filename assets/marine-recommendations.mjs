@@ -36,6 +36,21 @@ function formatNumber(value, suffix, digits = 0) {
   return Number.isFinite(value) ? `${value.toLocaleString("pt-PT", { maximumFractionDigits: digits })}${suffix}` : "—";
 }
 
+export function renderMarineSeaConditions(payload, { documentRef = document } = {}) {
+  const unavailable = !payload || ["expired", "unavailable"].includes(payload.dataStatus);
+  const values = unavailable ? {} : {
+    seaWaveHeight: formatNumber(payload.context?.waveHeightM, " m", 1),
+    seaCombinedWaveHeight: formatNumber(payload.conditions?.combinedWaveHeightM, " m", 1),
+    seaWavePeriod: formatNumber(payload.conditions?.swellPeriodS, " s"),
+    seaWaveDirection: payload.context?.waveDirectionLabel || "—",
+    seaTemperature: formatNumber(payload.context?.seaTemperatureC, " °C", 1)
+  };
+  for (const id of ["seaWaveHeight", "seaCombinedWaveHeight", "seaWavePeriod", "seaWaveDirection", "seaTemperature"]) {
+    const node = documentRef.getElementById(id);
+    if (node) node.textContent = values[id] || "—";
+  }
+}
+
 function renderUnavailable(root) {
   root.hidden = false;
   root.classList.add("is-unavailable");
@@ -80,6 +95,7 @@ export function activateCameraDeepLink({ windowRef = window, documentRef = docum
 }
 
 export function renderMarineRecommendations(payload, { documentRef = document, now = new Date() } = {}) {
+  renderMarineSeaConditions(payload, { documentRef });
   const teaser = documentRef.querySelector("#marineTeaser");
   const root = documentRef.querySelector("#marine-recommendations");
   if (!root || !teaser) return;
@@ -143,6 +159,16 @@ export function renderMarineRecommendations(payload, { documentRef = document, n
   renderDetail();
 }
 
+export async function refreshMarineRecommendations({ fetchImpl = fetch, documentRef = document, now = new Date() } = {}) {
+  try {
+    const response = await fetchImpl("/api/marine-recommendations", { cache: "no-store" });
+    if (!response.ok) throw new Error("unavailable");
+    renderMarineRecommendations(await response.json(), { documentRef, now });
+  } catch {
+    renderMarineRecommendations({ dataStatus: "unavailable" }, { documentRef, now });
+  }
+}
+
 export async function initializeMarineRecommendations({ fetchImpl = fetch, documentRef = document } = {}) {
   activateCameraDeepLink({ documentRef });
   const teaser = documentRef.querySelector("#marineTeaser");
@@ -150,13 +176,7 @@ export async function initializeMarineRecommendations({ fetchImpl = fetch, docum
     event.preventDefault();
     activateMarineRecommendationsAnchor({ documentRef, updateHistory: true });
   });
-  try {
-    const response = await fetchImpl("/api/marine-recommendations", { cache: "no-store" });
-    if (!response.ok) throw new Error("unavailable");
-    renderMarineRecommendations(await response.json(), { documentRef });
-  } catch {
-    renderMarineRecommendations({ dataStatus: "unavailable" }, { documentRef });
-  }
+  await refreshMarineRecommendations({ fetchImpl, documentRef });
   activateMarineRecommendationsAnchor({ documentRef });
 }
 

@@ -2930,12 +2930,17 @@
           </div>
 
           <div class="sea-card">
-            <h3>🌊 Estado do Mar</h3>
+            <h3>🌊 Condições do Mar</h3>
 
             <div class="sea-grid">
               <div class="sea-row">
                 <span>Ondulação</span>
                 <strong id="seaWaveHeight">—</strong>
+              </div>
+
+              <div class="sea-row">
+                <span>Altura das ondas</span>
+                <strong id="seaCombinedWaveHeight">—</strong>
               </div>
 
               <div class="sea-row">
@@ -3654,40 +3659,6 @@ async function updateTidesCard() {
     setText("highTides", "—");
     setText("lowTides", "—");
     setText("tidesSource", "Indisponível");
-  }
-}
-
-async function updateSeaState() {
-  try {
-    const url =
-      "https://marine-api.open-meteo.com/v1/marine" +
-      "?latitude=36.97639" +
-      "&longitude=-25.125" +
-      "&hourly=wave_height,wave_period,wave_direction,sea_surface_temperature" +
-      "&timezone=Atlantic%2FAzores" +
-      "&forecast_days=1";
-
-    const response = await fetch(url, { cache: "no-store" });
-    const data = await response.json();
-
-    const hourly = data.hourly || {};
-    const nowIndex = 0;
-
-    const height = Number(hourly.wave_height?.[nowIndex]);
-    const period = Number(hourly.wave_period?.[nowIndex]);
-    const direction = Number(hourly.wave_direction?.[nowIndex]);
-    const seaTemp = Number(hourly.sea_surface_temperature?.[nowIndex]);
-
-    setText("seaWaveHeight", Number.isFinite(height) ? `${height.toFixed(1)} m` : "—");
-    setText("seaWavePeriod", Number.isFinite(period) ? `${Math.round(period)} s` : "—");
-    setText("seaWaveDirection", degreesToCompass(direction));
-    setText("seaTemperature", Number.isFinite(seaTemp) ? `${seaTemp.toFixed(1)} °C` : "—");
-  } catch (err) {
-    console.warn("Erro estado do mar:", err);
-    setText("seaWaveHeight", "—");
-    setText("seaWavePeriod", "—");
-    setText("seaWaveDirection", "—");
-    setText("seaTemperature", "—");
   }
 }
 
@@ -5745,8 +5716,6 @@ updateWeather();
 updateSunCard();
 setInterval(updateCounts, 60 * 1000);
 setInterval(updateWeather, 10 * 60 * 1000);
-updateSeaState();
-setInterval(updateSeaState, 30 * 60 * 1000);
 updateTidesCard();
 setInterval(updateTidesCard, 30 * 60 * 1000);
 
