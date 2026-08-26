@@ -2,11 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-import {
-  activateMarineRecommendationsAnchor,
-  isBathingSeason,
-  ratingPresentation
-} from "../assets/marine-recommendations.mjs";
+import * as marine from "../assets/marine-recommendations.mjs";
+
+const { activateMarineRecommendationsAnchor, isBathingSeason, ratingPresentation } = marine;
 
 const html = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
@@ -53,6 +51,57 @@ test("marine teaser activates forecast before scrolling to the stable anchor", a
     ["frame"],
     ["scroll", { behavior: "smooth", block: "start" }]
   ]);
+});
+
+test("marine camera links activate Cameras before scrolling to the rendered target", () => {
+  assert.equal(typeof marine.marineCameraHref, "function");
+  assert.equal(typeof marine.activateCameraDeepLink, "function");
+  assert.equal(
+    marine.marineCameraHref("slourenco-sul"),
+    "?section=cameras&camera=slourenco-sul#camera-slourenco-sul"
+  );
+  const events = [];
+  let frameCallback;
+  const target = { scrollIntoView: options => events.push(["scroll", options]) };
+  const windowRef = {
+    location: { pathname: "/", search: "?section=cameras&camera=slourenco-sul", hash: "#camera-slourenco-sul" },
+    history: { replaceState: (_state, _title, url) => events.push(["replace", url]) },
+    setSection: section => events.push(["section", section]),
+    requestAnimationFrame: callback => { frameCallback = callback; events.push(["frame"]); }
+  };
+  const documentRef = { getElementById: id => id === "camera-slourenco-sul" ? target : null };
+
+  assert.equal(marine.activateCameraDeepLink({ windowRef, documentRef }), true);
+  assert.deepEqual(events, [["section", "cameras"], ["frame"]]);
+  frameCallback();
+  assert.deepEqual(events, [
+    ["section", "cameras"],
+    ["frame"],
+    ["scroll", { behavior: "smooth", block: "start" }]
+  ]);
+});
+
+test("an unknown marine camera stays in Cameras and removes only the broken hash", () => {
+  assert.equal(typeof marine.activateCameraDeepLink, "function");
+  const events = [];
+  const windowRef = {
+    location: { pathname: "/", search: "?section=cameras&camera=missing", hash: "#camera-missing" },
+    history: { replaceState: (_state, _title, url) => events.push(["replace", url]) },
+    setSection: section => events.push(["section", section]),
+    requestAnimationFrame: callback => callback()
+  };
+  const documentRef = { getElementById: () => null };
+
+  assert.doesNotThrow(() => marine.activateCameraDeepLink({ windowRef, documentRef }));
+  assert.deepEqual(events, [
+    ["section", "cameras"],
+    ["replace", "/?section=cameras&camera=missing"]
+  ]);
+});
+
+test("camera query routing and card offset remain on the Cameras section", () => {
+  assert.match(html, /if \(cameraId\) \{\s*setSection\("cameras"\);/);
+  assert.match(html, /\.camera-card\s*\{[\s\S]*?scroll-margin-top:/);
 });
 
 test("normal-user module never renders numeric score or internal jargon", async () => {

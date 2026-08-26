@@ -57,6 +57,27 @@ export function activateMarineRecommendationsAnchor({
   return true;
 }
 
+export function marineCameraHref(cameraId) {
+  const encodedId = encodeURIComponent(String(cameraId));
+  return `?section=cameras&camera=${encodedId}#camera-${encodedId}`;
+}
+
+export function activateCameraDeepLink({ windowRef = window, documentRef = document } = {}) {
+  const params = new URLSearchParams(windowRef.location?.search || "");
+  const cameraId = params.get("camera");
+  if (!cameraId) return false;
+  windowRef.setSection?.("cameras");
+  windowRef.requestAnimationFrame(() => {
+    const target = documentRef.getElementById(`camera-${cameraId}`);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    windowRef.history.replaceState({}, "", `${windowRef.location.pathname}${windowRef.location.search}`);
+  });
+  return true;
+}
+
 export function renderMarineRecommendations(payload, { documentRef = document, now = new Date() } = {}) {
   const teaser = documentRef.querySelector("#marineTeaser");
   const root = documentRef.querySelector("#marine-recommendations");
@@ -93,7 +114,7 @@ export function renderMarineRecommendations(payload, { documentRef = document, n
     const conditions = documentRef.createElement("span");
     conditions.textContent = `Ondulação ${payload.context.waveDirectionLabel || "—"} · ${formatNumber(payload.conditions.swellHeightM, " m", 1)} · ${formatNumber(payload.conditions.swellPeriodS, " s")} · vento ${formatNumber(payload.conditions.windSpeedKmh, " km/h")}`;
     const camera = documentRef.createElement("a");
-    camera.href = `?camera=${encodeURIComponent(location.cameraId)}`;
+    camera.href = marineCameraHref(location.cameraId);
     camera.textContent = "Ver câmara";
     detail.append(heading, message, conditions, camera);
   };
@@ -122,6 +143,7 @@ export function renderMarineRecommendations(payload, { documentRef = document, n
 }
 
 export async function initializeMarineRecommendations({ fetchImpl = fetch, documentRef = document } = {}) {
+  activateCameraDeepLink({ documentRef });
   const teaser = documentRef.querySelector("#marineTeaser");
   teaser?.addEventListener("click", event => {
     event.preventDefault();
