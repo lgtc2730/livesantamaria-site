@@ -51,6 +51,18 @@ export function renderMarineSeaConditions(payload, { documentRef = document } = 
   }
 }
 
+export function renderMarineCta(payload, { documentRef = document, now = new Date() } = {}) {
+  const cta = documentRef.querySelector("#marineTeaser");
+  if (!cta) return;
+  const season = payload?.season || DEFAULT_BATHING_SEASON;
+  const unavailable = !payload || ["expired", "unavailable"].includes(payload.dataStatus);
+  const temperature = unavailable ? null : payload.context?.seaTemperatureC;
+  cta.hidden = !isBathingSeason(now, season);
+  text(cta, ".marine-cta__label", Number.isFinite(temperature)
+    ? `ESCOLHA ONDE IR HOJE - ÁGUA ${Math.round(temperature)}º`
+    : "ESCOLHA ONDE IR HOJE");
+}
+
 function renderUnavailable(root) {
   root.hidden = false;
   root.classList.add("is-unavailable");
@@ -96,12 +108,10 @@ export function activateCameraDeepLink({ windowRef = window, documentRef = docum
 
 export function renderMarineRecommendations(payload, { documentRef = document, now = new Date() } = {}) {
   renderMarineSeaConditions(payload, { documentRef });
-  const teaser = documentRef.querySelector("#marineTeaser");
+  renderMarineCta(payload, { documentRef, now });
   const root = documentRef.querySelector("#marine-recommendations");
-  if (!root || !teaser) return;
+  if (!root) return;
   if (!payload || ["expired", "unavailable"].includes(payload.dataStatus) || !Array.isArray(payload.locations)) {
-    teaser.hidden = !isBathingSeason(now);
-    text(teaser, ".marine-teaser__context", "Recomendações temporariamente indisponíveis. →");
     renderUnavailable(root);
     return;
   }
@@ -110,9 +120,6 @@ export function renderMarineRecommendations(payload, { documentRef = document, n
   const stale = payload.dataStatus === "stale";
   text(root, ".marine-module__status", stale ? "Dados menos recentes" : "Onde está melhor o mar?");
   text(root, ".marine-module__context", `${payload.context.waveDirectionLabel || "—"} · ${formatNumber(payload.context.waveHeightM, " m", 1)} · Água ${formatNumber(payload.context.seaTemperatureC, " °C")}`);
-
-  teaser.hidden = !isBathingSeason(now, payload.season || DEFAULT_BATHING_SEASON);
-  text(teaser, ".marine-teaser__context", `Água ${formatNumber(payload.context.seaTemperatureC, " °C")} · ${payload.context.waveDirectionLabel || "—"} · ${formatNumber(payload.context.waveHeightM, " m", 1)} →`);
 
   const locationsHost = root.querySelector("#marineLocations");
   const detail = root.querySelector("#marineLocationDetail");

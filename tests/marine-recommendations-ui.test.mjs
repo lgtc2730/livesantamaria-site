@@ -17,6 +17,19 @@ function seaDocument() {
   return { nodes, documentRef: { getElementById: id => nodes[id] || null } };
 }
 
+function ctaDocument() {
+  const label = { textContent: "" };
+  const cta = {
+    hidden: true,
+    querySelector: selector => selector === ".marine-cta__label" ? label : null
+  };
+  return {
+    cta,
+    label,
+    documentRef: { querySelector: selector => selector === "#marineTeaser" ? cta : null }
+  };
+}
+
 const SEA_PAYLOAD = Object.freeze({
   dataStatus: "fresh",
   context: { waveHeightM: 0.64, waveDirectionLabel: "E", seaTemperatureC: 23.4 },
@@ -38,7 +51,16 @@ test("public rating labels and colors are presentation-only", () => {
 });
 
 test("homepage and forecast contain compact marine hosts and one shared detail", () => {
-  assert.match(html, /id="marineTeaser"[^>]*href="\?section=forecast#marine-recommendations"[^>]*hidden/);
+  assert.match(html, /class="marine-cta" id="marineTeaser" href="\?section=forecast#marine-recommendations" hidden/);
+  assert.doesNotMatch(html, /class="marine-teaser"/);
+  assert.match(html, /id="filters"[\s\S]*?id="marineTeaser"[\s\S]*?class="section-head-right"/);
+  assert.match(html, /\.section-head\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto\s+minmax\(0,\s*1fr\)/);
+  assert.match(html, /<svg class="marine-cta__flag"[^>]*aria-hidden="true"[^>]*viewBox="0 0 24 24"/);
+  assert.match(html, /\.marine-cta__flag\s*\{[\s\S]*?width:\s*18px;[\s\S]*?color:\s*currentColor;/);
+  assert.match(html, /\.marine-cta\s*\{[\s\S]*?background:\s*linear-gradient\([\s\S]*?border:\s*1px solid rgba\(246,196,83,\.72\)/);
+  assert.match(html, /\.marine-cta:hover\s*\{[\s\S]*?box-shadow:/);
+  assert.doesNotMatch(html, /<span aria-hidden="true">📍<\/span>/);
+  assert.match(html, /@media \(min-width:\s*681px\) and \(max-width:\s*900px\)\s*\{[\s\S]*?\.section-head\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto\s+minmax\(0,\s*1fr\)/);
   assert.match(html, /id="marine-recommendations"/);
   assert.match(html, /id="marineLocations"/);
   assert.match(html, /id="marineLocationDetail"/);
@@ -46,6 +68,42 @@ test("homepage and forecast contain compact marine hosts and one shared detail",
   assert.match(html, /grid-template-columns:\s*repeat\(4,/);
   assert.match(html, /@media[^}]*max-width:\s*680px[\s\S]*?\.marine-locations[^}]*repeat\(2,/);
   assert.match(html, /marine-recommendations\.mjs/);
+});
+
+test("marine CTA reuses payload water temperature and rounds it for the compact label", () => {
+  const { cta, label, documentRef } = ctaDocument();
+
+  marine.renderMarineCta({ ...SEA_PAYLOAD, context: { ...SEA_PAYLOAD.context, seaTemperatureC: 23.6 } }, {
+    documentRef,
+    now: new Date("2026-08-26T12:00:00.000Z")
+  });
+
+  assert.equal(cta.hidden, false);
+  assert.equal(label.textContent, "ESCOLHA ONDE IR HOJE - ÁGUA 24º");
+});
+
+test("marine CTA remains clickable without a valid water temperature", () => {
+  const { cta, label, documentRef } = ctaDocument();
+
+  marine.renderMarineCta({ ...SEA_PAYLOAD, context: { ...SEA_PAYLOAD.context, seaTemperatureC: null } }, {
+    documentRef,
+    now: new Date("2026-08-26T12:00:00.000Z")
+  });
+
+  assert.equal(cta.hidden, false);
+  assert.equal(label.textContent, "ESCOLHA ONDE IR HOJE");
+});
+
+test("marine CTA preserves bathing-season visibility for available and unavailable data", () => {
+  for (const [now, hidden] of [
+    [new Date("2026-06-01T12:00:00.000Z"), false],
+    [new Date("2026-10-01T12:00:00.000Z"), true]
+  ]) {
+    const { cta, label, documentRef } = ctaDocument();
+    marine.renderMarineCta({ dataStatus: "unavailable" }, { documentRef, now });
+    assert.equal(cta.hidden, hidden);
+    assert.equal(label.textContent, "ESCOLHA ONDE IR HOJE");
+  }
 });
 
 test("classic sea conditions render the canonical Marine payload without combined-wave divergence", () => {
@@ -99,7 +157,7 @@ test("one Marine refresh updates recommendations and classic sea conditions from
   const teaserContext = { textContent: "" };
   const teaser = {
     hidden: true,
-    querySelector: selector => selector === ".marine-teaser__context" ? teaserContext : null
+    querySelector: selector => selector === ".marine-cta__label" ? teaserContext : null
   };
   const documentRef = {
     ...seaRef,

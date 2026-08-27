@@ -185,8 +185,6 @@
     .weather-mini strong { color: var(--text); font-size: 1.35rem; }
     .weather-mini small { display: block; font-size: .72rem; }
 
-    .marine-teaser { display: flex; align-items: center; justify-content: space-between; gap: .8rem; margin: 10px 0 0; padding: .62rem .9rem; border: 1px solid rgba(66,183,255,.25); border-radius: 13px; background: rgba(24,119,255,.09); color: var(--muted); font-size: .84rem; }
-    .marine-teaser strong { color: var(--text); }
     .marine-module { scroll-margin-top: 5.5rem; margin-bottom: 1rem; padding: .9rem; border: 1px solid var(--line); border-radius: 18px; background: var(--card); }
     .marine-module__header { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: .7rem; }
     .marine-module__header h2 { margin: 0; font-size: 1.05rem; }
@@ -202,7 +200,7 @@
     .marine-detail a { color: var(--blue2); font-weight: 800; }
     .marine-module__disclaimer { margin: .65rem 0 0; color: var(--soft); font-size: .72rem; }
     .marine-module.is-unavailable .marine-locations, .marine-module.is-unavailable .marine-detail, .marine-module.is-unavailable .marine-module__context { display: none; }
-    @media (max-width: 680px) { .marine-teaser { flex-wrap: wrap; gap: .15rem .5rem; } .marine-locations { grid-template-columns: repeat(2, minmax(0, 1fr)); } .marine-detail { grid-template-columns: 1fr; gap: .35rem; } }
+    @media (max-width: 680px) { .marine-locations { grid-template-columns: repeat(2, minmax(0, 1fr)); } .marine-detail { grid-template-columns: 1fr; gap: .35rem; } }
 
     .mobile-menu {
       display: none;
@@ -493,15 +491,102 @@
 
     .section-head {
       margin: 24px 0 16px;
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
       align-items: center;
       gap: 14px;
-      flex-wrap: wrap;
     }
 
     .section-head-right {
-      margin-left: auto;
+      justify-self: end;
+    }
+
+    .marine-cta {
+      justify-self: center;
+      min-width: 0;
+      min-height: 38px;
+      max-width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 14px;
+      background: linear-gradient(180deg, rgba(246,196,83,.16), rgba(246,196,83,.09));
+      border: 1px solid rgba(246,196,83,.72);
+      border-radius: 999px;
+      color: #ffdc78;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 0 14px rgba(246,196,83,.1);
+      font-size: .76rem;
+      font-weight: 900;
+      letter-spacing: .02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: background .18s ease, border-color .18s ease, box-shadow .18s ease, color .18s ease;
+    }
+
+    .marine-cta__flag {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 18px;
+      color: currentColor;
+    }
+
+    .marine-cta:hover {
+      background: linear-gradient(180deg, rgba(246,196,83,.22), rgba(246,196,83,.13));
+      border-color: rgba(255,216,112,.88);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 0 16px rgba(246,196,83,.15);
+      color: #ffe39a;
+    }
+
+    .marine-cta:focus-visible {
+      outline: 2px solid #f8d982;
+      outline-offset: 3px;
+    }
+
+    @media (max-width: 900px) {
+      .section-head {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+
+      .marine-cta {
+        grid-column: 1 / -1;
+        grid-row: 2;
+      }
+    }
+
+    @media (min-width: 681px) and (max-width: 900px) {
+      .section-head {
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      }
+
+      .marine-cta {
+        grid-column: auto;
+        grid-row: auto;
+      }
+    }
+
+    @media (max-width: 680px) {
+      .section-head {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .filters,
+      .marine-cta {
+        grid-column: 1;
+      }
+
+      .marine-cta {
+        max-width: min(100%, 340px);
+        padding-inline: 12px;
+        font-size: .7rem;
+      }
+
+      .marine-cta__flag {
+        width: 16px;
+        height: 16px;
+        flex-basis: 16px;
+      }
     }
 
     .support-shortcut {
@@ -2818,11 +2903,6 @@
       </div>
     </section>
 
-    <a class="marine-teaser" id="marineTeaser" href="?section=forecast#marine-recommendations" hidden>
-      <strong>Escolha onde ir hoje. 🌊 Onde está melhor o mar?</strong>
-      <span class="marine-teaser__context">—</span>
-    </a>
-
     <main>
       <section id="camerasSection">
         <div class="section-head">
@@ -2831,6 +2911,13 @@
             <button class="chip" data-filter="live">Live</button>
             <button class="chip" data-filter="future">Futuras</button>
           </div>
+
+          <a class="marine-cta" id="marineTeaser" href="?section=forecast#marine-recommendations" hidden>
+            <svg class="marine-cta__flag" aria-hidden="true" viewBox="0 0 24 24" fill="none">
+              <path d="M6 21V3M7 4h10l-3 4 3 4H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span class="marine-cta__label">ESCOLHA ONDE IR HOJE</span>
+          </a>
 
           <div class="section-head-right">
             <button id="supportShortcut" class="support-shortcut">
