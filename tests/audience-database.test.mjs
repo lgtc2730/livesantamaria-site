@@ -6,10 +6,12 @@ import test from "node:test";
 const projectRoot = new URL("../", import.meta.url);
 
 async function loadDatabase() {
-  const source = await readFile(
-    new URL("functions/api/audience/db.js", projectRoot),
-    "utf8"
-  );
+  const [databaseSource, calendarSource] = await Promise.all([
+    readFile(new URL("functions/api/audience/db.js", projectRoot), "utf8"),
+    readFile(new URL("functions/api/audience/calendar.js", projectRoot), "utf8")
+  ]);
+  const calendarUrl = `data:text/javascript;base64,${Buffer.from(calendarSource).toString("base64")}`;
+  const source = databaseSource.replace("./calendar.js", calendarUrl);
   const sourceUrl = `data:text/javascript;base64,${Buffer.from(source).toString("base64")}`;
   return import(sourceUrl);
 }
@@ -23,7 +25,7 @@ class RecordingD1 {
       bind: (...values) => ({
         run: async () => {
           this.statements.push({ sql, values });
-          const eventKey = values[5];
+          const eventKey = values[6];
           if (this.rows.some(row => row.eventKey === eventKey)) {
             return { success: true, meta: { changes: 0, changed_db: false } };
           }
@@ -107,6 +109,13 @@ async function migrationSql() {
   );
 }
 
+async function aggregationMigrationSql() {
+  return readFile(
+    new URL("database/migrations/0002_audience_daily_aggregates.sql", projectRoot),
+    "utf8"
+  );
+}
+
 test("builds deterministic event keys from normalized event identity", async () => {
   const { buildEventKey } = await loadDatabase();
 
@@ -135,12 +144,12 @@ test("binds the deterministic event key and ignores a repeated logical event", a
   await insertEvent(db, event);
 
   assert.match(db.statements[0].sql, /event_key/);
-  assert.equal(db.statements[0].values.length, 6);
+  assert.equal(db.statements[0].values.length, 7);
   assert.equal(
-    db.statements[0].values[5],
+    db.statements[0].values[6],
     "v1:camera_view:31323365343536372D653839622D343264332D613435362D343236363134313734303030:636E736D"
   );
-  assert.equal(db.statements[1].values[5], db.statements[0].values[5]);
+  assert.equal(db.statements[1].values[6], db.statements[0].values[6]);
   assert.equal(db.rows.length, 1);
 });
 
@@ -218,6 +227,7 @@ test("compatible migration preserves every populated legacy row and supports old
   );
 
   const { insertEvent } = await loadDatabase();
+  database.exec(await aggregationMigrationSql());
   const newEvent = {
     type: "camera_view",
     session: "223e4567-e89b-42d3-a456-426614174000",

@@ -51,10 +51,12 @@ async function loadEvent(insertEvent, transformEventSource = source => source) {
 }
 
 async function loadDatabase() {
-  const source = await readFile(
-    new URL("functions/api/audience/db.js", projectRoot),
-    "utf8"
-  );
+  const [databaseSource, calendarSource] = await Promise.all([
+    readFile(new URL("functions/api/audience/db.js", projectRoot), "utf8"),
+    readFile(new URL("functions/api/audience/calendar.js", projectRoot), "utf8")
+  ]);
+  const calendarUrl = `data:text/javascript;base64,${Buffer.from(calendarSource).toString("base64")}`;
+  const source = databaseSource.replace("./calendar.js", calendarUrl);
   const sourceUrl = `data:text/javascript;base64,${Buffer.from(source).toString("base64")}#${crypto.randomUUID()}`;
   return import(sourceUrl);
 }
@@ -156,7 +158,7 @@ class DeduplicatingD1 {
       bind: (...values) => ({
         run: async () => {
           this.statements.push({ sql, values });
-          const eventKey = values[5];
+          const eventKey = values[6];
           if (this.rows.some(row => row.eventKey === eventKey)) {
             return { success: true, meta: { changes: 0 } };
           }
@@ -237,7 +239,7 @@ test("the apex browser visit passes the real handler and reaches D1", async () =
 
   assert.deepEqual(statuses, [200]);
   assert.equal(db.rows.length, 1);
-  assert.equal(db.rows[0].values[4], "livesantamaria.org");
+  assert.equal(db.rows[0].values[5], "livesantamaria.org");
 });
 
 test("pending consent neither touches the audience session nor sends an event", async () => {
@@ -427,6 +429,7 @@ test("stores a normalized allowed event and records only safe telemetry", async 
   });
 
   assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { ok: true });
   assert.deepEqual(JSON.parse(JSON.stringify(inserted)), [{
     type: "camera_view",
     session: validSession,

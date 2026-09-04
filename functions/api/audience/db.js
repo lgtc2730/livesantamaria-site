@@ -1,3 +1,5 @@
+import { azoresCalendarDate } from "./calendar.js";
+
 function encodeEventKeyPart(value) {
   return Array.from(
     new TextEncoder().encode(value),
@@ -11,20 +13,23 @@ export function buildEventKey(event) {
     : `v1:camera_view:${encodeEventKeyPart(event.session)}:${encodeEventKeyPart(event.camera)}`;
 }
 
-export async function insertEvent(db, event) {
+export async function insertEvent(db, event, { now = () => new Date() } = {}) {
+  const createdAt = now();
   return db.prepare(`
     INSERT OR IGNORE INTO events (
       created_at,
+      aggregate_date,
       event_type,
       camera_id,
       session_id,
       host,
       event_key
     )
-    VALUES (?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
   `)
   .bind(
-    new Date().toISOString(),
+    createdAt.toISOString(),
+    azoresCalendarDate(createdAt),
     event.type,
     event.camera ?? null,
     event.session,

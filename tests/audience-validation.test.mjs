@@ -45,6 +45,14 @@ test("accepts only the allowed camera-view payload shape", async () => {
     () => validateAudiencePayload({ event: "visit", session: validSession, extra: true }, cameraIds),
     /invalid request/i
   );
+  assert.throws(
+    () => validateAudiencePayload({
+      event: "visit",
+      session: validSession,
+      aggregate_date: "2026-09-04"
+    }, cameraIds),
+    /invalid request/i
+  );
 });
 
 test("rejects non-JSON, malformed, and oversized request bodies", async () => {
