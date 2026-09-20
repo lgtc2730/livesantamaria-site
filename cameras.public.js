@@ -649,7 +649,7 @@ window.LVSM_CAMERAS = [
     "fallbackImage": null,
     "preview": "./assets/previews/cultura-movimento.png",
     "message": "Agenda mensal de eventos em Santa Maria.",
-    "status": "Ampliar agenda",
+    "status": "Ver agenda",
     "position": null,
     "sponsor": {
       "name": "Câmara Municipal de Vila do Porto",
@@ -657,7 +657,6 @@ window.LVSM_CAMERAS = [
       "url": "https://www.exploresantamaria.pt/agenda",
       "label": "Agenda cultural"
     },
-    "promoAction": "expand-image",
     "enabled": true
   },
   {
