@@ -620,7 +620,7 @@ window.LVSM_CAMERAS = [
     "preview": "./assets/previews/slourenco-norte1.jpg",
     "message": null,
     "status": "Em preparação",
-    "operationalState": "future",
+    "operationalState": "preparing",
     "publicVisibility": "public",
     "publicMedia": "preview",
     "commissioned": null,
