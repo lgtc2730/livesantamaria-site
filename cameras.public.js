@@ -222,7 +222,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
-    "publicOrder": 8,
+    "publicOrder": 7,
     "commissioned": "2023",
     "position": {
       "lat": 36.952592,
@@ -254,7 +254,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
-    "publicOrder": 9,
+    "publicOrder": 8,
     "commissioned": "2013",
     "position": {
       "lat": 36.950908,
@@ -275,165 +275,6 @@ window.LVSM_CAMERAS = [
       "x": 99,
       "y": 1
     }
-  },
-  {
-    "id": "maia-piscina",
-    "name": "Baixa da Maia",
-    "region": null,
-    "type": "hls",
-    "fallbackImage": null,
-    "preview": "./assets/previews/baixa-maia.jpeg",
-    "message": null,
-    "status": "Em preparação",
-    "operationalState": "testing",
-    "publicVisibility": "public",
-    "publicMedia": "preview",
-    "publicOrder": 2,
-    "commissioned": null,
-    "position": {
-      "lat": 36.939774,
-      "lon": -25.014035,
-      "bearing": 45,
-      "fov": 90
-    },
-    "sponsor": {
-      "name": "Assoc. Amigos da Maia",
-      "logo": "./assets/sponsors/amigos-maia.jpeg",
-      "url": null,
-      "label": "Sponsor"
-    },
-    "support": null,
-    "enabled": true,
-    "url": "https://maia-piscina-cam.livesantamaria.org/cam1/index.m3u8",
-    "streamUrl": "https://maia-piscina-cam.livesantamaria.org/cam1hq/index.m3u8",
-    "previewStreamUrl": "https://maia-piscina-cam.livesantamaria.org/cam1/index.m3u8"
-  },
-  {
-    "id": "marina-club-motard",
-    "name": "Marina-Club Motard",
-    "region": null,
-    "type": "hls",
-    "fallbackImage": null,
-    "preview": "./assets/previews/marina-club-motard.jpeg",
-    "message": null,
-    "status": "Em preparação",
-    "publicVisibility": "public",
-    "publicMedia": "preview",
-    "operationalState": "testing",
-    "publicOrder": 1,
-    "commissioned": null,
-    "position": {
-      "lat": 36.946241,
-      "lon": -25.146948,
-      "bearing": 160,
-      "fov": 90
-    },
-    "sponsor": {
-      "name": "Clube Motard Santa Maria",
-      "logo": "./assets/sponsors/clube-motard.jpeg",
-      "url": null,
-      "label": "Sponsor"
-    },
-    "support": null,
-    "enabled": true,
-    "url": "https://marina-club-motard-cam.livesantamaria.org/cam1/index.m3u8",
-    "streamUrl": "https://marina-club-motard-cam.livesantamaria.org/cam1hq/index.m3u8",
-    "previewStreamUrl": "https://marina-club-motard-cam.livesantamaria.org/cam1/index.m3u8"
-  },
-  {
-    "id": "maia-sul",
-    "name": "Maia-Sul",
-    "region": null,
-    "type": "hls",
-    "fallbackImage": null,
-    "preview": "./assets/previews/maia-sul.jpeg",
-    "message": "Vista sobre a Baia e Farol da Maia",
-    "status": "Em preparação",
-    "commissioned": null,
-    "publicVisibility": "public",
-    "publicMedia": "preview",
-    "operationalState": "testing",
-    "publicOrder": 3,
-    "position": {
-      "lat": 36.938183,
-      "lon": -25.015193,
-      "bearing": 180,
-      "fov": 65
-    },
-    "sponsor": {
-      "name": "Ricardo Botelho",
-      "logo": null,
-      "url": null,
-      "label": "Sponsor"
-    },
-    "support": null,
-    "enabled": true,
-    "url": "https://maia-sul-cam.livesantamaria.org/cam1/index.m3u8",
-    "streamUrl": "https://maia-sul-cam.livesantamaria.org/cam1hq/index.m3u8",
-    "previewStreamUrl": "https://maia-sul-cam.livesantamaria.org/cam1/index.m3u8"
-  },
-  {
-    "id": "malbusca-sunset",
-    "name": "Malbusca-Sunset",
-    "region": null,
-    "type": "hls",
-    "preview": "./assets/previews/malbusca-sunset.jpeg",
-    "fallbackImage": "./assets/fallback/malbusca-sunset.jpg",
-    "message": null,
-    "status": null,
-    "operationalState": "public",
-    "publicVisibility": "public",
-    "publicOrder": 7,
-    "commissioned": "2026-07",
-    "position": {
-      "lat": 36.94324,
-      "lon": -25.078278,
-      "bearing": 280,
-      "fov": 100
-    },
-    "sponsor": {
-      "name": "Donna Corália Pastelaria",
-      "logo": "./assets/sponsors/donna-coralia.jpeg",
-      "url": null,
-      "label": "Sponsor"
-    },
-    "support": null,
-    "enabled": true,
-    "url": "https://malbusca-sunset-cam.livesantamaria.org/cam1/index.m3u8",
-    "streamUrl": "https://malbusca-sunset-cam.livesantamaria.org/cam1hq/index.m3u8",
-    "previewStreamUrl": "https://malbusca-sunset-cam.livesantamaria.org/cam1/index.m3u8"
-  },
-  {
-    "id": "praia-malbusca",
-    "name": "Praia-Malbusca",
-    "region": null,
-    "type": "hls",
-    "preview": "./assets/previews/praia-malbusca.png",
-    "message": null,
-    "status": "Em preparação",
-    "operationalState": "testing",
-    "publicVisibility": "public",
-    "publicMedia": "preview",
-    "publicOrder": 4,
-    "commissioned": null,
-    "position": {
-      "lat": 36.950578,
-      "lon": -25.094441,
-      "bearing": 140,
-      "fov": 120
-    },
-    "sponsor": {
-      "name": "Fernando Freitas",
-      "logo": null,
-      "url": null,
-      "label": "Sponsor"
-    },
-    "support": null,
-    "enabled": true,
-    "fallbackImage": null,
-    "url": "https://praia-malbusca-cam.livesantamaria.org/cam1/index.m3u8",
-    "streamUrl": "https://praia-malbusca-cam.livesantamaria.org/cam1hq/index.m3u8",
-    "previewStreamUrl": "https://praia-malbusca-cam.livesantamaria.org/cam1/index.m3u8"
   },
   {
     "id": "ilheu-lagoinhas",
