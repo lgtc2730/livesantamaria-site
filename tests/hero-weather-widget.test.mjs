@@ -96,7 +96,7 @@ test("o desktop afasta cardinais, seta e velocidade da circunferência", () => {
   assert.match(desktopCss, /\.hero-wind-speed\s*\{[^}]*right:\s*-22px[^}]*bottom:\s*-20px/s);
 });
 
-test("o widget roda a seta para onde o vento sopra e apresenta a direção meteorológica", () => {
+test("o widget posiciona a seta na direção meteorológica incluindo NNE", () => {
   const elements = {
     weatherIcon: { textContent: "" },
     weatherTemp: { textContent: "" },
@@ -125,6 +125,8 @@ test("o widget roda a seta para onde o vento sopra e apresenta a direção meteo
       "updateHeroWeather({ icon: '☁️', temp: 23, windSpeedKmh: 24, windDirectionDegrees: 180 });",
       "directions.push(document.getElementById('weatherWindArrow').style.values['--wind-direction']);",
       "updateHeroWeather({ icon: '☁️', temp: 23, windSpeedKmh: 24, windDirectionDegrees: 270 });",
+      "directions.push(document.getElementById('weatherWindArrow').style.values['--wind-direction']);",
+      "updateHeroWeather({ icon: '☁️', temp: 23, windSpeedKmh: 24, windDirectionDegrees: 22.5 });",
       "directions.push(document.getElementById('weatherWindArrow').style.values['--wind-direction']);"
     ].join("\n")
   ].join("\n"), context);
@@ -132,9 +134,22 @@ test("o widget roda a seta para onde o vento sopra e apresenta a direção meteo
   assert.equal(elements.weatherIcon.textContent, "☁️");
   assert.equal(elements.weatherTemp.textContent, "23°C");
   assert.equal(elements.weatherWindSpeed.textContent, "24 km/h");
-  assert.deepEqual([...context.directions], ["180deg", "270deg", "0deg", "90deg"]);
+  assert.deepEqual([...context.directions], ["0deg", "90deg", "180deg", "270deg", "22.5deg"]);
   assert.equal(elements.weatherWindArrow.hidden, false);
-  assert.equal(elements.weatherWindCompass.attributes["aria-label"], "Vento 24 km/h, 270 graus");
+  assert.equal(elements.weatherWindCompass.attributes["aria-label"], "Vento 24 km/h, 22.5 graus");
+});
+
+test("a ponta da seta fica no extremo interior sem alterar a extensão radial", () => {
+  const shaftRule = html.match(/\.hero-wind-arrow::before\s*\{([^}]*)\}/s)?.[1];
+  const arrowHeadRule = html.match(/\.hero-wind-arrow::after\s*\{([^}]*)\}/s)?.[1];
+
+  assert.ok(shaftRule, "regra do eixo da seta não encontrada");
+  assert.ok(arrowHeadRule, "regra da ponta da seta não encontrada");
+  assert.match(shaftRule, /top:\s*0(?:px)?\s*;/);
+  assert.match(shaftRule, /height:\s*7px\s*;/);
+  assert.match(arrowHeadRule, /top:\s*4px\s*;/);
+  assert.match(arrowHeadRule, /border-top:\s*6px solid rgba\(255,255,255,\.96\)\s*;/);
+  assert.doesNotMatch(arrowHeadRule, /border-bottom:/);
 });
 
 test("o widget não inventa rumo quando o METAR indica vento variável", () => {
