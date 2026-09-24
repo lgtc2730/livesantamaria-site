@@ -96,7 +96,7 @@ test("o desktop afasta cardinais, seta e velocidade da circunferência", () => {
   assert.match(desktopCss, /\.hero-wind-speed\s*\{[^}]*right:\s*-22px[^}]*bottom:\s*-20px/s);
 });
 
-test("o widget roda a seta pelos graus exatos e apresenta apenas a velocidade", () => {
+test("o widget roda a seta para onde o vento sopra e apresenta a direção meteorológica", () => {
   const elements = {
     weatherIcon: { textContent: "" },
     weatherTemp: { textContent: "" },
@@ -117,15 +117,24 @@ test("o widget roda a seta pelos graus exatos e apresenta apenas a velocidade", 
   vm.runInNewContext([
     extractFunction("setText"),
     extractFunction("updateHeroWeather"),
-    "updateHeroWeather({ icon: '☁️', temp: 23, windSpeedKmh: 24, windDirectionDegrees: 250 });"
+    [
+      "updateHeroWeather({ icon: '☁️', temp: 23, windSpeedKmh: 24, windDirectionDegrees: 0 });",
+      "directions = [document.getElementById('weatherWindArrow').style.values['--wind-direction']];",
+      "updateHeroWeather({ icon: '☁️', temp: 23, windSpeedKmh: 24, windDirectionDegrees: 90 });",
+      "directions.push(document.getElementById('weatherWindArrow').style.values['--wind-direction']);",
+      "updateHeroWeather({ icon: '☁️', temp: 23, windSpeedKmh: 24, windDirectionDegrees: 180 });",
+      "directions.push(document.getElementById('weatherWindArrow').style.values['--wind-direction']);",
+      "updateHeroWeather({ icon: '☁️', temp: 23, windSpeedKmh: 24, windDirectionDegrees: 270 });",
+      "directions.push(document.getElementById('weatherWindArrow').style.values['--wind-direction']);"
+    ].join("\n")
   ].join("\n"), context);
 
   assert.equal(elements.weatherIcon.textContent, "☁️");
   assert.equal(elements.weatherTemp.textContent, "23°C");
   assert.equal(elements.weatherWindSpeed.textContent, "24 km/h");
-  assert.equal(elements.weatherWindArrow.style.values["--wind-direction"], "250deg");
+  assert.deepEqual([...context.directions], ["180deg", "270deg", "0deg", "90deg"]);
   assert.equal(elements.weatherWindArrow.hidden, false);
-  assert.equal(elements.weatherWindCompass.attributes["aria-label"], "Vento 24 km/h, 250 graus");
+  assert.equal(elements.weatherWindCompass.attributes["aria-label"], "Vento 24 km/h, 270 graus");
 });
 
 test("o widget não inventa rumo quando o METAR indica vento variável", () => {

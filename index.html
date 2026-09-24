@@ -5123,8 +5123,8 @@ function updateHeroWeather({ icon, temp, windSpeedKmh, windDirectionDegrees }) {
   if (arrow) {
     arrow.hidden = !hasDirection;
     if (hasDirection) {
-      const normalizedDirection = ((windDirectionDegrees % 360) + 360) % 360;
-      arrow.style.setProperty("--wind-direction", `${normalizedDirection}deg`);
+      const visualDirection = (windDirectionDegrees + 180) % 360;
+      arrow.style.setProperty("--wind-direction", `${visualDirection}deg`);
     }
   }
 
