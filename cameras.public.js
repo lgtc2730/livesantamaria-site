@@ -428,33 +428,6 @@ window.LVSM_CAMERAS = [
     "enabled": true
   },
   {
-    "id": "praia-castelo",
-    "name": "Praia do Castelo",
-    "region": null,
-    "type": "future",
-    "preview": "./assets/previews/praia-castelo.jpg",
-    "message": null,
-    "status": "Brevemente",
-    "publicVisibility": "public",
-    "publicMedia": "preview",
-    "commissioned": null,
-    "position": {
-      "lat": 36.952287,
-      "lon": -25.102611,
-      "bearing": 140,
-      "fov": 90
-    },
-    "sponsor": {
-      "name": "PcClick Informática",
-      "logo": "./assets/sponsors/PcClick.png",
-      "url": "https://pcclick.pt/",
-      "label": "Sponsor"
-    },
-    "support": null,
-    "enabled": true,
-    "operationalState": "preparing"
-  },
-  {
     "id": "promo-cultura-em-movimento",
     "name": "Cultura em Movimento",
     "region": null,
