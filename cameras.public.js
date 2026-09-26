@@ -451,14 +451,15 @@ window.LVSM_CAMERAS = [
       "label": "Sponsor"
     },
     "support": null,
-    "enabled": true
+    "enabled": true,
+    "operationalState": "preparing"
   },
   {
     "id": "promo-cultura-em-movimento",
     "name": "Cultura em Movimento",
     "region": null,
     "type": "promo",
-    "url": "https://agendacultural.cm-viladoporto.pt/agenda.pdf",
+    "url": "https://www.exploresantamaria.pt/agenda",
     "refresh": null,
     "fallbackImage": null,
     "preview": "./assets/previews/cultura-movimento.png",
