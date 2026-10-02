@@ -1,279 +1,87 @@
-const TIME_ZONE = "Atlantic/Azores";
-
-function getZonedParts(date) {
-  const formatter = new Intl.DateTimeFormat("en-CA", {
-    timeZone: TIME_ZONE,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hourCycle: "h23"
-  });
-
-  return Object.fromEntries(
-    formatter
-      .formatToParts(date)
-      .filter(part => part.type !== "literal")
-      .map(part => [part.type, Number(part.value)])
-  );
-}
-
-function zonedMidnightUtc(year, month, day) {
-  const desiredAsUtc = Date.UTC(year, month - 1, day);
-  let guess = desiredAsUtc;
-
-  for (let i = 0; i < 2; i++) {
-    const actual = getZonedParts(new Date(guess));
-    const actualAsUtc = Date.UTC(
-      actual.year,
-      actual.month - 1,
-      actual.day,
-      actual.hour,
-      actual.minute,
-      actual.second
-    );
-
-    guess -= actualAsUtc - desiredAsUtc;
-  }
-
-  const resolved = new Date(guess);
-  const resolvedParts = getZonedParts(resolved);
-
-  if (
-    resolvedParts.year === year &&
-    resolvedParts.month === month &&
-    resolvedParts.day === day
-  ) {
-    return resolved;
-  }
-
-  let lower = desiredAsUtc - 36 * 60 * 60 * 1000;
-  let upper = desiredAsUtc + 36 * 60 * 60 * 1000;
-
-  while (lower < upper) {
-    const middle = lower + Math.floor((upper - lower) / 2);
-    const parts = getZonedParts(new Date(middle));
-    const isBeforeTarget =
-      parts.year < year ||
-      (parts.year === year && parts.month < month) ||
-      (parts.year === year && parts.month === month && parts.day < day);
-
-    if (isBeforeTarget) {
-      lower = middle + 1;
-    } else {
-      upper = middle;
-    }
-  }
-
-  const firstValidInstant = new Date(lower);
-  const firstValidParts = getZonedParts(firstValidInstant);
-
-  if (
-    firstValidParts.year !== year ||
-    firstValidParts.month !== month ||
-    firstValidParts.day !== day
-  ) {
-    throw new RangeError("Unable to resolve Atlantic/Azores calendar day");
-  }
-
-  return firstValidInstant;
-}
-
-function addCalendarDays(year, month, day, amount) {
-  const date = new Date(Date.UTC(year, month - 1, day + amount));
-
-  return {
-    year: date.getUTCFullYear(),
-    month: date.getUTCMonth() + 1,
-    day: date.getUTCDate()
-  };
-}
+import { getAzoresCalendarPeriods } from "./calendar.js";
 
 export function getPeriodBoundaries(now = new Date()) {
+  const periods = getAzoresCalendarPeriods(now);
+  return Object.freeze({
+    ...periods,
+    queryStartDate: periods.rolling30StartDate < periods.monthStartDate
+      ? periods.rolling30StartDate
+      : periods.monthStartDate
+  });
+}
 
-  const local = getZonedParts(now);
+function count(value) {
+  return Number(value ?? 0);
+}
 
-  const today = {
-    year: local.year,
-    month: local.month,
-    day: local.day
-  };
-
-  const yesterday = addCalendarDays(
-    today.year,
-    today.month,
-    today.day,
-    -1
-  );
-
-  const last7 = addCalendarDays(
-    today.year,
-    today.month,
-    today.day,
-    -6
-  );
-
-  const last30 = addCalendarDays(
-    today.year,
-    today.month,
-    today.day,
-    -29
-  );
-
-  const tomorrow = addCalendarDays(
-    today.year,
-    today.month,
-    today.day,
-    1
-  );
-
-  return {
-
-    yesterdayStart:
-      zonedMidnightUtc(
-        yesterday.year,
-        yesterday.month,
-        yesterday.day
-      ).toISOString(),
-
-    todayStart:
-      zonedMidnightUtc(
-        today.year,
-        today.month,
-        today.day
-      ).toISOString(),
-
-    tomorrowStart:
-      zonedMidnightUtc(
-        tomorrow.year,
-        tomorrow.month,
-        tomorrow.day
-      ).toISOString(),
-
-    last7Start:
-      zonedMidnightUtc(
-        last7.year,
-        last7.month,
-        last7.day
-      ).toISOString(),
-
-    last30Start:
-      zonedMidnightUtc(
-        last30.year,
-        last30.month,
-        last30.day
-      ).toISOString()
-
-  };
+function cameraRanking(rows, field) {
+  return rows
+    .map(row => ({ camera: row.camera, count: count(row[field]) }))
+    .filter(row => row.count > 0)
+    .sort((left, right) => right.count - left.count || (
+      left.camera < right.camera ? -1 : left.camera > right.camera ? 1 : 0
+    ))
+    .slice(0, 5);
 }
 
 export async function onRequestGet(context) {
-
   const db = context.env.LVSM_AUDIENCE;
-
   const now = context.now ?? new Date();
   const periods = getPeriodBoundaries(now);
 
-  const [
-    todayResult,
-    yesterdayResult,
-    last7Result,
-    last30Result,
-    topResult
-  ] = await db.batch([
-
+  const [visitsResult, camerasResult] = await db.batch([
     db.prepare(`
-      SELECT COUNT(*) AS count
-      FROM events
-      WHERE event_type='visit'
-        AND created_at>=?
-        AND created_at<?
+      SELECT
+        COALESCE(SUM(CASE WHEN date = ? THEN visits ELSE 0 END), 0) AS today,
+        COALESCE(SUM(CASE WHEN date = ? THEN visits ELSE 0 END), 0) AS yesterday,
+        COALESCE(SUM(CASE WHEN date >= ? THEN visits ELSE 0 END), 0) AS last7,
+        COALESCE(SUM(CASE WHEN date >= ? THEN visits ELSE 0 END), 0) AS last30,
+        COALESCE(SUM(CASE WHEN date >= ? THEN visits ELSE 0 END), 0) AS month_to_date
+      FROM audience_daily
+      WHERE date >= ?
+        AND date <= ?
     `).bind(
-      periods.todayStart,
-      periods.tomorrowStart
+      periods.currentDate,
+      periods.previousDate,
+      periods.rolling7StartDate,
+      periods.rolling30StartDate,
+      periods.monthStartDate,
+      periods.queryStartDate,
+      periods.currentDate
     ),
-
     db.prepare(`
-      SELECT COUNT(*) AS count
-      FROM events
-      WHERE event_type='visit'
-        AND created_at>=?
-        AND created_at<?
-    `).bind(
-      periods.yesterdayStart,
-      periods.todayStart
-    ),
-
-    db.prepare(`
-      SELECT COUNT(*) AS count
-      FROM events
-      WHERE event_type='visit'
-        AND created_at>=?
-        AND created_at<?
-    `).bind(
-      periods.last7Start,
-      periods.tomorrowStart
-    ),
-
-    db.prepare(`
-      SELECT COUNT(*) AS count
-      FROM events
-      WHERE event_type='visit'
-        AND created_at>=?
-        AND created_at<?
-    `).bind(
-      periods.last30Start,
-      periods.tomorrowStart
-    ),
-
-    db.prepare(`
-      SELECT camera_id AS camera,
-             COUNT(*) AS count
-      FROM events
-      WHERE event_type='camera_view'
-        AND camera_id IS NOT NULL
-        AND created_at>=?
-        AND created_at<?
+      SELECT
+        camera_id AS camera,
+        SUM(CASE WHEN date >= ? THEN views ELSE 0 END) AS last30_count,
+        SUM(CASE WHEN date >= ? THEN views ELSE 0 END) AS month_count
+      FROM audience_camera_daily
+      WHERE date >= ?
+        AND date <= ?
       GROUP BY camera_id
-      ORDER BY count DESC,camera_id ASC
-      LIMIT 5
     `).bind(
-      periods.last30Start,
-      periods.tomorrowStart
+      periods.rolling30StartDate,
+      periods.monthStartDate,
+      periods.queryStartDate,
+      periods.currentDate
     )
-
   ]);
+
+  const visitCounts = visitsResult.results[0] ?? {};
+  const last30 = count(visitCounts.last30);
 
   return Response.json({
     apiVersion: 1,
     generatedAt: now.toISOString(),
-
     visits: {
-
-      today:
-        todayResult.results[0]?.count ?? 0,
-
-      yesterday:
-        yesterdayResult.results[0]?.count ?? 0,
-
-      last7:
-        last7Result.results[0]?.count ?? 0,
-
-      last30:
-        last30Result.results[0]?.count ?? 0,
-
-      total:
-        last30Result.results[0]?.count ?? 0
+      today: count(visitCounts.today),
+      yesterday: count(visitCounts.yesterday),
+      last7: count(visitCounts.last7),
+      last30,
+      total: last30,
+      monthToDate: count(visitCounts.month_to_date)
     },
-
-    top:
-      topResult.results.map(row => ({
-        camera: row.camera,
-        count: row.count
-      }))
-
+    top: cameraRanking(camerasResult.results, "last30_count"),
+    cameraRankingMonth: cameraRanking(camerasResult.results, "month_count")
   }, {
     headers: {
       "Cache-Control": "no-store",
