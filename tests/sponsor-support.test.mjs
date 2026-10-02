@@ -155,7 +155,7 @@ test("camera attribution is optional and safely rendered", () => {
   assert.doesNotMatch(traversal, /<img/);
 });
 
-test("public data contains only the approved Support migration", () => {
+test("public data contains only the current approved Support attribution", () => {
   const window = {};
   new Function("window", publicDataSource)(window);
   const cameras = window.LVSM_CAMERAS;

@@ -613,12 +613,12 @@ window.LVSM_CAMERAS = [
     "enabled": true
   },
   {
-    "id": "teaser-e2e-20260816-01",
-    "name": "Teaser E2E LAB 2026-08-16",
+    "id": "slourenco-norte1",
+    "name": "São Lourenço-Norte",
     "region": null,
     "type": "future",
-    "preview": "./assets/previews/teaser-e2e-20260816-01.jpg",
-    "message": "Teste E2E temporário — não publicar em produção.",
+    "preview": "./assets/previews/slourenco-norte1.jpg",
+    "message": null,
     "status": "Em preparação",
     "operationalState": "future",
     "publicVisibility": "public",
@@ -640,56 +640,68 @@ window.LVSM_CAMERAS = [
     "enabled": true
   },
   {
-    "id": "teaser-retry-e2e-20260817-01",
-    "name": "Teaser Retry E2E LAB 2026-08-17",
+    "id": "lab-pico-dual-owner",
+    "name": "LAB Pico Dual Owner",
     "region": null,
     "type": "future",
-    "preview": "./assets/previews/teaser-retry-e2e-20260817-01.jpg",
-    "message": "Teste E2E temporário — não promover para produção.",
+    "preview": "./assets/previews/lab-pico-dual-owner.jpeg",
+    "message": null,
     "status": "Em preparação",
-    "operationalState": "future",
+    "operationalState": "preparing",
     "publicVisibility": "public",
     "publicMedia": "preview",
     "commissioned": null,
     "position": {
-      "lat": 36.98432,
-      "lon": -25.050211,
-      "bearing": 0,
-      "fov": 120
+      "lat": 36.58,
+      "lon": 25.1,
+      "bearing": 90,
+      "fov": 90
     },
-    "sponsor": {
-      "name": "Teste E2E LAB",
-      "logo": null,
-      "url": null,
-      "label": "Sponsor"
-    },
+    "sponsor": null,
     "support": null,
     "enabled": true
   },
   {
-    "id": "g2-live-acceptance-20260823-01",
-    "name": "G2 Live Acceptance LAB 2026-08-23",
+    "id": "lab-pico-dual-cam",
+    "name": "LAB Pico Dual Secondary",
     "region": null,
     "type": "future",
-    "preview": "./assets/previews/g2-live-acceptance-20260823-01.jpeg",
-    "message": "Synthetic G2 live acceptance candidate — LAB only; never promote to Production.",
+    "preview": "./assets/previews/lab-pico-dual-cam.jpeg",
+    "message": null,
+    "status": "Em preparação",
+    "operationalState": "removed",
+    "publicVisibility": "public",
+    "publicMedia": "preview",
+    "commissioned": null,
+    "position": {
+      "lat": 36.58,
+      "lon": 25.1,
+      "bearing": 270,
+      "fov": 90
+    },
+    "sponsor": null,
+    "support": null,
+    "enabled": true
+  },
+  {
+    "id": "lab-pico-dual-secondary",
+    "name": "LAB Pico Dual Secondary",
+    "region": null,
+    "type": "future",
+    "preview": "./assets/previews/lab-pico-dual-secondary.jpeg",
+    "message": null,
     "status": "Em preparação",
     "operationalState": "future",
     "publicVisibility": "public",
     "publicMedia": "preview",
     "commissioned": null,
     "position": {
-      "lat": 36.98432,
-      "lon": -25.050211,
-      "bearing": 0,
-      "fov": 120
+      "lat": 36.58,
+      "lon": 25.1,
+      "bearing": 270,
+      "fov": 90
     },
-    "sponsor": {
-      "name": "G2 Live Acceptance LAB",
-      "logo": null,
-      "url": null,
-      "label": "Sponsor"
-    },
+    "sponsor": null,
     "support": null,
     "enabled": true
   },

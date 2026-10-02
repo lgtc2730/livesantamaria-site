@@ -1,28 +1,7 @@
-CREATE TABLE IF NOT EXISTS events (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  created_at TEXT NOT NULL,
-  event_type TEXT NOT NULL,
-  camera_id TEXT,
-  session_id TEXT NOT NULL,
-  host TEXT,
-  event_key TEXT,
-  aggregate_date TEXT
-);
+ALTER TABLE events
+ADD COLUMN aggregate_date TEXT;
 
-CREATE INDEX IF NOT EXISTS idx_events_created
-ON events(created_at);
-
-CREATE INDEX IF NOT EXISTS idx_events_type
-ON events(event_type);
-
-CREATE INDEX IF NOT EXISTS idx_events_camera
-ON events(camera_id);
-
-CREATE UNIQUE INDEX IF NOT EXISTS idx_events_event_key_unique
-ON events(event_key)
-WHERE event_key IS NOT NULL;
-
-CREATE TABLE IF NOT EXISTS audience_daily (
+CREATE TABLE audience_daily (
   date TEXT PRIMARY KEY NOT NULL,
   visits INTEGER NOT NULL
     CHECK (typeof(visits) = 'integer' AND visits >= 0),
@@ -33,17 +12,20 @@ CREATE TABLE IF NOT EXISTS audience_daily (
   )
 ) WITHOUT ROWID;
 
-CREATE TABLE IF NOT EXISTS audience_camera_daily (
+CREATE TABLE audience_camera_daily (
   date TEXT NOT NULL,
   camera_id TEXT NOT NULL,
   views INTEGER NOT NULL
     CHECK (typeof(views) = 'integer' AND views >= 0),
+
   PRIMARY KEY (date, camera_id),
+
   CHECK (
     length(date) = 10
     AND date GLOB
       '[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
   ),
+
   CHECK (
     length(camera_id) BETWEEN 1 AND 64
     AND camera_id GLOB '[a-z0-9]*'
@@ -52,7 +34,7 @@ CREATE TABLE IF NOT EXISTS audience_camera_daily (
   )
 ) WITHOUT ROWID;
 
-CREATE TRIGGER IF NOT EXISTS events_validate_aggregate_date_insert
+CREATE TRIGGER events_validate_aggregate_date_insert
 BEFORE INSERT ON events
 WHEN NEW.aggregate_date IS NOT NULL
   AND (
@@ -64,7 +46,7 @@ BEGIN
   SELECT RAISE(ABORT, 'invalid aggregate_date');
 END;
 
-CREATE TRIGGER IF NOT EXISTS events_guard_aggregate_date_update
+CREATE TRIGGER events_guard_aggregate_date_update
 BEFORE UPDATE OF aggregate_date ON events
 WHEN (
     NEW.aggregate_date IS NOT NULL
@@ -82,7 +64,7 @@ BEGIN
   SELECT RAISE(ABORT, 'aggregate_date is invalid or immutable');
 END;
 
-CREATE TRIGGER IF NOT EXISTS events_aggregate_after_insert
+CREATE TRIGGER events_aggregate_after_insert
 AFTER INSERT ON events
 WHEN NEW.aggregate_date IS NOT NULL
   AND NEW.event_key IS NOT NULL
@@ -102,7 +84,7 @@ BEGIN
     SET views = views + 1;
 END;
 
-CREATE TRIGGER IF NOT EXISTS events_aggregate_after_date_backfill
+CREATE TRIGGER events_aggregate_after_date_backfill
 AFTER UPDATE OF aggregate_date ON events
 WHEN OLD.aggregate_date IS NULL
   AND NEW.aggregate_date IS NOT NULL
