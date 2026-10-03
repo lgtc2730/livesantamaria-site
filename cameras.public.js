@@ -706,6 +706,28 @@ window.LVSM_CAMERAS = [
     "enabled": true
   },
   {
+    "id": "lab-pico-dual-owner-3",
+    "name": "Lab Pico Dual Owner 3",
+    "region": null,
+    "type": "future",
+    "preview": "./assets/previews/lab-pico-dual-owner-3.jpeg",
+    "message": null,
+    "status": "Em preparação",
+    "operationalState": "future",
+    "publicVisibility": "public",
+    "publicMedia": "preview",
+    "commissioned": null,
+    "position": {
+      "lat": 36.58,
+      "lon": 25.1,
+      "bearing": 90,
+      "fov": 90
+    },
+    "sponsor": null,
+    "support": null,
+    "enabled": true
+  },
+  {
     "id": "promo-cultura-em-movimento",
     "name": "Cultura em Movimento",
     "region": null,
