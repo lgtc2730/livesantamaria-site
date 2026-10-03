@@ -640,28 +640,6 @@ window.LVSM_CAMERAS = [
     "enabled": true
   },
   {
-    "id": "lab-pico-dual-owner",
-    "name": "LAB Pico Dual Owner",
-    "region": null,
-    "type": "future",
-    "preview": "./assets/previews/lab-pico-dual-owner.jpeg",
-    "message": null,
-    "status": "Em preparação",
-    "operationalState": "preparing",
-    "publicVisibility": "public",
-    "publicMedia": "preview",
-    "commissioned": null,
-    "position": {
-      "lat": 36.58,
-      "lon": 25.1,
-      "bearing": 90,
-      "fov": 90
-    },
-    "sponsor": null,
-    "support": null,
-    "enabled": true
-  },
-  {
     "id": "lab-pico-dual-cam",
     "name": "LAB Pico Dual Secondary",
     "region": null,
