@@ -713,7 +713,7 @@ window.LVSM_CAMERAS = [
     "preview": "./assets/previews/lab-pico-dual-owner-3.jpeg",
     "message": null,
     "status": "Em preparação",
-    "operationalState": "future",
+    "operationalState": "preparing",
     "publicVisibility": "public",
     "publicMedia": "preview",
     "commissioned": null,
