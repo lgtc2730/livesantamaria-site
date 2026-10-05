@@ -80,7 +80,7 @@ test("parity reports only aggregate mismatches and invalid/null counts", async (
   add.run("2026-09-01T12:00:00Z","visit",null,"secret","private-host","key",null);
   add.run("2026-09-02T12:00:00Z","visit",null,"done","h","done","2026-09-02");
   db.prepare("UPDATE audience_daily SET visits=5 WHERE date='2026-09-02'").run();
-  const report=await tool.inspectParity(db);
+  const report=await tool.inspectParity(db,{now:new Date("2026-09-04T12:00:00Z")});
   assert.equal(report.eligibleNullCount,1);
   assert.equal(report.invalidAggregateDateCount,0);
   assert.deepEqual(report.visitMismatches,[{date:"2026-09-02",rawCount:1,aggregateCount:5}]);
