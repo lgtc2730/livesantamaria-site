@@ -296,7 +296,7 @@ window.LVSM_CAMERAS = [
       "fov": 120
     },
     "sponsor": {
-      "name": "Fernando Freitas",
+      "name": "Daciano Cosme",
       "logo": null,
       "url": null,
       "label": "Sponsor"
