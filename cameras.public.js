@@ -309,6 +309,38 @@ window.LVSM_CAMERAS = [
     "previewStreamUrl": "https://praia-malbusca-cam.livesantamaria.org/cam1/index.m3u8"
   },
   {
+    "id": "praia-castelo",
+    "name": "Praia do Castelo",
+    "region": null,
+    "type": "hls",
+    "preview": "./assets/previews/praia-castelo.jpg",
+    "message": null,
+    "status": "Brevemente",
+    "publicVisibility": "public",
+    "publicMedia": "stream",
+    "publicOrder": 10,
+    "commissioned": null,
+    "position": {
+      "lat": 36.952287,
+      "lon": -25.102611,
+      "bearing": 140,
+      "fov": 90
+    },
+    "sponsor": {
+      "name": "PcClick Informática",
+      "logo": "./assets/sponsors/PcClick.png",
+      "url": "https://pcclick.pt/",
+      "label": "Sponsor"
+    },
+    "support": null,
+    "enabled": true,
+    "operationalState": "public",
+    "fallbackImage": null,
+    "url": "https://praia-castelo-cam.livesantamaria.org/cam1/index.m3u8",
+    "streamUrl": "https://praia-castelo-cam.livesantamaria.org/cam1hq/index.m3u8",
+    "previewStreamUrl": "https://praia-castelo-cam.livesantamaria.org/cam1/index.m3u8"
+  },
+  {
     "id": "ilheu-lagoinhas",
     "name": "Ilhéu das Lagoinhas",
     "region": null,
