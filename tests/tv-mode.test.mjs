@@ -66,6 +66,18 @@ test("tv=1 auto-starts signage directly without changing sections", () => {
   assert.deepEqual(result.sections, []);
 });
 
+test("TV debug is enabled only when tv=1 and tvDebug=1 are both present", () => {
+  const enabled = runInitialParams("?tv=1&tvDebug=1");
+  const debugOnly = runInitialParams("?tvDebug=1&section=forecast");
+
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(enabled.starts)),
+    [{ signage: true, debug: true }]
+  );
+  assert.deepEqual(debugOnly.starts, []);
+  assert.deepEqual(debugOnly.sections, ["forecast"]);
+});
+
 test("a normal URL does not auto-start TV and preserves existing section routing", () => {
   const result = runInitialParams("?section=forecast");
 
@@ -93,6 +105,8 @@ function loadTvController({ tvCameras = [{ id: "tv-a" }, { id: "tv-b" }] } = {})
   const cleared = [];
   const rendered = [];
   const destroyed = [];
+  const debugStarts = [];
+  let debugStops = 0;
   let nextTimerId = 1;
   const context = {
     document: {
@@ -104,6 +118,10 @@ function loadTvController({ tvCameras = [{ id: "tv-a" }, { id: "tv-b" }] } = {})
     getTvCameras() { return tvCameras; },
     renderTvCamera(camera, options) { rendered.push({ camera, options }); },
     destroyMediaInstance(name) { destroyed.push(name); },
+    beginTvDebugCamera() {},
+    recordTvDebugEvent() {},
+    startTvDebug() { debugStarts.push(true); },
+    stopTvDebug() { debugStops += 1; },
     setInterval(callback, delay) {
       const timer = { id: nextTimerId++, callback, delay, kind: "interval" };
       intervals.push(timer);
@@ -123,7 +141,7 @@ function loadTvController({ tvCameras = [{ id: "tv-a" }, { id: "tv-b" }] } = {})
     "const SIGNAGE_SLIDESHOW_DURATION_MS = 20000;",
     "const SIGNAGE_STARTUP_TIMEOUT_MS = 8000;",
     "const SIGNAGE_FAILURE_DELAY_MS = 1000;",
-    "let tvIndex = 0; let tvTimer = null; let tvStartupTimer = null; let tvFailureTimer = null; let tvSignageMode = false; let tvRenderGeneration = 0;",
+    "let tvIndex = 0; let tvTimer = null; let tvStartupTimer = null; let tvFailureTimer = null; let tvSignageMode = false; let tvRenderGeneration = 0; let tvDebugEnabled = false;",
     extractFunction("clearTvTimers"),
     extractFunction("renderCurrentSignageCamera"),
     extractFunction("scheduleSignageFailure"),
@@ -132,7 +150,17 @@ function loadTvController({ tvCameras = [{ id: "tv-a" }, { id: "tv-b" }] } = {})
     "result = { startTvMode, stopTvMode, getSignage: () => tvSignageMode };"
   ].join("\n"), context);
 
-  return { context, elements, intervals, timeouts, cleared, rendered, destroyed };
+  return {
+    context,
+    elements,
+    intervals,
+    timeouts,
+    cleared,
+    rendered,
+    destroyed,
+    debugStarts,
+    getDebugStops: () => debugStops
+  };
 }
 
 test("normal slideshow keeps its 22 second interval and visible close button", () => {
@@ -144,6 +172,7 @@ test("normal slideshow keeps its 22 second interval and visible close button", (
   assert.equal(runtime.intervals[0].delay, 22000);
   assert.equal(runtime.elements.tvCloseButton.hidden, false);
   assert.equal(runtime.context.result.getSignage(), false);
+  assert.deepEqual(runtime.debugStarts, []);
 });
 
 test("signage uses its allowlisted cameras, 20 second duration, and startup timeout", () => {
@@ -157,6 +186,19 @@ test("signage uses its allowlisted cameras, 20 second duration, and startup time
   assert.equal(runtime.context.result.getSignage(), true);
   assert.deepEqual(runtime.timeouts.map(timer => timer.delay), [8000, 20000]);
   assert.equal(runtime.intervals.length, 0);
+  assert.deepEqual(runtime.debugStarts, []);
+  assert.equal(runtime.getDebugStops(), 0);
+});
+
+test("debug signage preserves the functional timers and only starts diagnostics", () => {
+  const runtime = loadTvController();
+
+  runtime.context.result.startTvMode({ signage: true, debug: true });
+
+  assert.deepEqual(runtime.timeouts.map(timer => timer.delay), [8000, 20000]);
+  assert.equal(runtime.intervals.length, 0);
+  assert.deepEqual(runtime.debugStarts, [true]);
+  assert.equal(runtime.rendered[0].camera.id, "tv-a");
 });
 
 test("a signage failure destroys media and advances after the anti-loop delay", () => {
@@ -212,6 +254,60 @@ test("callbacks from before stop and restart cannot affect the restarted signage
   assert.equal(runtime.context.result.getSignage(), true);
 });
 
+test("TV debug records event details with relative time and keeps only the latest eight", () => {
+  let now = 1000;
+  const context = {
+    performance: { now: () => now },
+    renderTvDebugPanel() {}
+  };
+
+  vm.runInNewContext([
+    "const TV_DEBUG_HISTORY_LIMIT = 8;",
+    "let tvDebugEnabled = true;",
+    "let tvDebugCameraId = 'maia-norte';",
+    "let tvDebugCameraStartedAt = 900;",
+    "let tvDebugLastEvent = '';",
+    "let tvDebugLastAdvanceReason = '';",
+    "let tvDebugEvents = [];",
+    "let tvRenderGeneration = 7;",
+    extractFunction("recordTvDebugEvent"),
+    "result = { recordTvDebugEvent, getEvents: () => tvDebugEvents, getLastEvent: () => tvDebugLastEvent, getLastAdvance: () => tvDebugLastAdvanceReason };"
+  ].join("\n"), context);
+
+  context.result.recordTvDebugEvent("hls-error", {
+    fatal: true,
+    type: "mediaError",
+    details: "fragParsingError",
+    reason: "bad frame",
+    responseCode: 503
+  });
+  assert.deepEqual(JSON.parse(JSON.stringify(context.result.getEvents()[0])), {
+    cameraId: "maia-norte",
+    generation: 7,
+    elapsedMs: 100,
+    event: "hls-error",
+    details: {
+      fatal: true,
+      type: "mediaError",
+      details: "fragParsingError",
+      reason: "bad frame",
+      responseCode: 503
+    }
+  });
+
+  for (let index = 1; index <= 8; index += 1) {
+    now += 10;
+    context.result.recordTvDebugEvent(`event-${index}`);
+  }
+
+  assert.equal(context.result.getEvents().length, 8);
+  assert.equal(context.result.getEvents()[0].event, "event-1");
+  assert.equal(context.result.getLastEvent(), "event-8");
+
+  context.result.recordTvDebugEvent("failure-advance", { reason: "hls-error" });
+  assert.equal(context.result.getLastAdvance(), "hls-error");
+});
+
 test("an empty TV list is safe and starts no timer", () => {
   const runtime = loadTvController({ tvCameras: [] });
 
@@ -253,11 +349,12 @@ function loadMediaAttachment() {
   return { attach: context.result, hlsInstances };
 }
 
-function fakeVideo({ nativeHls = false } = {}) {
+function fakeVideo({ nativeHls = false, mediaError = null } = {}) {
   const listeners = new Map();
   return {
     tagName: "VIDEO",
     controls: true,
+    error: mediaError,
     canPlayType() { return nativeHls ? "probably" : ""; },
     play() { return Promise.resolve(); },
     addEventListener(event, listener) { listeners.set(event, listener); },
@@ -287,6 +384,46 @@ test("signage video is unattended and reports playback plus fatal HLS errors", (
   assert.equal(failed, 0);
   hlsInstances[0].handlers.get("error")(null, { fatal: true });
   assert.equal(failed, 1);
+});
+
+test("debug media hooks report manifest, HLS details, and video error details", () => {
+  const { attach, hlsInstances } = loadMediaAttachment();
+  const media = fakeVideo({ mediaError: { code: 3, message: "decode failed" } });
+  const events = [];
+
+  attach(media, { type: "hls", url: "https://camera.test/live.m3u8" }, "tv", {
+    signage: true,
+    onFatalError() {},
+    onDebugEvent(event, details) { events.push({ event, details }); }
+  });
+
+  hlsInstances[0].handlers.get("manifest")();
+  hlsInstances[0].handlers.get("error")(null, {
+    fatal: true,
+    type: "mediaError",
+    details: "fragParsingError",
+    reason: "bad frame",
+    response: { code: 503 }
+  });
+  media.dispatch("error");
+
+  assert.deepEqual(JSON.parse(JSON.stringify(events)), [
+    { event: "manifest-parsed", details: null },
+    {
+      event: "hls-error",
+      details: {
+        fatal: true,
+        type: "mediaError",
+        details: "fragParsingError",
+        reason: "bad frame",
+        responseCode: 503
+      }
+    },
+    {
+      event: "video-error",
+      details: { code: 3, message: "decode failed" }
+    }
+  ]);
 });
 
 test("normal slideshow retains native video controls", () => {

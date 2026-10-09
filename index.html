@@ -1790,6 +1790,22 @@
 
     .tv-mode.show { display: block; }
 
+    .tv-debug-panel {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 20;
+      width: min(460px, calc(100vw - 32px));
+      padding: 12px 14px;
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 10px;
+      background: rgba(0,0,0,.82);
+      color: #fff;
+      font: 12px/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
+      white-space: pre-wrap;
+      pointer-events: none;
+    }
+
     .promo-image-lightbox {
       position: fixed;
       inset: 0;
@@ -3619,6 +3635,7 @@ const NORMAL_SLIDESHOW_DURATION_MS = 22000;
 const SIGNAGE_SLIDESHOW_DURATION_MS = 20000;
 const SIGNAGE_STARTUP_TIMEOUT_MS = 8000;
 const SIGNAGE_FAILURE_DELAY_MS = 1000;
+const TV_DEBUG_HISTORY_LIMIT = 8;
 
 function getTvCameras() {
   return liveCameras
@@ -3647,6 +3664,13 @@ let tvFailureTimer = null;
 let tvSignageMode = false;
 let tvActiveCameras = [];
 let tvRenderGeneration = 0;
+let tvDebugEnabled = false;
+let tvDebugTimer = null;
+let tvDebugCameraId = "";
+let tvDebugCameraStartedAt = 0;
+let tvDebugLastEvent = "";
+let tvDebugLastAdvanceReason = "";
+let tvDebugEvents = [];
 let tvHls = null;
 let fullscreenHls = null;
 let promoImageLightboxTrigger = null;
@@ -4899,12 +4923,85 @@ function destroyMediaInstance(instanceName) {
   }
 }
 
+function renderTvDebugPanel() {
+  if (!tvDebugEnabled) return;
+  const panel = document.getElementById("tvDebugPanel");
+  if (!panel) return;
+
+  const elapsedMs = tvDebugCameraStartedAt
+    ? Math.max(0, Math.round(performance.now() - tvDebugCameraStartedAt))
+    : 0;
+  const history = tvDebugEvents.map(entry => {
+    const details = entry.details ? ` ${JSON.stringify(entry.details)}` : "";
+    return `+${(entry.elapsedMs / 1000).toFixed(3)}s ${entry.cameraId} g${entry.generation} ${entry.event}${details}`;
+  });
+
+  panel.textContent = [
+    `cameraId: ${tvDebugCameraId || "-"}`,
+    `tvRenderGeneration: ${tvRenderGeneration}`,
+    `elapsed: ${(elapsedMs / 1000).toFixed(1)}s`,
+    `last event: ${tvDebugLastEvent || "-"}`,
+    `last advance: ${tvDebugLastAdvanceReason || "-"}`,
+    "events:",
+    ...history
+  ].join("\n");
+}
+
+function recordTvDebugEvent(event, details = null) {
+  if (!tvDebugEnabled) return;
+  const elapsedMs = Math.max(0, Math.round(performance.now() - tvDebugCameraStartedAt));
+  tvDebugLastEvent = event;
+  if (event === "normal-rotation" || event === "failure-advance") {
+    tvDebugLastAdvanceReason = details?.reason || event;
+  }
+  tvDebugEvents.push({
+    cameraId: tvDebugCameraId,
+    generation: tvRenderGeneration,
+    elapsedMs,
+    event,
+    details
+  });
+  tvDebugEvents = tvDebugEvents.slice(-TV_DEBUG_HISTORY_LIMIT);
+  renderTvDebugPanel();
+}
+
+function beginTvDebugCamera(cam) {
+  if (!tvDebugEnabled) return;
+  tvDebugCameraId = cam.id;
+  tvDebugCameraStartedAt = performance.now();
+  recordTvDebugEvent("camera-render");
+}
+
+function startTvDebug() {
+  tvDebugEnabled = true;
+  tvDebugCameraId = "";
+  tvDebugCameraStartedAt = performance.now();
+  tvDebugLastEvent = "";
+  tvDebugLastAdvanceReason = "";
+  tvDebugEvents = [];
+
+  const panel = document.createElement("div");
+  panel.id = "tvDebugPanel";
+  panel.className = "tv-debug-panel";
+  document.getElementById("tvMode").appendChild(panel);
+  renderTvDebugPanel();
+  tvDebugTimer = setInterval(renderTvDebugPanel, 250);
+}
+
+function stopTvDebug() {
+  clearInterval(tvDebugTimer);
+  tvDebugTimer = null;
+  document.getElementById("tvDebugPanel")?.remove();
+  tvDebugEnabled = false;
+}
+
 function attachMediaToElement(media, cam, instanceName) {
   const options = media.lvsmPlaybackOptions || arguments[3];
   const {
     signage = false,
     onPlaybackStarted = null,
-    onFatalError = null
+    onFatalError = null,
+    onDebugEvent = null
   } = options || {};
   if (getOperationalState(cam) === "maintenance") {
     media.src = getOfflineImage(cam);
@@ -4938,8 +5035,14 @@ function attachMediaToElement(media, cam, instanceName) {
   if (onPlaybackStarted) {
     media.addEventListener("playing", onPlaybackStarted, { once: true });
   }
-  if (onFatalError) {
-    media.addEventListener("error", onFatalError, { once: true });
+  if (onFatalError || onDebugEvent) {
+    media.addEventListener("error", () => {
+      onDebugEvent?.("video-error", {
+        code: media.error?.code ?? null,
+        message: media.error?.message ?? null
+      });
+      onFatalError?.("video-error");
+    }, { once: true });
   }
 
   if (media.canPlayType("application/vnd.apple.mpegurl")) {
@@ -4955,10 +5058,20 @@ function attachMediaToElement(media, cam, instanceName) {
 
     hls.loadSource(streamUrl);
     hls.attachMedia(media);
-    hls.on(Hls.Events.MANIFEST_PARSED, () => media.play().catch(() => {}));
-    if (onFatalError) {
+    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      onDebugEvent?.("manifest-parsed", null);
+      media.play().catch(() => {});
+    });
+    if (onFatalError || onDebugEvent) {
       hls.on(Hls.Events.ERROR, (_event, data) => {
-        if (data.fatal) onFatalError();
+        onDebugEvent?.("hls-error", {
+          fatal: Boolean(data.fatal),
+          type: data.type ?? null,
+          details: data.details ?? null,
+          reason: data.reason ?? null,
+          responseCode: data.response?.code ?? null
+        });
+        if (data.fatal) onFatalError?.("hls-error");
       });
     }
 
@@ -5163,25 +5276,34 @@ function renderCurrentSignageCamera() {
   if (!tvSignageMode || !tvActiveCameras.length) return;
 
   const generation = ++tvRenderGeneration;
+  const camera = tvActiveCameras[tvIndex];
+  beginTvDebugCamera(camera);
   tvStartupTimer = setTimeout(() => {
     if (generation !== tvRenderGeneration) return;
-    scheduleSignageFailure();
+    recordTvDebugEvent("startup-timeout");
+    scheduleSignageFailure("startup-timeout");
   }, SIGNAGE_STARTUP_TIMEOUT_MS);
-  renderTvCamera(tvActiveCameras[tvIndex], {
+  renderTvCamera(camera, {
     signage: true,
     onPlaybackStarted() {
       if (generation !== tvRenderGeneration) return;
+      recordTvDebugEvent("playing");
       clearTimeout(tvStartupTimer);
       tvStartupTimer = null;
     },
-    onFatalError() {
+    onFatalError(reason) {
       if (generation !== tvRenderGeneration) return;
-      scheduleSignageFailure();
+      scheduleSignageFailure(reason);
+    },
+    onDebugEvent(event, details) {
+      if (generation !== tvRenderGeneration) return;
+      recordTvDebugEvent(event, details);
     }
   });
 
   tvTimer = setTimeout(() => {
     if (generation !== tvRenderGeneration) return;
+    recordTvDebugEvent("normal-rotation");
     tvIndex = (tvIndex + 1) % tvActiveCameras.length;
     renderCurrentSignageCamera();
   }, SIGNAGE_SLIDESHOW_DURATION_MS);
@@ -5191,6 +5313,8 @@ function scheduleSignageFailure() {
   if (!tvSignageMode || tvFailureTimer) return;
 
   const generation = tvRenderGeneration;
+  const reason = arguments[0] || "unknown";
+  recordTvDebugEvent("failure-scheduled", { reason });
   clearTimeout(tvStartupTimer);
   clearTimeout(tvTimer);
   tvStartupTimer = null;
@@ -5199,23 +5323,26 @@ function scheduleSignageFailure() {
 
   tvFailureTimer = setTimeout(() => {
     if (generation !== tvRenderGeneration) return;
+    recordTvDebugEvent("failure-advance", { reason });
     tvFailureTimer = null;
     tvIndex = (tvIndex + 1) % tvActiveCameras.length;
     renderCurrentSignageCamera();
   }, SIGNAGE_FAILURE_DELAY_MS);
 }
 
-function startTvMode({ signage = false } = {}) {
+function startTvMode({ signage = false, debug = false } = {}) {
   const tvMode = document.getElementById("tvMode");
   const tvCloseButton = document.getElementById("tvCloseButton");
   const cameras = signage ? getTvCameras() : liveCameras;
 
   tvRenderGeneration += 1;
   clearTvTimers();
+  if (tvDebugEnabled) stopTvDebug();
   if (!cameras.length) return false;
 
   tvSignageMode = signage;
   tvActiveCameras = cameras;
+  if (signage && debug) startTvDebug();
   tvCloseButton.hidden = signage;
   tvMode.classList.add("show");
   tvIndex = 0;
@@ -5240,6 +5367,7 @@ function stopTvMode() {
 
   tvRenderGeneration += 1;
   clearTvTimers();
+  if (tvDebugEnabled) stopTvDebug();
   destroyMediaInstance("tv");
   tvStage.innerHTML = "";
   tvMode.classList.remove("show");
@@ -5275,11 +5403,12 @@ function setSection(section) {
 function applyInitialUrlParams() {
   const params = new URLSearchParams(window.location.search);
   const signageMode = params.get("tv") === "1";
+  const debugMode = signageMode && params.get("tvDebug") === "1";
   const cameraId = params.get("camera");
   const section = params.get("section");
 
   if (signageMode) {
-    startTvMode({ signage: true });
+    startTvMode(debugMode ? { signage: true, debug: true } : { signage: true });
     return;
   }
 
