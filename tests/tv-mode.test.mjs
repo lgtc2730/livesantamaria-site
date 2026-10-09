@@ -319,11 +319,11 @@ test("an empty TV list is safe and starts no timer", () => {
   assert.equal(runtime.timeouts.length, 0);
 });
 
-function loadMediaAttachment() {
+function loadMediaAttachment({ hlsSupported = true } = {}) {
   const hlsInstances = [];
   class FakeHls {
     static Events = { MANIFEST_PARSED: "manifest", ERROR: "error" };
-    static isSupported() { return true; }
+    static isSupported() { return hlsSupported; }
     constructor() {
       this.handlers = new Map();
       hlsInstances.push(this);
@@ -386,6 +386,54 @@ test("signage video is unattended and reports playback plus fatal HLS errors", (
   assert.equal(failed, 1);
 });
 
+test("signage prefers HLS.js when native HLS also claims support", () => {
+  const { attach, hlsInstances } = loadMediaAttachment();
+  const media = fakeVideo({ nativeHls: true });
+  const streamUrl = "https://camera.test/live.m3u8";
+  const events = [];
+
+  attach(media, { type: "hls", url: streamUrl }, "tv", {
+    signage: true,
+    onDebugEvent(event, details) { events.push({ event, details }); }
+  });
+
+  assert.equal(hlsInstances.length, 1);
+  assert.equal(hlsInstances[0].url, streamUrl);
+  assert.equal(hlsInstances[0].media, media);
+  assert.equal(media.src, undefined);
+  assert.deepEqual(JSON.parse(JSON.stringify(events)), [{
+    event: "playback-engine",
+    details: {
+      engine: "hls.js",
+      canPlayType: "probably",
+      hlsSupported: true
+    }
+  }]);
+});
+
+test("signage falls back to native HLS when HLS.js is unsupported", () => {
+  const { attach, hlsInstances } = loadMediaAttachment({ hlsSupported: false });
+  const media = fakeVideo({ nativeHls: true });
+  const streamUrl = "https://camera.test/live.m3u8";
+  const events = [];
+
+  attach(media, { type: "hls", url: streamUrl }, "tv", {
+    signage: true,
+    onDebugEvent(event, details) { events.push({ event, details }); }
+  });
+
+  assert.equal(hlsInstances.length, 0);
+  assert.equal(media.src, streamUrl);
+  assert.deepEqual(JSON.parse(JSON.stringify(events)), [{
+    event: "playback-engine",
+    details: {
+      engine: "native",
+      canPlayType: "probably",
+      hlsSupported: false
+    }
+  }]);
+});
+
 test("debug media hooks report manifest, HLS details, and video error details", () => {
   const { attach, hlsInstances } = loadMediaAttachment();
   const media = fakeVideo({ mediaError: { code: 3, message: "decode failed" } });
@@ -408,6 +456,14 @@ test("debug media hooks report manifest, HLS details, and video error details", 
   media.dispatch("error");
 
   assert.deepEqual(JSON.parse(JSON.stringify(events)), [
+    {
+      event: "playback-engine",
+      details: {
+        engine: "hls.js",
+        canPlayType: "",
+        hlsSupported: true
+      }
+    },
     { event: "manifest-parsed", details: null },
     {
       event: "hls-error",
@@ -427,12 +483,15 @@ test("debug media hooks report manifest, HLS details, and video error details", 
 });
 
 test("normal slideshow retains native video controls", () => {
-  const { attach } = loadMediaAttachment();
+  const { attach, hlsInstances } = loadMediaAttachment();
   const media = fakeVideo({ nativeHls: true });
+  const streamUrl = "https://camera.test/live.m3u8";
 
-  attach(media, { type: "hls", url: "https://camera.test/live.m3u8" }, "tv");
+  attach(media, { type: "hls", url: streamUrl }, "tv");
 
   assert.equal(media.controls, true);
+  assert.equal(hlsInstances.length, 0);
+  assert.equal(media.src, streamUrl);
 });
 
 function runTvExitHandlers({ signage, action }) {
