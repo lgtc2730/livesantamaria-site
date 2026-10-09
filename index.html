@@ -3608,6 +3608,24 @@ const liveCameras = PUBLIC_CAMERAS.filter(cam =>
   cam.url &&
   getCameraPresentation(cam).allowStream
 );
+const TV_CAMERA_IDS = new Set([
+  "praia-poente",
+  "praia-castelo",
+  "slourenco-sul",
+  "maia-norte",
+  "anjos-porto"
+]);
+const NORMAL_SLIDESHOW_DURATION_MS = 22000;
+const SIGNAGE_SLIDESHOW_DURATION_MS = 20000;
+const SIGNAGE_STARTUP_TIMEOUT_MS = 8000;
+const SIGNAGE_FAILURE_DELAY_MS = 1000;
+
+function getTvCameras() {
+  return liveCameras
+    .filter(cam => TV_CAMERA_IDS.has(cam.id))
+    .sort(comparePublicCameras);
+}
+
 const expandedMobileCards = new Set();
 const cameraRuntimeStatus = new Map();
 
@@ -3624,6 +3642,11 @@ let listMode = false;
 let currentSection = "cameras";
 let tvIndex = 0;
 let tvTimer = null;
+let tvStartupTimer = null;
+let tvFailureTimer = null;
+let tvSignageMode = false;
+let tvActiveCameras = [];
+let tvRenderGeneration = 0;
 let tvHls = null;
 let fullscreenHls = null;
 let promoImageLightboxTrigger = null;
@@ -4877,6 +4900,12 @@ function destroyMediaInstance(instanceName) {
 }
 
 function attachMediaToElement(media, cam, instanceName) {
+  const options = media.lvsmPlaybackOptions || arguments[3];
+  const {
+    signage = false,
+    onPlaybackStarted = null,
+    onFatalError = null
+  } = options || {};
   if (getOperationalState(cam) === "maintenance") {
     media.src = getOfflineImage(cam);
     return;
@@ -4904,7 +4933,14 @@ function attachMediaToElement(media, cam, instanceName) {
   media.autoplay = true;
   media.muted = true;
   media.playsInline = true;
-  media.controls = true;
+  media.controls = !signage;
+
+  if (onPlaybackStarted) {
+    media.addEventListener("playing", onPlaybackStarted, { once: true });
+  }
+  if (onFatalError) {
+    media.addEventListener("error", onFatalError, { once: true });
+  }
 
   if (media.canPlayType("application/vnd.apple.mpegurl")) {
     media.src = streamUrl;
@@ -4920,6 +4956,11 @@ function attachMediaToElement(media, cam, instanceName) {
     hls.loadSource(streamUrl);
     hls.attachMedia(media);
     hls.on(Hls.Events.MANIFEST_PARSED, () => media.play().catch(() => {}));
+    if (onFatalError) {
+      hls.on(Hls.Events.ERROR, (_event, data) => {
+        if (data.fatal) onFatalError();
+      });
+    }
 
     if (instanceName === "tv") tvHls = hls;
     if (instanceName === "fullscreen") fullscreenHls = hls;
@@ -5036,7 +5077,7 @@ function setupPromoImageLightboxInteractions() {
   });
 }
 
-function renderTvCamera(cam) {
+function renderTvCamera(cam, options = null) {
 
   const tvStage = document.getElementById("tvStage");
 
@@ -5051,8 +5092,6 @@ function renderTvCamera(cam) {
       ? document.createElement("img")
       : document.createElement("video");
 
-  attachMediaToElement(media, cam, "tv");
-
   media.addEventListener("error", () => {
 
     if (presentation.allowStream && cam.fallbackImage) {
@@ -5065,6 +5104,12 @@ function renderTvCamera(cam) {
       media.replaceWith(fallback);
     }
   });
+
+  if (options?.onPlaybackStarted && media.tagName === "IMG") {
+    media.addEventListener("load", options.onPlaybackStarted, { once: true });
+  }
+  media.lvsmPlaybackOptions = options;
+  attachMediaToElement(media, cam, "tv");
 
   const info = document.createElement("div");
 
@@ -5104,30 +5149,103 @@ function renderTvCamera(cam) {
   tvStage.appendChild(info);
 }
 
-function startTvMode() {
-  const tvMode = document.getElementById("tvMode");
-  if (!liveCameras.length) return;
+function clearTvTimers() {
+  clearInterval(tvTimer);
+  clearTimeout(tvTimer);
+  clearTimeout(tvStartupTimer);
+  clearTimeout(tvFailureTimer);
+  tvTimer = null;
+  tvStartupTimer = null;
+  tvFailureTimer = null;
+}
 
+function renderCurrentSignageCamera() {
+  if (!tvSignageMode || !tvActiveCameras.length) return;
+
+  const generation = ++tvRenderGeneration;
+  tvStartupTimer = setTimeout(() => {
+    if (generation !== tvRenderGeneration) return;
+    scheduleSignageFailure();
+  }, SIGNAGE_STARTUP_TIMEOUT_MS);
+  renderTvCamera(tvActiveCameras[tvIndex], {
+    signage: true,
+    onPlaybackStarted() {
+      if (generation !== tvRenderGeneration) return;
+      clearTimeout(tvStartupTimer);
+      tvStartupTimer = null;
+    },
+    onFatalError() {
+      if (generation !== tvRenderGeneration) return;
+      scheduleSignageFailure();
+    }
+  });
+
+  tvTimer = setTimeout(() => {
+    if (generation !== tvRenderGeneration) return;
+    tvIndex = (tvIndex + 1) % tvActiveCameras.length;
+    renderCurrentSignageCamera();
+  }, SIGNAGE_SLIDESHOW_DURATION_MS);
+}
+
+function scheduleSignageFailure() {
+  if (!tvSignageMode || tvFailureTimer) return;
+
+  const generation = tvRenderGeneration;
+  clearTimeout(tvStartupTimer);
+  clearTimeout(tvTimer);
+  tvStartupTimer = null;
+  tvTimer = null;
+  destroyMediaInstance("tv");
+
+  tvFailureTimer = setTimeout(() => {
+    if (generation !== tvRenderGeneration) return;
+    tvFailureTimer = null;
+    tvIndex = (tvIndex + 1) % tvActiveCameras.length;
+    renderCurrentSignageCamera();
+  }, SIGNAGE_FAILURE_DELAY_MS);
+}
+
+function startTvMode({ signage = false } = {}) {
+  const tvMode = document.getElementById("tvMode");
+  const tvCloseButton = document.getElementById("tvCloseButton");
+  const cameras = signage ? getTvCameras() : liveCameras;
+
+  tvRenderGeneration += 1;
+  clearTvTimers();
+  if (!cameras.length) return false;
+
+  tvSignageMode = signage;
+  tvActiveCameras = cameras;
+  tvCloseButton.hidden = signage;
   tvMode.classList.add("show");
   tvIndex = 0;
-  renderTvCamera(liveCameras[tvIndex]);
 
-  clearInterval(tvTimer);
+  if (signage) {
+    renderCurrentSignageCamera();
+    return true;
+  }
+
+  renderTvCamera(cameras[tvIndex]);
   tvTimer = setInterval(() => {
-    tvIndex = (tvIndex + 1) % liveCameras.length;
-    renderTvCamera(liveCameras[tvIndex]);
-  }, 22000);
+    tvIndex = (tvIndex + 1) % cameras.length;
+    renderTvCamera(cameras[tvIndex]);
+  }, NORMAL_SLIDESHOW_DURATION_MS);
+  return true;
 }
 
 function stopTvMode() {
   const tvMode = document.getElementById("tvMode");
   const tvStage = document.getElementById("tvStage");
+  const tvCloseButton = document.getElementById("tvCloseButton");
 
-  clearInterval(tvTimer);
-  tvTimer = null;
+  tvRenderGeneration += 1;
+  clearTvTimers();
   destroyMediaInstance("tv");
   tvStage.innerHTML = "";
   tvMode.classList.remove("show");
+  tvCloseButton.hidden = false;
+  tvSignageMode = false;
+  tvActiveCameras = [];
   if (document.fullscreenElement) {
     document.exitFullscreen().catch(() => {});
   }
@@ -5156,8 +5274,14 @@ function setSection(section) {
 
 function applyInitialUrlParams() {
   const params = new URLSearchParams(window.location.search);
+  const signageMode = params.get("tv") === "1";
   const cameraId = params.get("camera");
   const section = params.get("section");
+
+  if (signageMode) {
+    startTvMode({ signage: true });
+    return;
+  }
 
   if (section) {
     setSection(section);
@@ -5708,16 +5832,21 @@ document.getElementById("supportShortcut")
 
   });
 
-document.getElementById("tvCloseButton")?.addEventListener("click", stopTvMode);
+function handleTvClose() {
+  if (!tvSignageMode) stopTvMode();
+}
+
+function handleGlobalEscape(event) {
+  if (event.key !== "Escape") return;
+  if (!tvSignageMode) stopTvMode();
+  closeFullscreenCamera();
+}
+
+document.getElementById("tvCloseButton")?.addEventListener("click", handleTvClose);
 document.getElementById("fullscreenCloseButton")?.addEventListener("click", closeFullscreenCamera);
 setupPromoImageLightboxInteractions();
 
-document.addEventListener("keydown", event => {
-  if (event.key === "Escape") {
-    stopTvMode();
-    closeFullscreenCamera();
-  }
-});
+document.addEventListener("keydown", handleGlobalEscape);
 
 let lastMobileMode = window.matchMedia("(max-width: 680px)").matches;
 
