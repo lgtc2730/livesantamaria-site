@@ -5045,10 +5045,21 @@ function attachMediaToElement(media, cam, instanceName) {
     }, { once: true });
   }
 
-  if (media.canPlayType("application/vnd.apple.mpegurl")) {
-    media.src = streamUrl;
-    media.play().catch(() => {});
-  } else if (window.Hls && Hls.isSupported()) {
+  const nativeHlsSupport = media.canPlayType("application/vnd.apple.mpegurl");
+  let hlsSupported = false;
+  let useHlsJs = false;
+
+  if (signage || !nativeHlsSupport) {
+    hlsSupported = Boolean(window.Hls && Hls.isSupported());
+    useHlsJs = hlsSupported;
+  }
+
+  if (useHlsJs) {
+    onDebugEvent?.("playback-engine", {
+      engine: "hls.js",
+      canPlayType: nativeHlsSupport,
+      hlsSupported
+    });
     const hls = new Hls({
       enableWorker: true,
       lowLatencyMode: false,
@@ -5077,6 +5088,14 @@ function attachMediaToElement(media, cam, instanceName) {
 
     if (instanceName === "tv") tvHls = hls;
     if (instanceName === "fullscreen") fullscreenHls = hls;
+  } else if (nativeHlsSupport) {
+    onDebugEvent?.("playback-engine", {
+      engine: "native",
+      canPlayType: nativeHlsSupport,
+      hlsSupported
+    });
+    media.src = streamUrl;
+    media.play().catch(() => {});
   }
 }
 
