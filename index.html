@@ -5055,17 +5055,23 @@ function attachMediaToElement(media, cam, instanceName) {
   }
 
   if (useHlsJs) {
-    onDebugEvent?.("playback-engine", {
-      engine: "hls.js",
-      canPlayType: nativeHlsSupport,
-      hlsSupported
-    });
-    const hls = new Hls({
+    const hlsConfig = {
       enableWorker: true,
       lowLatencyMode: false,
       liveSyncDuration: 4,
       liveMaxLatencyDuration: 12
+    };
+    if (signage) {
+      hlsConfig.audioTrackController = undefined;
+      hlsConfig.audioStreamController = undefined;
+    }
+    onDebugEvent?.("playback-engine", {
+      engine: "hls.js",
+      canPlayType: nativeHlsSupport,
+      hlsSupported,
+      ...(signage ? { alternateAudio: false } : {})
     });
+    const hls = new Hls(hlsConfig);
 
     hls.loadSource(streamUrl);
     hls.attachMedia(media);
