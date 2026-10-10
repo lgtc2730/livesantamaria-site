@@ -3624,22 +3624,79 @@ const liveCameras = PUBLIC_CAMERAS.filter(cam =>
   cam.url &&
   getCameraPresentation(cam).allowStream
 );
-const TV_CAMERA_IDS = new Set([
-  "praia-poente",
-  "praia-castelo",
-  "slourenco-sul",
-  "maia-norte",
-  "anjos-porto"
-]);
+const DEFAULT_TV_CONFIG = Object.freeze({
+  durationSeconds: 20,
+  cameras: Object.freeze([
+    "praia-poente",
+    "praia-castelo",
+    "slourenco-sul",
+    "maia-norte",
+    "anjos-porto"
+  ])
+});
 const NORMAL_SLIDESHOW_DURATION_MS = 22000;
-const SIGNAGE_SLIDESHOW_DURATION_MS = 20000;
+const TV_CONFIG_FETCH_TIMEOUT_MS = 2000;
 const SIGNAGE_STARTUP_TIMEOUT_MS = 8000;
 const SIGNAGE_FAILURE_DELAY_MS = 1000;
 const TV_DEBUG_HISTORY_LIMIT = 8;
 
-function getTvCameras() {
+function validateTvConfig(value) {
+  if (!value || !Number.isInteger(value.durationSeconds)) return null;
+  if (value.durationSeconds < 5 || value.durationSeconds > 300) return null;
+  if (!Array.isArray(value.cameras)) return null;
+  if (value.cameras.some(id => typeof id !== "string" || !id.trim())) return null;
+  if (new Set(value.cameras).size !== value.cameras.length) return null;
+
+  const publicCameraIds = new Set(PUBLIC_CAMERAS.map(cam => cam.id));
+  if (value.cameras.some(id => !publicCameraIds.has(id))) return null;
+
+  return {
+    durationSeconds: value.durationSeconds,
+    cameras: [...value.cameras]
+  };
+}
+
+async function loadTvConfig() {
+  let timeoutId = null;
+  try {
+    const request = (async () => {
+      const response = await fetch("./tv.config.json", { cache: "no-store" });
+      if (!response.ok) {
+        return { config: DEFAULT_TV_CONFIG, fallbackReason: `http-${response.status}` };
+      }
+
+      let value;
+      try {
+        value = await response.json();
+      } catch {
+        return { config: DEFAULT_TV_CONFIG, fallbackReason: "invalid-json" };
+      }
+      const config = validateTvConfig(value);
+      return config
+        ? { config, fallbackReason: null }
+        : { config: DEFAULT_TV_CONFIG, fallbackReason: "invalid-config" };
+    })();
+    const timeout = new Promise(resolve => {
+      timeoutId = setTimeout(() => resolve({
+        config: DEFAULT_TV_CONFIG,
+        fallbackReason: "timeout"
+      }), TV_CONFIG_FETCH_TIMEOUT_MS);
+    });
+    return await Promise.race([request, timeout]);
+  } catch {
+    return {
+      config: DEFAULT_TV_CONFIG,
+      fallbackReason: "network"
+    };
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+function getTvCameras(config) {
+  const cameraIds = new Set(config.cameras);
   return liveCameras
-    .filter(cam => TV_CAMERA_IDS.has(cam.id))
+    .filter(cam => cameraIds.has(cam.id))
     .sort(comparePublicCameras);
 }
 
@@ -3663,6 +3720,7 @@ let tvStartupTimer = null;
 let tvFailureTimer = null;
 let tvSignageMode = false;
 let tvActiveCameras = [];
+let tvSignageDurationMs = DEFAULT_TV_CONFIG.durationSeconds * 1000;
 let tvRenderGeneration = 0;
 let tvDebugEnabled = false;
 let tvDebugTimer = null;
@@ -5331,7 +5389,7 @@ function renderCurrentSignageCamera() {
     recordTvDebugEvent("normal-rotation");
     tvIndex = (tvIndex + 1) % tvActiveCameras.length;
     renderCurrentSignageCamera();
-  }, SIGNAGE_SLIDESHOW_DURATION_MS);
+  }, tvSignageDurationMs);
 }
 
 function scheduleSignageFailure() {
@@ -5355,20 +5413,39 @@ function scheduleSignageFailure() {
   }, SIGNAGE_FAILURE_DELAY_MS);
 }
 
-function startTvMode({ signage = false, debug = false } = {}) {
+function startTvMode({
+  signage = false,
+  debug = false,
+  config = DEFAULT_TV_CONFIG,
+  configFallbackReason = null
+} = {}) {
   const tvMode = document.getElementById("tvMode");
+  const tvStage = document.getElementById("tvStage");
   const tvCloseButton = document.getElementById("tvCloseButton");
-  const cameras = signage ? getTvCameras() : liveCameras;
+  const cameras = signage ? getTvCameras(config) : liveCameras;
 
   tvRenderGeneration += 1;
   clearTvTimers();
   if (tvDebugEnabled) stopTvDebug();
-  if (!cameras.length) return false;
 
   tvSignageMode = signage;
   tvActiveCameras = cameras;
-  if (signage && debug) startTvDebug();
+  if (signage) tvSignageDurationMs = config.durationSeconds * 1000;
+  if (signage && debug) {
+    startTvDebug();
+    recordTvDebugEvent(
+      configFallbackReason ? "config-fallback" : "config-loaded",
+      configFallbackReason ? { reason: configFallbackReason } : null
+    );
+  }
   tvCloseButton.hidden = signage;
+  if (!cameras.length) {
+    if (!signage) return false;
+    destroyMediaInstance("tv");
+    tvStage.innerHTML = '<div class="tv-empty-state">Sem câmaras disponíveis.</div>';
+    tvMode.classList.add("show");
+    return true;
+  }
   tvMode.classList.add("show");
   tvIndex = 0;
 
@@ -5425,7 +5502,7 @@ function setSection(section) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-function applyInitialUrlParams() {
+async function applyInitialUrlParams() {
   const params = new URLSearchParams(window.location.search);
   const signageMode = params.get("tv") === "1";
   const debugMode = signageMode && params.get("tvDebug") === "1";
@@ -5433,7 +5510,13 @@ function applyInitialUrlParams() {
   const section = params.get("section");
 
   if (signageMode) {
-    startTvMode(debugMode ? { signage: true, debug: true } : { signage: true });
+    const { config, fallbackReason } = await loadTvConfig();
+    startTvMode({
+      signage: true,
+      ...(debugMode ? { debug: true } : {}),
+      config,
+      configFallbackReason: fallbackReason
+    });
     return;
   }
 

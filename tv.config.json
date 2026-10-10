@@ -1,0 +1,10 @@
+{
+  "durationSeconds": 20,
+  "cameras": [
+    "praia-poente",
+    "praia-castelo",
+    "slourenco-sul",
+    "maia-norte",
+    "anjos-porto"
+  ]
+}
