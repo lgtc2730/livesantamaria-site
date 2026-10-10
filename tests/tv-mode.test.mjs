@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import vm from "node:vm";
@@ -6,7 +7,7 @@ import vm from "node:vm";
 const source = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
 const expectedTvConfig = {
-  durationSeconds: 20,
+  durationSeconds: 15,
   cameras: [
     "praia-poente",
     "praia-castelo",
@@ -35,6 +36,14 @@ function extractFunction(name) {
 test("tv.config.json contains the approved signage defaults", async () => {
   const config = JSON.parse(await readFile(new URL("../tv.config.json", import.meta.url), "utf8"));
   assert.deepEqual(config, expectedTvConfig);
+});
+
+test("embedded TV fallback matches the approved signage duration", () => {
+  const fallbackBlock = source.match(/const DEFAULT_TV_CONFIG = Object\.freeze\(\{([\s\S]*?)\n\}\);/);
+  assert.ok(fallbackBlock, "embedded TV fallback missing");
+  const duration = fallbackBlock[1].match(/durationSeconds:\s*(\d+)/);
+  assert.ok(duration, "embedded TV fallback duration missing");
+  assert.equal(Number(duration[1]), 15);
 });
 
 test("TV selection intersects configured IDs with live cameras and keeps editorial order", () => {
@@ -347,7 +356,53 @@ test("normal slideshow keeps its 22 second interval and visible close button", (
   assert.deepEqual(runtime.debugStarts, []);
 });
 
-test("signage uses its allowlisted cameras, 20 second duration, and startup timeout", () => {
+test("signage QR asset declares the exact public destination", async () => {
+  const svg = await readFile(new URL("../assets/lvsm-tv-qr.svg", import.meta.url), "utf8");
+
+  assert.match(svg, /<metadata id="qr-target">https:\/\/www\.livesantamaria\.org\/<\/metadata>/);
+  assert.match(svg, /viewBox="0 0 \d+ \d+"/);
+  assert.doesNotMatch(svg, /\b(?:href|src)=/i);
+  assert.equal(
+    createHash("sha256").update(svg.replace(/\r\n/g, "\n")).digest("hex"),
+    "14aab63f1d79855ffca221729ac946d2f39cdaeb749d6a5952b9f37724b689d8"
+  );
+});
+
+test("TV QR overlay is persistent, responsive, and leaves debug below it", () => {
+  const tvModeStart = source.indexOf('<div class="tv-mode" id="tvMode">');
+  const fullscreenStart = source.indexOf('<div class="tv-mode" id="fullscreenMode">');
+  const tvMarkup = source.slice(tvModeStart, fullscreenStart);
+  const stageEnd = tvMarkup.indexOf('</div>', tvMarkup.indexOf('id="tvStage"'));
+  const qrStart = tvMarkup.indexOf('class="tv-qr"');
+
+  assert.ok(tvModeStart >= 0 && fullscreenStart > tvModeStart);
+  assert.ok(qrStart > stageEnd, "QR overlay must stay outside the rotating TV stage");
+  assert.match(tvMarkup, /src="\.\/assets\/lvsm-tv-qr\.svg"/);
+  assert.match(tvMarkup, /Veja todas as câmaras/);
+  assert.match(source, /\.tv-qr\s*\{[^}]*top:\s*clamp\(12px,\s*1\.5625vw,\s*30px\)/s);
+  assert.match(source, /\.tv-qr\s+img\s*\{[^}]*width:\s*clamp\(84px,\s*6\.25vw,\s*120px\)/s);
+  assert.match(source, /\.tv-mode\.signage\s+\.tv-debug-panel\s*\{[^}]*top:\s*clamp\(150px,\s*10\.5208vw,\s*202px\)/s);
+});
+
+test("QR is enabled only for signage and survives camera rotation", () => {
+  const signage = loadTvController();
+  const normal = loadTvController();
+
+  signage.context.result.startTvMode({ signage: true });
+  assert.equal(signage.elements.tvMode.classList.contains("signage"), true);
+
+  const rotationTimer = signage.timeouts.find(timer => timer.delay === 15000);
+  rotationTimer.callback();
+  assert.equal(signage.elements.tvMode.classList.contains("signage"), true);
+
+  signage.context.result.stopTvMode();
+  assert.equal(signage.elements.tvMode.classList.contains("signage"), false);
+
+  normal.context.result.startTvMode();
+  assert.equal(normal.elements.tvMode.classList.contains("signage"), false);
+});
+
+test("signage uses its allowlisted cameras, 15 second duration, and startup timeout", () => {
   const runtime = loadTvController();
 
   runtime.context.result.startTvMode({ signage: true });
@@ -356,7 +411,7 @@ test("signage uses its allowlisted cameras, 20 second duration, and startup time
   assert.equal(runtime.rendered[0].options.signage, true);
   assert.equal(runtime.elements.tvCloseButton.hidden, true);
   assert.equal(runtime.context.result.getSignage(), true);
-  assert.deepEqual(runtime.timeouts.map(timer => timer.delay), [8000, 20000]);
+  assert.deepEqual(runtime.timeouts.map(timer => timer.delay), [8000, 15000]);
   assert.equal(runtime.intervals.length, 0);
   assert.deepEqual(runtime.debugStarts, []);
   assert.equal(runtime.getDebugStops(), 0);
@@ -383,7 +438,7 @@ test("debug signage preserves the functional timers and only starts diagnostics"
 
   runtime.context.result.startTvMode({ signage: true, debug: true });
 
-  assert.deepEqual(runtime.timeouts.map(timer => timer.delay), [8000, 20000]);
+  assert.deepEqual(runtime.timeouts.map(timer => timer.delay), [8000, 15000]);
   assert.equal(runtime.intervals.length, 0);
   assert.deepEqual(runtime.debugStarts, [true]);
   assert.equal(runtime.rendered[0].camera.id, "tv-a");
@@ -422,7 +477,7 @@ test("callbacks from the previous signage camera cannot affect the current camer
   const runtime = loadTvController();
   runtime.context.result.startTvMode({ signage: true });
   const staleCallbacks = runtime.rendered[0].options;
-  const rotationTimer = runtime.timeouts.find(timer => timer.delay === 20000);
+  const rotationTimer = runtime.timeouts.find(timer => timer.delay === 15000);
 
   rotationTimer.callback();
   const currentStartupTimer = runtime.timeouts.at(-2);
