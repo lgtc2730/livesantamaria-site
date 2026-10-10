@@ -1790,6 +1790,38 @@
 
     .tv-mode.show { display: block; }
 
+    .tv-qr {
+      position: absolute;
+      top: clamp(12px, 1.5625vw, 30px);
+      right: clamp(12px, 1.5625vw, 30px);
+      z-index: 10;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(4px, .3125vw, 6px);
+      padding: clamp(6px, .4167vw, 8px);
+      border-radius: clamp(8px, .625vw, 12px);
+      background: #fff;
+      color: #06101b;
+      font-size: clamp(10px, .6771vw, 13px);
+      font-weight: 800;
+      line-height: 1.15;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .tv-mode.signage .tv-qr { display: flex; }
+
+    .tv-qr img {
+      display: block;
+      width: clamp(84px, 6.25vw, 120px);
+      height: clamp(84px, 6.25vw, 120px);
+    }
+
+    .tv-mode.signage .tv-debug-panel {
+      top: clamp(150px, 10.5208vw, 202px);
+    }
+
     .tv-debug-panel {
       position: absolute;
       top: 16px;
@@ -3440,6 +3472,10 @@
 
   <div class="tv-mode" id="tvMode">
     <div class="tv-stage" id="tvStage"></div>
+    <div class="tv-qr" aria-label="Veja todas as câmaras em www.livesantamaria.org">
+      <img src="./assets/lvsm-tv-qr.svg" alt="QR Code para www.livesantamaria.org">
+      <span>Veja todas as câmaras</span>
+    </div>
     <button class="close-button" id="tvCloseButton" aria-label="Fechar">×</button>
   </div>
 
@@ -3625,7 +3661,7 @@ const liveCameras = PUBLIC_CAMERAS.filter(cam =>
   getCameraPresentation(cam).allowStream
 );
 const DEFAULT_TV_CONFIG = Object.freeze({
-  durationSeconds: 20,
+  durationSeconds: 15,
   cameras: Object.freeze([
     "praia-poente",
     "praia-castelo",
@@ -5430,6 +5466,8 @@ function startTvMode({
 
   tvSignageMode = signage;
   tvActiveCameras = cameras;
+  if (signage) tvMode.classList.add("signage");
+  else tvMode.classList.remove("signage");
   if (signage) tvSignageDurationMs = config.durationSeconds * 1000;
   if (signage && debug) {
     startTvDebug();
@@ -5473,6 +5511,7 @@ function stopTvMode() {
   destroyMediaInstance("tv");
   tvStage.innerHTML = "";
   tvMode.classList.remove("show");
+  tvMode.classList.remove("signage");
   tvCloseButton.hidden = false;
   tvSignageMode = false;
   tvActiveCameras = [];
