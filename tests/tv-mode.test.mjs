@@ -324,7 +324,8 @@ function loadMediaAttachment({ hlsSupported = true } = {}) {
   class FakeHls {
     static Events = { MANIFEST_PARSED: "manifest", ERROR: "error" };
     static isSupported() { return hlsSupported; }
-    constructor() {
+    constructor(config) {
+      this.config = config;
       this.handlers = new Map();
       hlsInstances.push(this);
     }
@@ -401,12 +402,17 @@ test("signage prefers HLS.js when native HLS also claims support", () => {
   assert.equal(hlsInstances[0].url, streamUrl);
   assert.equal(hlsInstances[0].media, media);
   assert.equal(media.src, undefined);
+  assert.equal(Object.hasOwn(hlsInstances[0].config, "audioTrackController"), true);
+  assert.equal(hlsInstances[0].config.audioTrackController, undefined);
+  assert.equal(Object.hasOwn(hlsInstances[0].config, "audioStreamController"), true);
+  assert.equal(hlsInstances[0].config.audioStreamController, undefined);
   assert.deepEqual(JSON.parse(JSON.stringify(events)), [{
     event: "playback-engine",
     details: {
       engine: "hls.js",
       canPlayType: "probably",
-      hlsSupported: true
+      hlsSupported: true,
+      alternateAudio: false
     }
   }]);
 });
@@ -461,7 +467,8 @@ test("debug media hooks report manifest, HLS details, and video error details", 
       details: {
         engine: "hls.js",
         canPlayType: "",
-        hlsSupported: true
+        hlsSupported: true,
+        alternateAudio: false
       }
     },
     { event: "manifest-parsed", details: null },
@@ -492,6 +499,67 @@ test("normal slideshow retains native video controls", () => {
   assert.equal(media.controls, true);
   assert.equal(hlsInstances.length, 0);
   assert.equal(media.src, streamUrl);
+});
+
+test("normal slideshow keeps the standard HLS.js configuration", () => {
+  const { attach, hlsInstances } = loadMediaAttachment();
+  const media = fakeVideo();
+
+  attach(media, { type: "hls", url: "https://camera.test/live.m3u8" }, "tv");
+
+  assert.equal(hlsInstances.length, 1);
+  assert.equal(Object.hasOwn(hlsInstances[0].config, "audioTrackController"), false);
+  assert.equal(Object.hasOwn(hlsInstances[0].config, "audioStreamController"), false);
+});
+
+test("camera cards keep the standard HLS.js configuration", () => {
+  const hlsInstances = [];
+  const video = {
+    currentTime: 0,
+    canPlayType() { return ""; },
+    addEventListener() {}
+  };
+  class FakeHls {
+    static Events = {
+      MANIFEST_PARSED: "manifest",
+      FRAG_LOADED: "fragment",
+      ERROR: "error"
+    };
+    static ErrorTypes = { MEDIA_ERROR: "media" };
+    static isSupported() { return true; }
+    constructor(config) {
+      this.config = config;
+      hlsInstances.push(this);
+    }
+    loadSource() {}
+    attachMedia() {}
+    on() {}
+  }
+  const context = {
+    window: { Hls: FakeHls },
+    Hls: FakeHls,
+    Date,
+    setTimeout() { return 1; },
+    clearTimeout() {},
+    setInterval() { return 1; },
+    clearInterval() {},
+    getCameraPresentation() { return { allowStream: true }; },
+    setCardChecking() {},
+    setCardOffline() {},
+    setCardLive() {},
+    mediaLooksAlive() { return true; }
+  };
+  const card = {
+    hlsInstance: null,
+    querySelector(selector) { return selector === "video" ? video : null; }
+  };
+
+  vm.runInNewContext(`${extractFunction("loadHls")}; result = loadHls;`, context);
+  context.result(card, { type: "hls", url: "https://camera.test/live.m3u8" });
+
+  assert.equal(hlsInstances.length, 1);
+  assert.equal(Object.hasOwn(hlsInstances[0].config, "audioTrackController"), false);
+  assert.equal(Object.hasOwn(hlsInstances[0].config, "audioStreamController"), false);
 });
 
 function runTvExitHandlers({ signage, action }) {
