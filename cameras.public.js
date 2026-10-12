@@ -222,7 +222,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
-    "publicOrder": 7,
+    "publicOrder": 9,
     "commissioned": "2023",
     "position": {
       "lat": 36.952592,
@@ -254,7 +254,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
-    "publicOrder": 8,
+    "publicOrder": 11,
     "commissioned": "2013",
     "position": {
       "lat": 36.950908,
@@ -306,7 +306,7 @@ window.LVSM_CAMERAS = [
     "url": "https://maia-sul-cam.livesantamaria.org/cam1/index.m3u8",
     "streamUrl": "https://maia-sul-cam.livesantamaria.org/cam1hq/index.m3u8",
     "previewStreamUrl": "https://maia-sul-cam.livesantamaria.org/cam1/index.m3u8",
-    "publicOrder": 11
+    "publicOrder": 7
   },
   {
     "id": "praia-malbusca",
@@ -319,7 +319,7 @@ window.LVSM_CAMERAS = [
     "operationalState": "public",
     "publicVisibility": "public",
     "publicMedia": "stream",
-    "publicOrder": 9,
+    "publicOrder": 8,
     "commissioned": null,
     "position": {
       "lat": 36.950578,
