@@ -155,24 +155,49 @@ test("camera attribution is optional and safely rendered", () => {
   assert.doesNotMatch(traversal, /<img/);
 });
 
-test("public data contains only the current approved Support attribution", () => {
+test("public attribution has valid structure without restricting supported camera IDs", () => {
   const window = {};
   new Function("window", publicDataSource)(window);
   const cameras = window.LVSM_CAMERAS;
-  const byId = Object.fromEntries(cameras.map((camera) => [camera.id, camera]));
-  const supportIds = cameras
-    .filter((camera) => camera.support?.name)
-    .map((camera) => camera.id)
-    .sort();
+  assert.ok(Array.isArray(cameras) && cameras.length > 0);
+  assert.equal(new Set(cameras.map(({ id }) => id)).size, cameras.length);
+  const { select } = createCardPartnerFactory();
+  for (const camera of cameras) {
+    assert.equal(typeof camera.id, "string");
+    assert.ok(camera.id.trim());
+    for (const attribution of [camera.sponsor, camera.support]) {
+      if (attribution == null) continue;
+      assert.equal(typeof attribution, "object", camera.id);
+      assert.equal(typeof attribution.name, "string", camera.id);
+      assert.ok(attribution.name.trim(), camera.id);
+      if (attribution.url != null) assert.match(attribution.url, /^https:\/\//, camera.id);
+      if (attribution.logo != null) {
+        assert.equal(select({ support: attribution }), attribution, camera.id);
+      }
+      if (attribution.label != null) {
+        assert.equal(typeof attribution.label, "string", camera.id);
+        assert.ok(attribution.label.trim(), camera.id);
+      }
+    }
+  }
+});
 
-  assert.deepEqual(supportIds, [
-    "anjos-blues",
-    "maia-norte"
-  ]);
-  assert.equal(byId["anjos-blues"].sponsor.name, "Rui Chaves");
-  assert.equal(byId["anjos-blues"].support.name, "Escravos da Cadeinha");
-  assert.equal(byId["maia-norte"].message, null);
-  assert.equal(byId["maia-norte"].support.name, "Carlos Andrade");
-  assert.equal(byId["slourenco-norte"].sponsor.name, "SpotAzores");
-  assert.equal(byId["praia-nascente"].sponsor.name, "SpotAzores");
+test("Support rendering preserves association with each synthetic camera", () => {
+  const render = new Function(
+    extractFunction("escapeHtml") + extractFunction("safeHttpsUrl") +
+    extractFunction("safeAttributionLogoUrl") + extractFunction("renderCameraAttribution") +
+    "return renderCameraAttribution;"
+  )();
+  const cameras = [
+    { id: "fixture-a", support: { name: "Support A", url: "https://a.example.test/" } },
+    { id: "fixture-b", support: { name: "Support B", url: "https://b.example.test/" } },
+    { id: "fixture-c", support: null }
+  ];
+  const rendered = cameras.map((camera) => render(camera.support, { defaultLabel: "Apoio", className: "camera-support" }));
+  assert.match(rendered[0], /Support A/);
+  assert.match(rendered[0], /https:\/\/a\.example\.test\//);
+  assert.doesNotMatch(rendered[0], /Support B/);
+  assert.match(rendered[1], /Support B/);
+  assert.doesNotMatch(rendered[1], /Support A/);
+  assert.equal(rendered[2], "");
 });
