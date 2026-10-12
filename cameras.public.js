@@ -277,6 +277,38 @@ window.LVSM_CAMERAS = [
     }
   },
   {
+    "id": "maia-sul",
+    "name": "Maia-Sul",
+    "region": null,
+    "type": "hls",
+    "fallbackImage": null,
+    "preview": "./assets/previews/maia-sul.jpeg",
+    "message": "Vista sobre a Baia e Farol da Maia",
+    "status": "Em preparação",
+    "commissioned": null,
+    "publicVisibility": "public",
+    "publicMedia": "stream",
+    "operationalState": "public",
+    "position": {
+      "lat": 36.938183,
+      "lon": -25.015193,
+      "bearing": 180,
+      "fov": 65
+    },
+    "sponsor": {
+      "name": "Ricardo Botelho",
+      "logo": null,
+      "url": null,
+      "label": "Sponsor"
+    },
+    "support": null,
+    "enabled": true,
+    "url": "https://maia-sul-cam.livesantamaria.org/cam1/index.m3u8",
+    "streamUrl": "https://maia-sul-cam.livesantamaria.org/cam1hq/index.m3u8",
+    "previewStreamUrl": "https://maia-sul-cam.livesantamaria.org/cam1/index.m3u8",
+    "publicOrder": 11
+  },
+  {
     "id": "praia-malbusca",
     "name": "Praia-Malbusca",
     "region": null,
@@ -332,7 +364,10 @@ window.LVSM_CAMERAS = [
       "url": "https://pcclick.pt/",
       "label": "Sponsor"
     },
-    "support": null,
+    "support": {
+      "name": "Villa Natura",
+      "url": "https://villanaturaazores.com/"
+    },
     "enabled": true,
     "operationalState": "public",
     "fallbackImage": null,
