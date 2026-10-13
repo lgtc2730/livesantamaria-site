@@ -48,9 +48,17 @@ test("embedded TV fallback matches the approved signage configuration", () => {
   assert.deepEqual(JSON.parse(JSON.stringify(context.result)), expectedTvConfig);
 });
 
-test("tv.config.json contains the approved signage defaults", async () => {
+test("tv.config.json preserves a valid current editorial selection from the public catalog", async () => {
   const config = JSON.parse(await readFile(new URL("../tv.config.json", import.meta.url), "utf8"));
-  assert.deepEqual(config, expectedTvConfig);
+  const catalog = { window: {} };
+  vm.runInNewContext(await readFile(new URL("../cameras.public.js", import.meta.url), "utf8"), catalog);
+  assert.ok(Array.isArray(catalog.window.LVSM_CAMERAS), "public camera catalog missing");
+  const context = { PUBLIC_CAMERAS: catalog.window.LVSM_CAMERAS };
+  vm.runInNewContext([
+    extractFunction("validateTvConfig"),
+    `result = validateTvConfig(${JSON.stringify(config)});`
+  ].join("\n"), context);
+  assert.deepEqual(JSON.parse(JSON.stringify(context.result)), config);
 });
 
 test("embedded TV fallback matches the approved signage duration", () => {
