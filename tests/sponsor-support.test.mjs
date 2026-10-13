@@ -155,26 +155,38 @@ test("camera attribution is optional and safely rendered", () => {
   assert.doesNotMatch(traversal, /<img/);
 });
 
-test("public data contains only the current approved Support attribution", () => {
+test("public attribution remains valid with and without the retired camera", () => {
   const window = {};
   new Function("window", publicDataSource)(window);
-  const cameras = window.LVSM_CAMERAS;
-  const byId = Object.fromEntries(cameras.map((camera) => [camera.id, camera]));
-  const supportIds = cameras
-    .filter((camera) => camera.support?.name)
-    .map((camera) => camera.id)
-    .sort();
+  for (const cameras of [window.LVSM_CAMERAS, window.LVSM_CAMERAS.filter(({ id }) => id !== "praia-nascente")]) {
+    for (const camera of cameras) {
+      for (const attribution of [camera.sponsor, camera.support]) {
+        if (attribution == null) continue;
+        assert.equal(typeof attribution.name, "string", camera.id);
+        assert.ok(attribution.name.trim(), camera.id);
+        if (attribution.url != null) assert.match(attribution.url, /^https:\/\//, camera.id);
+        if (attribution.label != null) assert.equal(typeof attribution.label, "string", camera.id);
+      }
+    }
+    const byId = Object.fromEntries(cameras.map((camera) => [camera.id, camera]));
+    const supportIds = cameras
+      .filter((camera) => camera.support?.name)
+      .map((camera) => camera.id)
+      .sort();
 
-  assert.deepEqual(supportIds, [
-    "anjos-blues",
-    "maia-norte",
-    "malbusca-sunset"
-  ]);
-  assert.equal(byId["anjos-blues"].sponsor.name, "Rui Chaves");
-  assert.equal(byId["anjos-blues"].support.name, "Escravos da Cadeinha");
-  assert.equal(byId["maia-norte"].message, null);
-  assert.equal(byId["maia-norte"].support.name, "Carlos Andrade");
-  assert.equal(byId["malbusca-sunset"].support.name, "Maria Leonardo");
-  assert.equal(byId["slourenco-norte"].sponsor.name, "SpotAzores");
-  assert.equal(byId["praia-nascente"].sponsor.name, "SpotAzores");
+    assert.deepEqual(supportIds, [
+      "anjos-blues",
+      "maia-norte",
+      "malbusca-sunset"
+    ]);
+    assert.equal(byId["anjos-blues"].sponsor.name, "Rui Chaves");
+    assert.equal(byId["anjos-blues"].support.name, "Escravos da Cadeinha");
+    assert.equal(byId["maia-norte"].message, null);
+    assert.equal(byId["maia-norte"].support.name, "Carlos Andrade");
+    assert.equal(byId["malbusca-sunset"].support.name, "Maria Leonardo");
+    assert.equal(byId["slourenco-norte"].sponsor.name, "SpotAzores");
+    if (byId["praia-nascente"]) {
+      assert.equal(byId["praia-nascente"].sponsor.name, "SpotAzores");
+    }
+  }
 });
