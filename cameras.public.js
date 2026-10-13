@@ -208,38 +208,6 @@ window.LVSM_CAMERAS = [
     "enabled": true
   },
   {
-    "id": "praia-nascente",
-    "name": "Praia-Nascente",
-    "region": null,
-    "type": "snapshot",
-    "url": "https://www.spotazores.com/camaras/SMAFOR01/VGAcurrent.jpg",
-    "streamUrl": null,
-    "previewStreamUrl": null,
-    "refresh": 15000,
-    "fallbackImage": "./assets/fallback/praia-nascente.jpg",
-    "preview": null,
-    "message": null,
-    "status": null,
-    "publicVisibility": "public",
-    "operationalState": "public",
-    "publicOrder": 8,
-    "commissioned": "2023",
-    "position": {
-      "lat": 36.952592,
-      "lon": -25.102554,
-      "bearing": 100,
-      "fov": 65
-    },
-    "sponsor": {
-      "name": "SpotAzores",
-      "logo": "./assets/sponsors/spotazores.jpeg",
-      "url": "https://spotazores.com/",
-      "label": "Em parceria com"
-    },
-    "support": null,
-    "enabled": true
-  },
-  {
     "id": "praia-poente",
     "name": "Praia-Poente",
     "region": null,
@@ -254,7 +222,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
-    "publicOrder": 9,
+    "publicOrder": 8,
     "commissioned": "2013",
     "position": {
       "lat": 36.950908,
