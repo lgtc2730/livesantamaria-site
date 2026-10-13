@@ -340,7 +340,7 @@ window.LVSM_CAMERAS = [
     "operationalState": "public",
     "fallbackImage": null,
     "url": "https://praia-castelo-cam.livesantamaria.org/cam1/index.m3u8",
-    "streamUrl": "https://praia-castelo-cam.livesantamaria.org/cam1hq/index.m3u8",
+    "streamUrl": "https://praia-castelo-cam.livesantamaria.org/cam1hq/video1_stream.m3u8",
     "previewStreamUrl": "https://praia-castelo-cam.livesantamaria.org/cam1/index.m3u8"
   },
   {
