@@ -315,11 +315,11 @@ window.LVSM_CAMERAS = [
     "type": "hls",
     "preview": "./assets/previews/praia-castelo.jpg",
     "message": null,
-    "status": "Brevemente",
+    "status": null,
     "publicVisibility": "public",
     "publicMedia": "stream",
     "publicOrder": 9,
-    "commissioned": null,
+    "commissioned": "2026-10-10",
     "position": {
       "lat": 36.952287,
       "lon": -25.102611,
@@ -338,7 +338,7 @@ window.LVSM_CAMERAS = [
     },
     "enabled": true,
     "operationalState": "public",
-    "fallbackImage": null,
+    "fallbackImage": "./assets/fallback/praia-castelo.jpg",
     "url": "https://praia-castelo-cam.livesantamaria.org/cam1/index.m3u8",
     "streamUrl": "https://praia-castelo-cam.livesantamaria.org/cam1hq/video1_stream.m3u8",
     "previewStreamUrl": "https://praia-castelo-cam.livesantamaria.org/cam1/index.m3u8"
