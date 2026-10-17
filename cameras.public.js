@@ -251,7 +251,7 @@ window.LVSM_CAMERAS = [
     "type": "hls",
     "fallbackImage": null,
     "preview": "./assets/previews/maia-sul.jpeg",
-    "message": "Vista sobre a Baia e Farol da Maia",
+    "message": null,
     "status": "Em preparação",
     "commissioned": null,
     "publicVisibility": "public",
@@ -264,12 +264,14 @@ window.LVSM_CAMERAS = [
       "fov": 65
     },
     "sponsor": {
-      "name": "Ricardo Botelho",
+      "name": "NautiBotelho",
       "logo": null,
       "url": null,
       "label": "Sponsor"
     },
-    "support": null,
+    "support": {
+      "name": "João Andrade"
+    },
     "enabled": true,
     "url": "https://maia-sul-cam.livesantamaria.org/cam1/index.m3u8",
     "streamUrl": "https://maia-sul-cam.livesantamaria.org/cam1hq/index.m3u8",
