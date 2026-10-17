@@ -310,7 +310,7 @@ window.LVSM_CAMERAS = [
   },
   {
     "id": "praia-castelo",
-    "name": "Praia do Castelo",
+    "name": "Praia Nascente",
     "region": null,
     "type": "hls",
     "preview": "./assets/previews/praia-castelo.jpg",
