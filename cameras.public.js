@@ -494,7 +494,8 @@ window.LVSM_CAMERAS = [
       "label": "Sponsor"
     },
     "support": null,
-    "enabled": true
+    "enabled": true,
+    "operationalState": "preparing"
   },
   {
     "id": "promo-cultura-em-movimento",
