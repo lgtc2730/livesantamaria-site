@@ -471,33 +471,6 @@ window.LVSM_CAMERAS = [
     "enabled": true
   },
   {
-    "id": "aeroporto",
-    "name": "Aeroporto",
-    "region": null,
-    "type": "future",
-    "preview": "./assets/previews/aeroporto.jpeg",
-    "message": null,
-    "status": "Brevemente",
-    "publicVisibility": "public",
-    "publicMedia": "preview",
-    "commissioned": null,
-    "position": {
-      "lat": 36.975991,
-      "lon": -25.166998,
-      "bearing": 160,
-      "fov": 90
-    },
-    "sponsor": {
-      "name": "Aeroporto de Santa Maria",
-      "logo": "./assets/sponsors/vinci.jpeg",
-      "url": "https://www.ana.pt/pt",
-      "label": "Sponsor"
-    },
-    "support": null,
-    "enabled": true,
-    "operationalState": "preparing"
-  },
-  {
     "id": "promo-cultura-em-movimento",
     "name": "Cultura em Movimento",
     "region": null,
