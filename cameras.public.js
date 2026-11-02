@@ -475,7 +475,7 @@ window.LVSM_CAMERAS = [
     "name": "Cultura em Movimento",
     "region": null,
     "type": "promo",
-    "url": "https://www.exploresantamaria.pt/agenda",
+    "url": "https://scontent.flis5-4.fna.fbcdn.net/v/t39.30808-6/873505085_1688748133044256_7204059359619393861_n.jpg?stp=dst-jpg_tt6&cstp=mx1448x2048&ctp=s720x720&_nc_cat=111&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=127cfc&_nc_ohc=mw7kPuPdZHkQ7kNvwG0sfAI&_nc_oc=Adr3iR0JyUZ2EqzGU02UiNLGdeoU3WaSmQfF_lbjjVBnlv2Rsf31EpzQcakdYIoMbmc&_nc_zt=23&_nc_ht=scontent.flis5-4.fna&_nc_gid=7F92BXHPigdl_spwS2u_hQ&_nc_ss=7a2a8&oh=00_AQQ96fEwEdzdRZNtdZI8hDg7-wn2uYbNnW9Ks_xduHPsNw&oe=6AEE4783",
     "refresh": null,
     "fallbackImage": null,
     "preview": "./assets/previews/cultura-movimento.png",
