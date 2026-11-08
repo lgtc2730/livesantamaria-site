@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import vm from "node:vm";
@@ -356,35 +355,19 @@ test("normal slideshow keeps its 22 second interval and visible close button", (
   assert.deepEqual(runtime.debugStarts, []);
 });
 
-test("signage QR asset declares the exact public destination", async () => {
-  const svg = await readFile(new URL("../assets/lvsm-tv-qr.svg", import.meta.url), "utf8");
-
-  assert.match(svg, /<metadata id="qr-target">https:\/\/www\.livesantamaria\.org\/<\/metadata>/);
-  assert.match(svg, /viewBox="0 0 \d+ \d+"/);
-  assert.doesNotMatch(svg, /\b(?:href|src)=/i);
-  assert.equal(
-    createHash("sha256").update(svg.replace(/\r\n/g, "\n")).digest("hex"),
-    "14aab63f1d79855ffca221729ac946d2f39cdaeb749d6a5952b9f37724b689d8"
-  );
-});
-
-test("TV QR overlay is persistent, responsive, and leaves debug below it", () => {
+test("TV address is shown only in signage and stays outside the rotating stage", () => {
   const tvModeStart = source.indexOf('<div class="tv-mode" id="tvMode">');
   const fullscreenStart = source.indexOf('<div class="tv-mode" id="fullscreenMode">');
-  const tvMarkup = source.slice(tvModeStart, fullscreenStart);
-  const stageEnd = tvMarkup.indexOf('</div>', tvMarkup.indexOf('id="tvStage"'));
-  const qrStart = tvMarkup.indexOf('class="tv-qr"');
-
   assert.ok(tvModeStart >= 0 && fullscreenStart > tvModeStart);
-  assert.ok(qrStart > stageEnd, "QR overlay must stay outside the rotating TV stage");
-  assert.match(tvMarkup, /src="\.\/assets\/lvsm-tv-qr\.svg"/);
-  assert.match(tvMarkup, /Veja todas as câmaras/);
-  assert.match(source, /\.tv-qr\s*\{[^}]*top:\s*clamp\(12px,\s*1\.5625vw,\s*30px\)/s);
-  assert.match(source, /\.tv-qr\s+img\s*\{[^}]*width:\s*clamp\(84px,\s*6\.25vw,\s*120px\)/s);
-  assert.match(source, /\.tv-mode\.signage\s+\.tv-debug-panel\s*\{[^}]*top:\s*clamp\(150px,\s*10\.5208vw,\s*202px\)/s);
+  const tvMarkup = source.slice(tvModeStart, fullscreenStart);
+
+  assert.match(tvMarkup, /<div class="tv-stage" id="tvStage"><\/div>\s*<div class="tv-site-address">livesantamaria\.org<\/div>/);
+  assert.doesNotMatch(tvMarkup, /lvsm-tv-qr|class="tv-qr"/);
+  assert.match(source, /\.tv-site-address\s*\{[^}]*display:\s*none/);
+  assert.match(source, /\.tv-mode\.signage\s+\.tv-site-address\s*\{\s*display:\s*block/);
 });
 
-test("QR is enabled only for signage and survives camera rotation", () => {
+test("Signage class survives camera rotation and is cleared on exit", () => {
   const signage = loadTvController();
   const normal = loadTvController();
 
