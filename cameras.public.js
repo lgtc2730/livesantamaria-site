@@ -312,7 +312,7 @@ window.LVSM_CAMERAS = [
   },
   {
     "id": "praia-castelo",
-    "name": "Praia Nascente",
+    "name": "Praia-Nascente",
     "region": null,
     "type": "hls",
     "preview": "./assets/previews/praia-castelo.jpg",
@@ -467,6 +467,28 @@ window.LVSM_CAMERAS = [
       "url": "https://www.nav.pt/",
       "label": "Sponsor"
     },
+    "support": null,
+    "enabled": true
+  },
+  {
+    "id": "cascata-aveiro",
+    "name": "Maia-Cascata Aveiro",
+    "region": null,
+    "type": "future",
+    "preview": "./assets/previews/cascata-aveiro.jpeg",
+    "message": "Procuramos Sponsor",
+    "status": "Em preparação",
+    "operationalState": "future",
+    "publicVisibility": "public",
+    "publicMedia": "preview",
+    "commissioned": null,
+    "position": {
+      "lat": 36.947716,
+      "lon": -25.018765,
+      "bearing": 290,
+      "fov": 100
+    },
+    "sponsor": null,
     "support": null,
     "enabled": true
   },
