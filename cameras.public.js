@@ -23,7 +23,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
-    "publicOrder": 1,
+    "publicOrder": 2,
     "commissioned": "2020",
     "position": {
       "lat": 36.946593,
@@ -55,7 +55,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
-    "publicOrder": 2,
+    "publicOrder": 3,
     "commissioned": "2021",
     "position": {
       "lat": 37.0039,
@@ -86,7 +86,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
-    "publicOrder": 3,
+    "publicOrder": 4,
     "commissioned": "2026-07",
     "position": {
       "lat": 37.00799592,
@@ -136,7 +136,7 @@ window.LVSM_CAMERAS = [
     },
     "support": null,
     "enabled": true,
-    "publicOrder": 4
+    "publicOrder": 5
   },
   {
     "id": "slourenco-sul",
@@ -153,7 +153,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
-    "publicOrder": 5,
+    "publicOrder": 6,
     "commissioned": "2012",
     "position": {
       "lat": 36.9952,
@@ -186,7 +186,7 @@ window.LVSM_CAMERAS = [
     "commissioned": "2023",
     "publicVisibility": "public",
     "operationalState": "public",
-    "publicOrder": 6,
+    "publicOrder": 7,
     "position": {
       "lat": 36.94428,
       "lon": -25.016115,
@@ -222,7 +222,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "operationalState": "public",
-    "publicOrder": 10,
+    "publicOrder": 11,
     "commissioned": "2013",
     "position": {
       "lat": 36.950908,
@@ -274,7 +274,7 @@ window.LVSM_CAMERAS = [
     "url": "https://marina-club-motard-cam.livesantamaria.org/cam1/index.m3u8",
     "streamUrl": "https://marina-club-motard-cam.livesantamaria.org/cam1hq/index.m3u8",
     "previewStreamUrl": "https://marina-club-motard-cam.livesantamaria.org/cam1/index.m3u8",
-    "publicOrder": 11
+    "publicOrder": 1
   },
   {
     "id": "maia-sul",
@@ -308,7 +308,7 @@ window.LVSM_CAMERAS = [
     "url": "https://maia-sul-cam.livesantamaria.org/cam1/index.m3u8",
     "streamUrl": "https://maia-sul-cam.livesantamaria.org/cam1hq/index.m3u8",
     "previewStreamUrl": "https://maia-sul-cam.livesantamaria.org/cam1/index.m3u8",
-    "publicOrder": 7
+    "publicOrder": 8
   },
   {
     "id": "praia-malbusca",
@@ -321,7 +321,7 @@ window.LVSM_CAMERAS = [
     "operationalState": "public",
     "publicVisibility": "public",
     "publicMedia": "stream",
-    "publicOrder": 8,
+    "publicOrder": 9,
     "commissioned": null,
     "position": {
       "lat": 36.950578,
@@ -352,7 +352,7 @@ window.LVSM_CAMERAS = [
     "status": null,
     "publicVisibility": "public",
     "publicMedia": "stream",
-    "publicOrder": 9,
+    "publicOrder": 10,
     "commissioned": "2026-10-10",
     "position": {
       "lat": 36.952287,
