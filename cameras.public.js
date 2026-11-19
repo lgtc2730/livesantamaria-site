@@ -245,6 +245,38 @@ window.LVSM_CAMERAS = [
     }
   },
   {
+    "id": "marina-club-motard",
+    "name": "Marina-Club Motard",
+    "region": null,
+    "type": "hls",
+    "fallbackImage": null,
+    "preview": "./assets/previews/marina-club-motard.jpeg",
+    "message": null,
+    "status": "Em preparação",
+    "publicVisibility": "public",
+    "publicMedia": "stream",
+    "operationalState": "public",
+    "commissioned": null,
+    "position": {
+      "lat": 36.946241,
+      "lon": -25.146948,
+      "bearing": 160,
+      "fov": 90
+    },
+    "sponsor": {
+      "name": "Clube Motard Santa Maria",
+      "logo": "./assets/sponsors/clube-motard.jpeg",
+      "url": null,
+      "label": "Sponsor"
+    },
+    "support": null,
+    "enabled": true,
+    "url": "https://marina-club-motard-cam.livesantamaria.org/cam1/index.m3u8",
+    "streamUrl": "https://marina-club-motard-cam.livesantamaria.org/cam1hq/index.m3u8",
+    "previewStreamUrl": "https://marina-club-motard-cam.livesantamaria.org/cam1/index.m3u8",
+    "publicOrder": 11
+  },
+  {
     "id": "maia-sul",
     "name": "Maia-Sul",
     "region": null,
